@@ -19,25 +19,44 @@
   <text style="font-size:28rpx;margin-top:16rpx;">还没有渔获分享</text>
 </view>
 
-<view wx:else>
-  <view class="card post" wx:for="{{posts}}" wx:key="time">
-    <view class="post-header">
-      <view class="post-avatar">🎣</view>
-      <view class="post-user">
-        <text class="post-name">钓鱼人</text>
-        <text class="post-time">{{item.time}}</text>
+<view class="post-list" wx:else>
+  <view class="card post-card" wx:for="{{posts}}" wx:key="time">
+    <!-- Header -->
+    <view class="post-head">
+      <image wx:if="{{item.userAvatar}}" src="{{item.userAvatar}}" class="post-avatar-img" mode="aspectFill"/>
+      <view wx:else class="post-avatar-em">🎣</view>
+      <view class="post-head-info">
+        <text class="post-uname">{{item.userName}}</text>
+        <text class="post-utime">{{item.timeAgo}}</text>
       </view>
       <text class="tag tag-green" wx:if="{{item.fishType}}">{{item.fishType}}</text>
     </view>
-    <image src="{{item.photo}}" mode="aspectFill" class="post-photo" wx:if="{{item.photo}}"/>
-    <view class="post-body">
+
+    <!-- Photo -->
+    <view wx:if="{{item.photo}}" class="post-photo-wrap">
+      <image src="{{item.photo}}" mode="aspectFill" class="post-photo"/>
+      <view class="post-photo-meta" wx:if="{{item.weight || item.spot}}">
+        <text wx:if="{{item.weight}}">⚖️ {{item.weight}}斤</text>
+        <text wx:if="{{item.weight && item.spot}}"> · </text>
+        <text wx:if="{{item.spot}}">📍 {{item.spot}}</text>
+      </view>
+    </view>
+
+    <!-- Info without photo -->
+    <view wx:elif="{{item.weight || item.spot}}" class="post-info-inline">
       <text wx:if="{{item.weight}}">⚖️ {{item.weight}}斤  </text>
       <text wx:if="{{item.spot}}">📍 {{item.spot}}</text>
-      <text wx:if="{{item.note}}" class="post-note">{{item.note}}</text>
     </view>
-    <view class="post-actions">
-      <text>❤️ 0</text><text>💬 0</text>
-      <text class="del-btn" bindtap="delPost" data-idx="{{index}}">删除</text>
+
+    <!-- Note -->
+    <text wx:if="{{item.note}}" class="post-note-text">{{item.note}}</text>
+
+    <!-- Actions -->
+    <view class="post-foot">
+      <view class="post-action {{item.liked ? 'liked' : ''}}" bindtap="toggleLike" data-idx="{{index}}">
+        <text>{{item.liked ? '❤️' : '🤍'}} {{item.likes || 0}}</text>
+      </view>
+      <text class="post-del" bindtap="delPost" data-idx="{{index}}">删除</text>
     </view>
   </view>
 </view>

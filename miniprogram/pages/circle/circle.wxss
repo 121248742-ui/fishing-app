@@ -1,3 +1,4 @@
+/* Publish Form */
 .photo-upload { margin-bottom: 16rpx; }
 .photo-placeholder {
   border: 2rpx dashed #D0D5DD; border-radius: var(--radius-sm);
@@ -17,17 +18,60 @@
   font-size: 30rpx; font-weight: 700; text-align: center;
 }
 
-.post-header { display: flex; align-items: center; gap: 16rpx; margin-bottom: 16rpx; }
-.post-avatar {
-  width: 64rpx; height: 64rpx; border-radius: 50%;
-  background: linear-gradient(135deg, #E8F8EF, #C6F0D8);
-  display: flex; align-items: center; justify-content: center; font-size: 32rpx;
+/* Post Card */
+.post-list { margin-top: 8rpx; }
+.post-card { padding: 24rpx; }
+
+.post-head {
+  display: flex; align-items: center; gap: 14rpx;
 }
-.post-user { flex: 1; }
-.post-name { font-size: 28rpx; font-weight: 700; display: block; }
-.post-time { font-size: 22rpx; color: var(--text-secondary); }
-.post-photo { width: 100%; border-radius: var(--radius-sm); max-height: 500rpx; margin-bottom: 16rpx; }
-.post-body { font-size: 26rpx; color: #555; line-height: 1.8; }
-.post-note { display: block; margin-top: 8rpx; color: #333; }
-.post-actions { display: flex; gap: 30rpx; font-size: 24rpx; color: var(--text-secondary); margin-top: 16rpx; padding-top: 16rpx; border-top: 1px solid #f0f0f0; }
-.del-btn { margin-left: auto; color: var(--danger); }
+.post-avatar-img {
+  width: 72rpx; height: 72rpx; border-radius: 50%; flex-shrink: 0;
+  border: 3rpx solid #E8F8EF;
+}
+.post-avatar-em {
+  width: 72rpx; height: 72rpx; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, #E8F8EF, #C6F0D8);
+  display: flex; align-items: center; justify-content: center; font-size: 36rpx;
+}
+.post-head-info { flex: 1; }
+.post-uname { font-size: 28rpx; font-weight: 700; display: block; }
+.post-utime { font-size: 22rpx; color: var(--text-secondary); }
+
+/* Photo */
+.post-photo-wrap {
+  position: relative; border-radius: var(--radius-sm); overflow: hidden;
+  margin-top: 16rpx;
+}
+.post-photo { width: 100%; max-height: 600rpx; display: block; }
+.post-photo-meta {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 32rpx 20rpx 12rpx;
+  background: linear-gradient(transparent, rgba(0,0,0,0.5));
+  color: #fff; font-size: 24rpx;
+}
+
+/* Info without photo */
+.post-info-inline {
+  margin-top: 14rpx; font-size: 26rpx; color: var(--text-secondary);
+}
+
+/* Note */
+.post-note-text {
+  display: block; margin-top: 12rpx; font-size: 28rpx;
+  color: var(--text); line-height: 1.6;
+}
+
+/* Footer */
+.post-foot {
+  display: flex; align-items: center; margin-top: 18rpx;
+  padding-top: 16rpx; border-top: 1rpx solid #F0F2F5;
+}
+.post-action {
+  font-size: 26rpx; color: var(--text-secondary);
+  padding: 8rpx 16rpx; border-radius: 20rpx;
+  transition: all 0.2s;
+}
+.post-action.liked { color: #FA5151; }
+.post-action:active { background: #FDE8E8; }
+.post-del { margin-left: auto; font-size: 22rpx; color: #ccc; }
