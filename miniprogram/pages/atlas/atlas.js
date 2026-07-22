@@ -6,7 +6,8 @@ Page({
     unlocked: [], locked: [], unlockedCount: 0, totalCount: 0, pct: 0,
     userInfo: null, hasLogin: false,
     tempAvatar: '', tempNickname: '',
-    myPosts: [], postCount: 0, totalLikes: 0
+    myPosts: [], postCount: 0, totalLikes: 0,
+    subPage: '', noLikedPosts: false
   },
   onShow: function() {
     var atlas = wx.getStorageSync('fish_atlas') || {}
@@ -16,11 +17,9 @@ Page({
       if (rec && rec.unlocked) unlocked.push(f)
       else locked.push(f)
     })
-    var pct = Math.round(unlocked.length / all.length * 100)
     var userInfo = wx.getStorageSync('userInfo')
     var hasLogin = !!(userInfo && userInfo.code)
 
-    // My posts
     var allPosts = wx.getStorageSync('circle_posts') || []
     var myPosts = allPosts.slice().reverse()
     myPosts = myPosts.map(function(p) {
@@ -28,12 +27,14 @@ Page({
       return p
     }.bind(this))
     var totalLikes = allPosts.reduce(function(sum, p) { return sum + (p.likes || 0) }, 0)
+    var noLikedPosts = myPosts.every(function(p) { return !p.likes })
 
     this.setData({
       unlocked: unlocked, locked: locked,
-      unlockedCount: unlocked.length, totalCount: all.length, pct: pct,
+      unlockedCount: unlocked.length, totalCount: all.length,
       userInfo: userInfo, hasLogin: hasLogin,
-      myPosts: myPosts, postCount: allPosts.length, totalLikes: totalLikes
+      myPosts: myPosts, postCount: allPosts.length, totalLikes: totalLikes,
+      noLikedPosts: noLikedPosts
     })
   },
   _formatTime: function(timeStr) {
@@ -46,6 +47,12 @@ Page({
     if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前'
     if (diff < 604800000) return Math.floor(diff / 86400000) + '天前'
     return timeStr.substring(0, 10)
+  },
+  openSubPage: function(e) {
+    this.setData({ subPage: e.currentTarget.dataset.page })
+  },
+  closeSubPage: function() {
+    this.setData({ subPage: '' })
   },
   goDetail: function(e) {
     wx.navigateTo({ url: '/pages/detail/detail?id=' + e.currentTarget.dataset.id })
@@ -88,17 +95,11 @@ Page({
       success: function(res) {
         if (res.confirm) {
           wx.removeStorageSync('userInfo')
-          that.setData({ userInfo: null, hasLogin: false })
+          that.setData({ userInfo: null, hasLogin: false, subPage: '' })
         }
       }
     })
   },
-  viewMyPost: function(e) {
-    var idx = e.currentTarget.dataset.idx
-    var post = this.data.myPosts[idx]
-    if (post) this.setData({ viewPost: post })
-  },
-  closeViewPost: function() { this.setData({ viewPost: null }) },
   delMyPost: function(e) {
     var that = this
     var idx = e.currentTarget.dataset.idx

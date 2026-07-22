@@ -51,7 +51,7 @@
     </view>
 
     <view wx:if="{{item.photo}}" class="post-photo-wrap">
-      <image src="{{item.photo}}" mode="aspectFill" class="post-photo"/>
+      <image src="{{item.photo}}" mode="widthFix" class="post-photo"/>
       <view class="post-photo-meta" wx:if="{{item.weight || item.spot}}">
         <text wx:if="{{item.weight}}">⚖️ {{item.weight}}斤</text>
         <text wx:if="{{item.weight && item.spot}}"> · </text>
