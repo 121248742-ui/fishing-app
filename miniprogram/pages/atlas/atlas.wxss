@@ -5,17 +5,25 @@
 
 /* Login */
 .login-box { display: flex; flex-direction: column; align-items: center; gap: 16rpx; }
-.login-title { font-size: 36rpx; font-weight: 700; margin-top: 8rpx; }
-.login-sub { font-size: 24rpx; opacity: 0.8; }
-.avatar-placeholder {
-  width: 120rpx; height: 120rpx; border-radius: 50%;
-  background: rgba(255,255,255,0.2); display: flex;
-  align-items: center; justify-content: center; font-size: 56rpx;
+.avatar-pick-btn {
+  width: 140rpx; height: 140rpx; border-radius: 50%; padding: 0; margin: 0;
+  background: rgba(255,255,255,0.15); border: 4rpx dashed rgba(255,255,255,0.4);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
+.avatar-pick-btn::after { border: none; }
+.pick-avatar-preview { width: 100%; height: 100%; border-radius: 50%; }
+.avatar-placeholder { font-size: 48rpx; }
+.pick-hint { font-size: 22rpx; opacity: 0.7; }
+.nickname-input {
+  background: rgba(255,255,255,0.15); color: #fff; text-align: center;
+  padding: 14rpx 40rpx; border-radius: 40rpx; font-size: 28rpx;
+  width: 360rpx;
+}
+.nickname-input::placeholder { color: rgba(255,255,255,0.5); }
 .login-btn {
-  background: rgba(255,255,255,0.95); color: #07C160; font-size: 30rpx;
-  font-weight: 600; padding: 18rpx 56rpx; border-radius: 44rpx;
-  border: none; line-height: 1; margin-top: 12rpx;
+  background: rgba(255,255,255,0.95); color: #07C160; font-size: 28rpx;
+  font-weight: 600; padding: 16rpx 60rpx; border-radius: 40rpx;
+  border: none; line-height: 1; margin-top: 8rpx;
 }
 
 /* Logged in */
