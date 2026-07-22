@@ -40,27 +40,43 @@ Page({
     var userInfo = wx.getStorageSync('userInfo')
     var hasLogin = !!(userInfo && userInfo.code)
 
-    var allPosts = wx.getStorageSync('circle_posts') || []
-    var myPosts = allPosts.slice().reverse()
-    myPosts = myPosts.map(function(p) {
-      p.timeAgo = this._fmt(p.time)
-      if (p.comments) p.comments.forEach(function(c) { c.timeAgo = this._fmt(c.time) }.bind(this))
-      return p
-    }.bind(this))
-    var totalLikes = allPosts.reduce(function(s, p) { return s + (p.likes || 0) }, 0)
-    var allComments = allPosts.reduce(function(s, p) { return s + (p.comments ? p.comments.length : 0) }, 0)
-    var lastSeen = wx.getStorageSync('notify_seen') || { likes: 0, comments: 0 }
-    var newLikes = Math.max(0, totalLikes - lastSeen.likes)
-    var newComments = Math.max(0, allComments - lastSeen.comments)
+    var that = this
+    var localPosts = wx.getStorageSync('circle_posts') || []
 
-    this.setData({
-      unlocked: unlocked, locked: locked,
-      unlockedCount: unlocked.length, totalCount: all.length,
-      userInfo: userInfo, hasLogin: hasLogin,
-      myPosts: myPosts, postCount: allPosts.length, totalLikes: totalLikes,
-      allComments: allComments, newLikes: newLikes, newComments: newComments,
-      noLikedPosts: myPosts.every(function(p) { return !p.likes })
-    })
+    // Helper to render posts
+    function renderPosts(allPosts) {
+      var myPosts = allPosts.slice().reverse()
+      myPosts = myPosts.map(function(p) {
+        p.timeAgo = that._fmt(p.createTime || p.time)
+        if (p.comments) p.comments.forEach(function(c) { c.timeAgo = that._fmt(c.createTime || c.time) })
+        return p
+      })
+      var totalLikes = allPosts.reduce(function(s, p) { return s + (p.likes || 0) }, 0)
+      var allComments = allPosts.reduce(function(s, p) { return s + (p.comments ? p.comments.length : 0) }, 0)
+      var lastSeen = wx.getStorageSync('notify_seen') || { likes: 0, comments: 0 }
+      var newLikes = Math.max(0, totalLikes - lastSeen.likes)
+      var newComments = Math.max(0, allComments - lastSeen.comments)
+      that.setData({
+        unlocked: unlocked, locked: locked,
+        unlockedCount: unlocked.length, totalCount: all.length,
+        userInfo: userInfo, hasLogin: hasLogin,
+        myPosts: myPosts, postCount: allPosts.length, totalLikes: totalLikes,
+        allComments: allComments, newLikes: newLikes, newComments: newComments,
+        noLikedPosts: myPosts.every(function(p) { return !p.likes })
+      })
+    }
+
+    // Try cloud first
+    CDB.getPosts(
+      function(cloudPosts) {
+        if (cloudPosts.length > 0) {
+          renderPosts(cloudPosts)
+        } else {
+          renderPosts(localPosts)
+        }
+      },
+      function() { renderPosts(localPosts) }
+    )
   },
   _fmt: function(ts) {
     if (!ts) return ''; var then = new Date(ts).getTime(); if (isNaN(then)) return ts
