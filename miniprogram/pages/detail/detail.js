@@ -1,4 +1,5 @@
 var F = require('../../utils/fish-data')
+var CDB = require('../../utils/cloud-db')
 
 Page({
   data: { fish: {}, unlocked: false, photo: '', weight: '', spot: '', date: '' },
@@ -44,27 +45,27 @@ Page({
   unlock: function() {
     var atlas = wx.getStorageSync('fish_atlas') || {}
     atlas[this.fishId] = {
-      unlocked: true,
-      photo: this.data.photo,
-      weight: this.data.weight,
-      spot: this.data.spot,
-      date: this.data.date || new Date().toISOString().split('T')[0]
+      unlocked: true, photo: this.data.photo, weight: this.data.weight,
+      spot: this.data.spot, date: this.data.date || new Date().toISOString().split('T')[0]
     }
     wx.setStorageSync('fish_atlas', atlas)
     this.setData({ unlocked: true })
     wx.showToast({ title: '解锁成功！', icon: 'success' })
+    // Sync to cloud
+    var u = wx.getStorageSync('userInfo') || {}
+    if (u.code) { CDB.saveAtlas(u.code, atlas) }
   },
   lock: function() {
     var that = this
-    wx.showModal({
-      title: '重新锁定？',
-      content: '照片将被清除',
+    wx.showModal({ title: '重新锁定？', content: '照片将被清除',
       success: function(res) {
         if (!res.confirm) return
         var atlas = wx.getStorageSync('fish_atlas') || {}
         delete atlas[that.fishId]
         wx.setStorageSync('fish_atlas', atlas)
         that.setData({ unlocked: false, photo: '', weight: '', spot: '' })
+        var u = wx.getStorageSync('userInfo') || {}
+        if (u.code) { CDB.saveAtlas(u.code, atlas) }
       }
     })
   },

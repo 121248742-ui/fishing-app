@@ -1,14 +1,8 @@
 App({
   onLaunch: function() {
-    // Register privacy agreement if needed
-    if (wx.getPrivacySetting) {
-      wx.getPrivacySetting({
-        success: function(res) {
-          if (res.needAuthorization) {
-            // Will show privacy popup when privacy API is called
-          }
-        }
-      })
+    // Init cloud
+    if (wx.cloud) {
+      wx.cloud.init({ env: 'cloud1-5g7p2gkseb26e491', traceUser: true })
     }
   }
 })

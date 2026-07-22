@@ -3,6 +3,7 @@
   "appid": "wx2fed0a8edd3ba786",
   "projectname": "fishing-app",
   "miniprogramRoot": "miniprogram/",
+  "cloudfunctionRoot": "cloudfunctions/",
   "compileType": "miniprogram",
   "setting": {
     "urlCheck": false,

@@ -1,27 +1,47 @@
+var CDB = require('../../utils/cloud-db')
+
 Page({
   data: {
     posts: [], showForm: false, photo: '', fishType: '', weight: '', spot: '', note: '',
-    detailPost: null, detailIdx: -1, commentText: ''
+    detailPost: null, detailIdx: -1, commentText: '',
+    cloudOk: false
   },
   onShow: function() {
-    var posts = wx.getStorageSync('circle_posts') || []
-    var userInfo = wx.getStorageSync('userInfo') || {}
     var that = this
-    posts = posts.slice().reverse()
-    posts = posts.map(function(p) {
-      p.timeAgo = that._fmt(p.time)
-      p.userName = userInfo.nickName || '钓鱼人'
-      p.userAvatar = userInfo.avatarUrl || ''
-      p.liked = p.liked || false
-      p.likes = p.likes || 0
-      p.comments = p.comments || []
-      // Format comment times
-      if (p.comments.length) {
-        p.comments.forEach(function(c) { c.timeAgo = that._fmt(c.time) })
+    var userInfo = wx.getStorageSync('userInfo') || {}
+    var userId = userInfo.code || 'local'
+
+    // Try cloud first
+    CDB.getPosts(
+      function(cloudPosts) {
+        var posts = cloudPosts.map(function(p) {
+          return that._formatPost(p, userInfo, userId)
+        })
+        that.setData({ posts: posts, cloudOk: true })
+      },
+      function() {
+        // Fallback to local
+        var posts = wx.getStorageSync('circle_posts') || []
+        posts = posts.slice().reverse().map(function(p) {
+          p._id = 'local_' + p.time
+          return that._formatPost(p, userInfo, userId)
+        })
+        that.setData({ posts: posts })
       }
-      return p
-    })
-    this.setData({ posts: posts })
+    )
+  },
+  _formatPost: function(p, userInfo, userId) {
+    p.timeAgo = this._fmt(p.createTime || p.time)
+    p.userName = p.userName || userInfo.nickName || '钓鱼人'
+    p.userAvatar = p.userAvatar || userInfo.avatarUrl || ''
+    var likedBy = p.likedBy || []
+    p.liked = likedBy.indexOf(userId) !== -1
+    p.likes = (p.likes || 0)
+    p.comments = p.comments || []
+    if (p.comments.length) {
+      p.comments.forEach(function(c) { c.timeAgo = this._fmt(c.createTime || c.time) }.bind(this))
+    }
+    return p
   },
   _fmt: function(ts) {
     if (!ts) return ''
@@ -43,58 +63,106 @@ Page({
   },
   closeForm: function() { this.setData({ showForm: false }) },
   onInput: function(e) { var d = {}; d[e.currentTarget.dataset.field] = e.detail.value; this.setData(d) },
+  choosePhoto: function() {
+    var that = this
+    wx.chooseMedia({
+      count: 1, mediaType: ['image'], sourceType: ['album', 'camera'], sizeType: ['compressed'],
+      success: function(res) { that.setData({ photo: res.tempFiles[0].tempFilePath }) },
+      fail: function() {
+        wx.chooseImage({ count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'],
+          success: function(res) { that.setData({ photo: res.tempFilePaths[0] }) }
+        })
+      }
+    })
+  },
   chooseSpot: function() {
     var that = this
     wx.chooseLocation({
       success: function(res) {
-        if (res.name) {
-          that.setData({ spot: res.name, spotLat: res.latitude, spotLon: res.longitude })
-        }
-      }
-    })
-  },
-  choosePhoto: function() {
-    var that = this
-    wx.chooseMedia({
-      count: 1, mediaType: ['image'], sourceType: ['album', 'camera'],
-      sizeType: ['compressed'],
-      success: function(res) { that.setData({ photo: res.tempFiles[0].tempFilePath }) },
-      fail: function(err) {
-        // Fallback to chooseImage
-        wx.chooseImage({
-          count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'],
-          success: function(res) { that.setData({ photo: res.tempFilePaths[0] }) }
-        })
+        if (res.name) that.setData({ spot: res.name, spotLat: res.latitude, spotLon: res.longitude })
       }
     })
   },
   publish: function() {
     var u = wx.getStorageSync('userInfo')
     if (!u || !u.code) { wx.showToast({ title: '请先登录', icon: 'none' }); return }
-    var that = this
-    var d = this.data
+    var that = this, d = this.data
     if (!d.photo && !d.fishType) { wx.showToast({ title: '至少上传照片或填写鱼种', icon: 'none' }); return }
     if (!d.note.trim()) { wx.showToast({ title: '请说点什么', icon: 'none' }); return }
-    var doSave = function(savedPhoto) {
-      var posts = wx.getStorageSync('circle_posts') || []
-      posts.push({
-        photo: savedPhoto, fishType: d.fishType, weight: d.weight,
-        spot: d.spot, spotLat: d.spotLat, spotLon: d.spotLon, note: d.note,
-        time: new Date().toISOString(),
-        liked: false, likes: 0, comments: []
-      })
-      wx.setStorageSync('circle_posts', posts)
-      // Clear notifications for self-post
-      that.closeForm()
-      that.onShow()
+
+    var post = {
+      photo: d.photo, fishType: d.fishType, weight: d.weight,
+      spot: d.spot, spotLat: d.spotLat, spotLon: d.spotLon, note: d.note,
+      userName: u.nickName || '钓鱼人', userAvatar: u.avatarUrl || '',
+      likes: 0, likedBy: [], userId: u.code
     }
-    if (d.photo) {
-      var savedPath = wx.env.USER_DATA_PATH + '/post_' + Date.now() + '.jpg'
-      try { wx.getFileSystemManager().copyFileSync(d.photo, savedPath); doSave(savedPath) }
-      catch(e) { doSave(d.photo) }
-    } else { doSave('') }
+    // Save photo to persistent
+    if (post.photo && post.photo.indexOf('tmp_') !== -1) {
+      var sp = wx.env.USER_DATA_PATH + '/post_' + Date.now() + '.jpg'
+      try { wx.getFileSystemManager().copyFileSync(post.photo, sp); post.photo = sp } catch(e) {}
+    }
+
+    CDB.addPost(post,
+      function() { that.closeForm(); that.onShow() },
+      function() {
+        var posts = wx.getStorageSync('circle_posts') || []
+        post.time = new Date().toISOString()
+        posts.push(post)
+        wx.setStorageSync('circle_posts', posts)
+        that.closeForm(); that.onShow()
+      }
+    )
   },
 
+  // ---- Post Detail ----
+  openDetail: function(e) {
+    var idx = e.currentTarget.dataset.idx
+    var post = Object.assign({}, this.data.posts[idx])
+    this.setData({ detailPost: post, detailIdx: idx, commentText: '' })
+  },
+  closeDetail: function() {
+    this.setData({ detailPost: null, detailIdx: -1 })
+    this.onShow()
+  },
+  toggleLike: function(e) {
+    var that = this, idx = e.currentTarget.dataset.idx
+    var u = wx.getStorageSync('userInfo') || {}
+    var userId = u.code || 'local'
+    var post = this.data.posts[idx]
+    var newLiked = !post.liked
+
+    // Optimistic update
+    post.liked = newLiked
+    post.likes = (post.likes || 0) + (newLiked ? 1 : -1)
+    if (!post.likedBy) post.likedBy = []
+    if (newLiked) post.likedBy.push(userId)
+    else { var li = post.likedBy.indexOf(userId); if (li !== -1) post.likedBy.splice(li, 1) }
+    this.setData({ posts: this.data.posts })
+
+    if (post._id && post._id.indexOf('local_') !== 0) {
+      CDB.updatePost(post._id, { likes: post.likes, likedBy: post.likedBy }, null, null)
+    } else {
+      var posts = wx.getStorageSync('circle_posts') || []
+      var rIdx = posts.length - 1 - idx
+      if (rIdx >= 0) { posts[rIdx].likedBy = post.likedBy; posts[rIdx].likes = post.likes; wx.setStorageSync('circle_posts', posts) }
+    }
+  },
+  toggleDetailLike: function() {
+    var that = this
+    var u = wx.getStorageSync('userInfo') || {}
+    var userId = u.code || 'local'
+    var post = this.data.detailPost
+    var newLiked = !post.liked
+    post.liked = newLiked
+    post.likes = (post.likes || 0) + (newLiked ? 1 : -1)
+    if (!post.likedBy) post.likedBy = []
+    if (newLiked) post.likedBy.push(userId)
+    else { var li = post.likedBy.indexOf(userId); if (li !== -1) post.likedBy.splice(li, 1) }
+    this.setData({ detailPost: post })
+    if (post._id && post._id.indexOf('local_') !== 0) {
+      CDB.updatePost(post._id, { likes: post.likes, likedBy: post.likedBy }, null, null)
+    }
+  },
   previewPhoto: function(e) {
     var src = e.currentTarget.dataset.src
     if (src) wx.previewImage({ urls: [src], current: src })
@@ -108,89 +176,27 @@ Page({
       wx.showToast({ title: '该帖子未保存位置坐标', icon: 'none' })
     }
   },
-  // ---- Post Detail ----
-  openDetail: function(e) {
-    var idx = e.currentTarget.dataset.idx
-    var post = Object.assign({}, this.data.posts[idx])
-    this.setData({ detailPost: post, detailIdx: idx, commentText: '' })
-  },
-  closeDetail: function() {
-    this.setData({ detailPost: null, detailIdx: -1 })
-    this.onShow() // refresh
-  },
-  toggleLike: function(e) {
-    var idx = e.currentTarget.dataset.idx
-    this._doLike(idx)
-  },
-  toggleDetailLike: function() {
-    var that = this
-    this._doLike(this.data.detailIdx)
-    var posts = this.data.posts
-    this.setData({ 'detailPost.liked': posts[this.data.detailIdx].liked, 'detailPost.likes': posts[this.data.detailIdx].likes })
-  },
-  _doLike: function(idx) {
-    var posts = wx.getStorageSync('circle_posts') || []
-    var realIdx = posts.length - 1 - idx
-    if (realIdx < 0 || realIdx >= posts.length) return
-    posts[realIdx].liked = !posts[realIdx].liked
-    posts[realIdx].likes = (posts[realIdx].likes || 0) + (posts[realIdx].liked ? 1 : -1)
-    wx.setStorageSync('circle_posts', posts)
-    var dp = this.data.posts
-    dp[idx].liked = posts[realIdx].liked
-    dp[idx].likes = posts[realIdx].likes
-    this.setData({ posts: dp })
-  },
 
   // ---- Comments ----
   onCommentInput: function(e) { this.setData({ commentText: e.detail.value }) },
   sendComment: function() {
-    var that = this
-    var text = this.data.commentText.trim()
+    var that = this, text = this.data.commentText.trim()
     if (!text) return
-    var userInfo = wx.getStorageSync('userInfo') || {}
-    var posts = wx.getStorageSync('circle_posts') || []
-    var realIdx = posts.length - 1 - this.data.detailIdx
-    if (realIdx < 0 || realIdx >= posts.length) return
-    var comment = {
-      text: text,
-      userName: userInfo.nickName || '钓鱼人',
-      time: new Date().toISOString()
-    }
-    posts[realIdx].comments = posts[realIdx].comments || []
-    posts[realIdx].comments.push(comment)
-    wx.setStorageSync('circle_posts', posts)
-
-    // Update detail
+    var u = wx.getStorageSync('userInfo') || {}
+    var comment = { text: text, userName: u.nickName || '钓鱼人', replyTo: this.data.replyTo || '' }
     var dp = this.data.detailPost
+    comment.timeAgo = '刚刚'
     dp.comments = dp.comments || []
-    dp.comments.push(Object.assign({}, comment, { timeAgo: '刚刚' }))
-    this.setData({ detailPost: dp, commentText: '' })
-  },
+    dp.comments.push(comment)
+    this.setData({ detailPost: dp, commentText: '', replyTo: '' })
 
-  // ---- Edit ----
-  editDetailPost: function() {
-    var that = this
-    var p = this.data.detailPost
-    wx.showModal({
-      title: '编辑帖子',
-      editable: true,
-      placeholderText: '输入鱼种、重量、钓点、描述',
-      content: [p.fishType, p.weight ? p.weight+'斤' : '', p.spot, p.note].filter(Boolean).join(' | '),
-      success: function(res) {
-        if (!res.confirm || !res.content) return
-        var parts = res.content.split('|').map(function(s){return s.trim()})
-        var posts = wx.getStorageSync('circle_posts') || []
-        var realIdx = posts.length - 1 - that.data.detailIdx
-        if (realIdx >= 0 && realIdx < posts.length) {
-          posts[realIdx].fishType = parts[0] || ''
-          posts[realIdx].weight = parts[1] ? parts[1].replace('斤','') : ''
-          posts[realIdx].spot = parts[2] || ''
-          posts[realIdx].note = parts[3] || ''
-          wx.setStorageSync('circle_posts', posts)
-          that.closeDetail()
-        }
-      }
-    })
+    if (dp._id && dp._id.indexOf('local_') !== 0) {
+      CDB.addComment(dp._id, comment)
+    } else {
+      var posts = wx.getStorageSync('circle_posts') || []
+      var rIdx = posts.length - 1 - this.data.detailIdx
+      if (rIdx >= 0) { posts[rIdx].comments = dp.comments; wx.setStorageSync('circle_posts', posts) }
+    }
   },
 
   // ---- Delete ----
@@ -200,16 +206,38 @@ Page({
       title: '删除这条帖子？',
       success: function(res) {
         if (!res.confirm) return
-        var idx = that.data.detailIdx
-        var posts = wx.getStorageSync('circle_posts') || []
-        var realIdx = posts.length - 1 - idx
-        var p = posts[realIdx]
-        if (p && p.photo && p.photo.indexOf(wx.env.USER_DATA_PATH) === 0) {
-          try { wx.getFileSystemManager().unlinkSync(p.photo) } catch(e) {}
+        var idx = that.data.detailIdx, post = that.data.posts[idx]
+        if (post._id && post._id.indexOf('local_') !== 0) {
+          CDB.removePost(post._id, function() { that.closeDetail() })
+        } else {
+          var posts = wx.getStorageSync('circle_posts') || []
+          var rIdx = posts.length - 1 - idx
+          if (rIdx >= 0) posts.splice(rIdx, 1)
+          wx.setStorageSync('circle_posts', posts)
+          that.closeDetail()
         }
-        posts.splice(realIdx, 1)
-        wx.setStorageSync('circle_posts', posts)
-        that.closeDetail()
+      }
+    })
+  },
+  editDetailPost: function() {
+    var that = this, p = this.data.detailPost
+    wx.showModal({
+      title: '编辑帖子', editable: true,
+      placeholderText: '鱼种、重量、钓点、描述',
+      content: [p.fishType, p.weight ? p.weight+'斤' : '', p.spot, p.note].filter(Boolean).join(' | '),
+      success: function(res) {
+        if (!res.confirm || !res.content) return
+        var parts = res.content.split('|').map(function(s){return s.trim()})
+        var data = { fishType: parts[0]||'', weight: parts[1] ? parts[1].replace('斤','') : '', spot: parts[2]||'', note: parts[3]||'' }
+        if (p._id && p._id.indexOf('local_') !== 0) {
+          CDB.updatePost(p._id, data, function() { that.closeDetail() })
+        } else {
+          var posts = wx.getStorageSync('circle_posts') || []
+          var rIdx = posts.length - 1 - that.data.detailIdx
+          if (rIdx >= 0) Object.assign(posts[rIdx], data)
+          wx.setStorageSync('circle_posts', posts)
+          that.closeDetail()
+        }
       }
     })
   }

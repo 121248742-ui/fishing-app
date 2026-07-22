@@ -1,4 +1,5 @@
 var F = require('../../utils/fish-data')
+var CDB = require('../../utils/cloud-db')
 var all = F.FISH_SPECIES
 
 Page({
@@ -12,7 +13,26 @@ Page({
     commentText: '', replyTo: ''
   },
   onShow: function() {
+    var that = this
     var atlas = wx.getStorageSync('fish_atlas') || {}
+    var userInfo = wx.getStorageSync('userInfo')
+    var userId = (userInfo && userInfo.code) || 'local'
+
+    // Try cloud atlas sync
+    if (userId !== 'local') {
+      CDB.getAtlas(userId, function(cloudAtlas) {
+        if (Object.keys(cloudAtlas).length) {
+          wx.setStorageSync('fish_atlas', cloudAtlas)
+          that._renderAtlas(cloudAtlas, userInfo)
+        } else {
+          that._renderAtlas(atlas, userInfo)
+        }
+      }, function() { that._renderAtlas(atlas, userInfo) })
+    } else {
+      this._renderAtlas(atlas, userInfo)
+    }
+  },
+  _renderAtlas: function(atlas, userInfo) {
     var unlocked = [], locked = []
     all.forEach(function(f) {
       var rec = atlas[f.id]; rec && rec.unlocked ? unlocked.push(f) : locked.push(f)
