@@ -79,11 +79,13 @@
 .wf-like { font-size: 20rpx; color: #999; }
 
 /* Detail */
-.detail-photo-wrap { text-align: center; margin-bottom: 20rpx; }
-.detail-photo { width: 80%; display: inline-block; border-radius: var(--radius-sm); }
-.detail-actions { display: flex; align-items: center; justify-content: center; gap: 16rpx; padding: 0 8rpx 16rpx; border-bottom: 1px solid #F0F2F5; }
-.act-btn { font-size: 24rpx; padding: 8rpx 24rpx; border-radius: 20rpx; }
-.act-edit { color: #1AAD5F; background: #E8F8EF; }
+.detail-photo-wrap { display: flex; justify-content: center; margin-bottom: 20rpx; }
+.detail-photo { width: 80%; border-radius: var(--radius-sm); }
+.detail-actions { display: flex; align-items: center; padding: 0 8rpx 16rpx; border-bottom: 1px solid #F0F2F5; }
+.detail-like { font-size: 28rpx; color: var(--text-secondary); }
+.detail-like.active { color: #FA5151; }
+.act-btn { font-size: 24rpx; padding: 8rpx 24rpx; border-radius: 20rpx; margin-left: 12rpx; }
+.act-edit { color: #1AAD5F; background: #E8F8EF; margin-left: auto; }
 .act-del { color: #FA5151; background: #FDE8E8; }
 .detail-info { margin-bottom: 20rpx; }
 .detail-user { display: flex; align-items: center; gap: 12rpx; margin-bottom: 12rpx; }
