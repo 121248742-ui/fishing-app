@@ -83,8 +83,13 @@ Page({
   onEditInput: function(e) { var d={}; d[e.currentTarget.dataset.field]=e.detail.value; this.setData(d) },
   editChoosePhoto: function() {
     var that = this
-    wx.chooseMedia({count:1, mediaType:['image'], sourceType:['album','camera'],
-      success: function(res) { that.setData({editPhoto: res.tempFiles[0].tempFilePath}) }
+    wx.chooseMedia({count:1, mediaType:['image'], sourceType:['album','camera'], sizeType:['compressed'],
+      success: function(res) { that.setData({editPhoto: res.tempFiles[0].tempFilePath}) },
+      fail: function() {
+        wx.chooseImage({count:1, sizeType:['compressed'], sourceType:['album','camera'],
+          success: function(r) { that.setData({editPhoto: r.tempFilePaths[0]}) }
+        })
+      }
     })
   },
   saveEdit: function() {

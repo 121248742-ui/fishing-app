@@ -43,7 +43,15 @@ Page({
     var that = this
     wx.chooseMedia({
       count: 1, mediaType: ['image'], sourceType: ['album', 'camera'],
-      success: function(res) { that.setData({ photo: res.tempFiles[0].tempFilePath }) }
+      sizeType: ['compressed'],
+      success: function(res) { that.setData({ photo: res.tempFiles[0].tempFilePath }) },
+      fail: function(err) {
+        // Fallback to chooseImage
+        wx.chooseImage({
+          count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'],
+          success: function(res) { that.setData({ photo: res.tempFilePaths[0] }) }
+        })
+      }
     })
   },
   publish: function() {
