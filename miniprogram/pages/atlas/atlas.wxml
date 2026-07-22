@@ -1,3 +1,17 @@
-<view class="page">
-  <button bindtap="testTap">测试点击</button>
+<view wx:if="{{hasLogin}}" style="padding:100rpx;text-align:center;">
+  <image wx:if="{{userInfo.avatarUrl}}" src="{{userInfo.avatarUrl}}" mode="aspectFill" style="width:100rpx;height:100rpx;border-radius:50%;"/>
+  <text style="font-size:32rpx;display:block;margin-top:16rpx;">{{userInfo.nickName}}</text>
+  <text style="font-size:24rpx;color:#999;display:block;margin-top:8rpx;">已登录</text>
+</view>
+
+<view wx:else class="login-card">
+  <view class="login-inner">
+    <view class="avatar-zone" bindtap="pickAvatar">
+      <image wx:if="{{tempAvatar}}" src="{{tempAvatar}}" mode="aspectFill" class="avatar-preview"/>
+      <view wx:else class="avatar-empty"><text>📷</text></view>
+    </view>
+    <text class="avatar-tip">点击获取微信头像</text>
+    <input class="name-input" placeholder="点击获取微信昵称" bindinput="onNicknameInput" value="{{tempNickname}}"/>
+    <button class="submit-btn" bindtap="doLogin">登录</button>
+  </view>
 </view>
