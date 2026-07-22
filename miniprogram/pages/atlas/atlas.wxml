@@ -30,21 +30,20 @@
   <view class="logout-row" bindtap="doLogout"><text>退出登录</text></view>
 </view>
 
-<view class="header-banner login-banner" wx:else>
+<view class="header-banner" wx:else style="background:rgba(0,0,0,0.5);">
   <image class="login-bg" src="/images/user-bg.jpg" mode="aspectFill"/>
   <view class="login-box">
-    <text class="login-sub">登录后记录你的钓鱼旅程</text>
+    <view class="login-sub">登录后记录你的钓鱼旅程</view>
     <button class="avatar-pick-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
       <image wx:if="{{tempAvatar}}" src="{{tempAvatar}}" class="pick-avatar-preview" mode="aspectFill"/>
-      <view wx:else class="avatar-placeholder">📷</view>
+      <text wx:else class="avatar-placeholder-text">+</text>
     </button>
-    <view class="pick-actions">
-      <text class="pick-hint">点击获取微信头像</text>
-      <text class="pick-or">或</text>
-      <text class="pick-upload" bindtap="uploadAvatar">上传头像</text>
+    <view class="pick-row">
+      <text class="pick-label">点击上方获取微信头像</text>
+      <text class="pick-upload" bindtap="uploadAvatar">从相册上传</text>
     </view>
-    <input type="nickname" class="nickname-input" placeholder="点击获取微信昵称（必填）" bindinput="onNicknameInput" value="{{tempNickname}}"/>
-    <button class="login-btn" bindtap="doLogin" disabled="{{!tempAvatar || !tempNickname}}">登录</button>
+    <input type="nickname" class="nickname-input" placeholder="点击输入微信昵称（必填）" bindinput="onNicknameInput" value="{{tempNickname}}"/>
+    <button class="login-btn" bindtap="doLogin">登录</button>
   </view>
 </view>
 
