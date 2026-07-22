@@ -1,19 +1,21 @@
 .header-banner {
   margin: 24rpx 16rpx; padding: 32rpx; border-radius: var(--radius);
-  background-image: url('../../images/user-bg.jpg');
-  background-position: center; background-size: cover; background-repeat: no-repeat;
-  color: #fff; position: relative;
+  color: #fff; position: relative; overflow: hidden;
+}
+.login-bg {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 0; border-radius: var(--radius);
 }
 .header-banner::after {
   content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  border-radius: var(--radius); background: rgba(0,0,0,0.25); z-index: 0;
+  border-radius: var(--radius); background: rgba(0,0,0,0.3); z-index: 1;
 }
 .header-banner .user-row,
 .header-banner .share-banner,
 .header-banner .stats-row,
 .header-banner .logout-row,
 .header-banner .login-box,
-.header-banner .progress-section { position: relative; z-index: 1; }
+.header-banner .progress-section { position: relative; z-index: 2; }
 
 /* Login */
 .login-box { display: flex; flex-direction: column; align-items: center; gap: 16rpx; }
@@ -26,7 +28,12 @@
 .avatar-pick-btn::after { border: none; }
 .pick-avatar-preview { width: 100%; height: 100%; border-radius: 50%; }
 .avatar-placeholder { font-size: 48rpx; }
-.pick-hint { font-size: 22rpx; opacity: 0.7; }
+.pick-hint { font-size: 22rpx; opacity: 0.8; }
+.pick-actions { display: flex; align-items: center; gap: 12rpx; }
+.pick-or { font-size: 20rpx; opacity: 0.5; }
+.pick-upload { font-size: 22rpx; opacity: 0.8; text-decoration: underline; }
+.login-title { font-size: 36rpx; font-weight: 700; }
+.login-sub { font-size: 24rpx; opacity: 0.85; }
 .nickname-input {
   background: rgba(255,255,255,0.25); color: #fff; text-align: center;
   padding: 14rpx 40rpx; border-radius: 40rpx; font-size: 28rpx; width: 360rpx;

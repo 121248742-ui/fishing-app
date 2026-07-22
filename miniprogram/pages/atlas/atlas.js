@@ -167,11 +167,23 @@ Page({
     var sp=wx.env.USER_DATA_PATH+'/avatar.png'
     try{fs.copyFileSync(tp,sp);that.setData({tempAvatar:sp})}catch(e){that.setData({tempAvatar:tp})}
   },
+  uploadAvatar: function() {
+    var that = this
+    wx.chooseMedia({
+      count: 1, mediaType: ['image'], sourceType: ['album'], sizeType: ['compressed'],
+      success: function(res) {
+        var tp = res.tempFiles[0].tempFilePath
+        var sp = wx.env.USER_DATA_PATH + '/avatar.png'
+        try { wx.getFileSystemManager().copyFileSync(tp, sp) } catch(e) {}
+        that.setData({ tempAvatar: sp })
+      }
+    })
+  },
   onNicknameInput: function(e) { this.setData({tempNickname: e.detail.value}) },
   doLogin: function() {
     var that=this; var a=this.data.tempAvatar; var n=this.data.tempNickname
-    if(!a&&!n){var s=wx.getStorageSync('userInfo')||{}; a=s.avatarUrl||''; n=s.nickName||''}
-    if(!n) n='钓鱼达人'
+    if(!n){ wx.showToast({title:'请先获取微信昵称',icon:'none'}); return }
+    if(!a){ wx.showToast({title:'请先获取头像',icon:'none'}); return }
     wx.login({success:function(r){
       if(r.code){
         wx.setStorageSync('userInfo',{avatarUrl:a,nickName:n,code:r.code,loginTime:new Date().toLocaleString('zh-CN')})
