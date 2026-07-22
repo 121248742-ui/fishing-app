@@ -1,9 +1,22 @@
-.publish-btn {
-  background: linear-gradient(135deg, #1AAD5F, #2BD472); color: #fff;
-  margin: 20rpx 16rpx; padding: 24rpx; border-radius: var(--radius);
-  text-align: center; font-size: 30rpx; font-weight: 700;
-  box-shadow: 0 4rpx 16rpx rgba(26,173,95,0.25);
+.photo-upload { margin-bottom: 16rpx; }
+.photo-placeholder {
+  border: 2rpx dashed #D0D5DD; border-radius: var(--radius-sm);
+  padding: 48rpx; text-align: center; display: flex;
+  flex-direction: column; align-items: center; gap: 8rpx;
 }
+.photo-preview { width: 100%; height: 320rpx; border-radius: var(--radius-sm); }
+
+.form-input {
+  width: 100%; padding: 18rpx 0; border-bottom: 1px solid #f0f0f0;
+  font-size: 28rpx; margin-bottom: 4rpx;
+}
+.form-textarea { height: 120rpx; }
+.pub-btn {
+  background: linear-gradient(135deg, #1AAD5F, #2BD472); color: #fff;
+  margin-top: 20rpx; border-radius: var(--radius-sm);
+  font-size: 30rpx; font-weight: 700; text-align: center;
+}
+
 .post-header { display: flex; align-items: center; gap: 16rpx; margin-bottom: 16rpx; }
 .post-avatar {
   width: 64rpx; height: 64rpx; border-radius: 50%;

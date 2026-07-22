@@ -15,6 +15,31 @@
 </view>
 
 <view class="card">
+  <view class="section-title">📸 我的渔获</view>
+  <view wx:if="{{unlocked}}">
+    <image wx:if="{{photo}}" src="{{photo}}" mode="aspectFit" class="catch-photo"/>
+    <view class="catch-info">
+      <text wx:if="{{weight}}">🎣 {{weight}}斤 · </text>
+      <text>{{date}}</text>
+      <text wx:if="{{spot}}"> · {{spot}}</text>
+    </view>
+    <button class="btn-small btn-danger" bindtap="lock">🔒 重新锁定</button>
+  </view>
+  <view wx:else>
+    <view class="photo-upload" bindtap="choosePhoto">
+      <image wx:if="{{photo}}" src="{{photo}}" mode="aspectFill" class="catch-upload-preview"/>
+      <view wx:else class="photo-placeholder-small">
+        <text style="font-size:48rpx;">📷</text>
+        <text style="font-size:24rpx;color:#ccc;">上传渔获照片来解锁</text>
+      </view>
+    </view>
+    <input class="form-input" placeholder="重量（斤）" value="{{weight}}" bindinput="onInput" data-field="weight"/>
+    <input class="form-input" placeholder="钓点名称" value="{{spot}}" bindinput="onInput" data-field="spot"/>
+    <button class="pub-btn" bindtap="unlock">🔓 解锁此鱼种</button>
+  </view>
+</view>
+
+<view class="card">
   <view class="section-title">📋 基本信息</view>
   <text class="body-text">{{fish.habitat}}</text>
   <view class="peak-row">
