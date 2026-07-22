@@ -154,7 +154,7 @@
 .detail-like.active {color:#FA5151;background:#FDE8E8}
 .act-btn {font-size:24rpx;padding:10rpx 24rpx;border-radius:20rpx}
 .act-edit {color:var(--text-secondary);background:#F0F2F5;margin-left:auto}
-.act-del {color:#FA5151;background:#FDE8E8}
+.act-del {color:#FA5151;background:#FDE8E8;margin-right:16rpx}
 
 /* Comments */
 .comment-section {padding:20rpx 0 100rpx}
