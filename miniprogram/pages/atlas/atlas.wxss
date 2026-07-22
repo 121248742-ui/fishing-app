@@ -10,6 +10,7 @@
   content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
   border-radius: var(--radius); background: rgba(0,0,0,0.3); z-index: 1;
 }
+.login-banner::after { z-index: 0; pointer-events: none; }
 .header-banner .user-row,
 .header-banner .share-banner,
 .header-banner .stats-row,
