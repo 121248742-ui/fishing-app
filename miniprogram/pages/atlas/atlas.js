@@ -5,8 +5,8 @@ Page({
     if (u) this.setData({ hasLogin: true, userInfo: u })
   },
   pickAvatar: function() {
+    wx.showToast({ title: '触发', icon: 'none', duration: 500 })
     var that = this
-    // Same working code from circle page
     wx.chooseMedia({
       count: 1, mediaType: ['image'], sourceType: ['album', 'camera'],
       sizeType: ['compressed'],
