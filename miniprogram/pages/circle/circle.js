@@ -11,22 +11,29 @@ Page({
     var userInfo = wx.getStorageSync('userInfo') || {}
     var userId = userInfo.code || 'local'
 
-    // Try cloud first
+    // Load local posts first (always available)
+    var localPosts = wx.getStorageSync('circle_posts') || []
+    localPosts = localPosts.slice().reverse().map(function(p) {
+      p._id = 'local_' + p.time
+      return that._formatPost(p, userInfo, userId)
+    })
+
+    // Try cloud, merge with local
     CDB.getPosts(
       function(cloudPosts) {
-        var posts = cloudPosts.map(function(p) {
-          return that._formatPost(p, userInfo, userId)
-        })
-        that.setData({ posts: posts, cloudOk: true })
+        if (cloudPosts.length === 0 && localPosts.length > 0) {
+          // Cloud empty but local has posts - show local
+          that.setData({ posts: localPosts })
+        } else {
+          var posts = cloudPosts.map(function(p) {
+            return that._formatPost(p, userInfo, userId)
+          })
+          that.setData({ posts: posts, cloudOk: true })
+        }
       },
       function() {
-        // Fallback to local
-        var posts = wx.getStorageSync('circle_posts') || []
-        posts = posts.slice().reverse().map(function(p) {
-          p._id = 'local_' + p.time
-          return that._formatPost(p, userInfo, userId)
-        })
-        that.setData({ posts: posts })
+        // Cloud failed, show local
+        that.setData({ posts: localPosts })
       }
     )
   },
