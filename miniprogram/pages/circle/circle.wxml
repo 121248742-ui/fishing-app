@@ -101,7 +101,7 @@
           <text wx:if="{{detailPost.spot}}">📍 {{detailPost.spot}}</text>
         </view>
         <view class="detail-actions">
-          <text class="detail-like {{detailPost.liked ? 'active' : ''}}" bindtap="toggleDetailLike">❤️ {{detailPost.likes || 0}}</text>
+          <text class="detail-like {{detailPost.liked ? 'active' : ''}}" bindtap="toggleDetailLike">{{detailPost.liked ? '❤️' : '🤍'}} {{detailPost.likes || 0}}</text>
           <text class="act-btn act-edit" bindtap="editDetailPost">✏️ 重新编辑</text>
           <text class="act-btn act-del" bindtap="delDetailPost" data-idx="{{detailIdx}}">🗑️ 删除</text>
         </view>

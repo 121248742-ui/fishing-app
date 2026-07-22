@@ -149,11 +149,12 @@
 .detail-time {font-size:22rpx;color:var(--text-secondary)}
 .detail-note {font-size:28rpx;color:var(--text);line-height:1.6;margin-bottom:8rpx}
 .detail-meta {font-size:24rpx;color:var(--text-secondary);margin-bottom:12rpx}
-.detail-actions {display:flex;align-items:center;padding:0 8rpx 16rpx;border-bottom:1px solid #F0F2F5}
-.detail-like {font-size:28rpx;color:var(--text-secondary)}
-.act-btn {font-size:24rpx;padding:8rpx 24rpx;border-radius:20rpx;margin-left:12rpx}
-.act-edit {color:#1AAD5F;background:#E8F8EF;margin-left:auto}
-.act-del {color:#FA5151;background:#FDE8E8;margin-right:24rpx}
+.detail-actions {display:flex;align-items:center;gap:12rpx;padding:12rpx 0;border-bottom:1px solid #F0F2F5}
+.detail-like {font-size:32rpx;padding:12rpx 20rpx;border-radius:20rpx}
+.detail-like.active {color:#FA5151;background:#FDE8E8}
+.act-btn {font-size:24rpx;padding:10rpx 24rpx;border-radius:20rpx}
+.act-edit {color:var(--text-secondary);background:#F0F2F5;margin-left:auto}
+.act-del {color:#FA5151;background:#FDE8E8}
 
 /* Comments */
 .comment-section {padding:20rpx 0 100rpx}
