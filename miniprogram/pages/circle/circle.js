@@ -91,8 +91,12 @@ Page({
 
   openLocation: function(e) {
     var p = this.data.detailPost
-    if (p && p.spotLat) {
+    if (!p || !p.spot) return
+    if (p.spotLat) {
       wx.openLocation({ latitude: p.spotLat, longitude: p.spotLon, name: p.spot, scale: 14 })
+    } else {
+      // Try to search by name
+      wx.chooseLocation({ latitude: 35, longitude: 110 })
     }
   },
   // ---- Post Detail ----
