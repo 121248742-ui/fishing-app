@@ -99,6 +99,31 @@ Page({
     this.setData({subPage: page})
   },
   closeSubPage: function() { this.setData({subPage: ''}) },
+  delNotifItem: function(e) {
+    var that = this, idx = e.currentTarget.dataset.idx
+    wx.showModal({ title: '删除这条消息？', success: function(res) {
+      if (!res.confirm) return
+      var posts = wx.getStorageSync('circle_posts') || []
+      var realIdx = posts.length - 1 - idx
+      if (realIdx >= 0 && realIdx < posts.length) {
+        posts[realIdx].likes = 0
+        posts[realIdx].likedBy = []
+        wx.setStorageSync('circle_posts', posts)
+      }
+      that.onShow()
+    }})
+  },
+  clearAllNotif: function() {
+    var that = this
+    wx.showModal({ title: '清空所有消息？', content: '所有点赞记录将被清除', success: function(res) {
+      if (!res.confirm) return
+      var posts = wx.getStorageSync('circle_posts') || []
+      posts.forEach(function(p) { p.likes = 0; p.likedBy = [] })
+      wx.setStorageSync('circle_posts', posts)
+      wx.setStorageSync('notify_seen', { likes: 0, comments: 0 })
+      that.onShow()
+    }})
+  },
   markNotifRead: function() {
     var ap = wx.getStorageSync('circle_posts') || []
     var likes = ap.reduce(function(s,p){return s+(p.likes||0)},0)

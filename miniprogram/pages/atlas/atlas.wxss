@@ -105,6 +105,7 @@
 .mp-name { font-size: 28rpx; font-weight: 700; display: block; }
 .mp-note { font-size: 24rpx; color: #555; display: block; margin-top: 4rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mp-meta { font-size: 22rpx; color: var(--text-secondary); display: block; margin-top: 6rpx; }
+.msg-del {font-size:28rpx;color:#ccc;padding:8rpx;flex-shrink:0}
 .mp-del-btn { background: none; color: #FA5151; font-size: 22rpx; padding: 8rpx 16rpx; border: 1rpx solid #FDE8E8; border-radius: 20rpx; }
 .mp-arrow { font-size: 32rpx; color: #ccc; flex-shrink: 0; }
 .mp-actions { display: flex; align-items: center; gap: 12rpx; flex-shrink: 0; margin-left: 12rpx; }
