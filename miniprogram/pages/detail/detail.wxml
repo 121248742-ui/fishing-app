@@ -15,6 +15,28 @@
 </view>
 
 <view class="card">
+  <view class="section-title">📋 基本信息</view>
+  <text class="body-text">{{fish.habitat}}</text>
+  <view class="peak-row">
+    <text class="tag tag-green" wx:for="{{fish.peakMonths}}" wx:key="*this">旺季{{item}}月</text>
+  </view>
+  <text class="record-text">📏 {{fish.record}}</text>
+</view>
+
+<view class="card">
+  <view class="section-title">🪱 推荐饵料</view>
+  <view class="bait-row">
+    <text class="tag-{{item.tier}}" wx:for="{{fish.bait}}" wx:key="name">{{item.name}}</text>
+  </view>
+</view>
+
+<view class="card">
+  <view class="section-title">🎣 作钓思路</view>
+  <text class="body-text">{{fish.technique}}</text>
+  <view class="tips-box">💡 {{fish.tips}}</view>
+</view>
+
+<view class="card">
   <view class="section-title">📸 我的渔获</view>
   <view wx:if="{{unlocked}}">
     <image wx:if="{{photo}}" src="{{photo}}" mode="aspectFit" class="catch-photo"/>
@@ -37,26 +59,4 @@
     <view class="form-input pick-spot" bindtap="chooseSpot">{{spot || '📍 钓点 选填（点击选择）'}}</view>
     <button class="pub-btn" bindtap="unlock">🔓 解锁此鱼种</button>
   </view>
-</view>
-
-<view class="card">
-  <view class="section-title">📋 基本信息</view>
-  <text class="body-text">{{fish.habitat}}</text>
-  <view class="peak-row">
-    <text class="tag tag-green" wx:for="{{fish.peakMonths}}" wx:key="*this">旺季{{item}}月</text>
-  </view>
-  <text class="record-text">📏 {{fish.record}}</text>
-</view>
-
-<view class="card">
-  <view class="section-title">🪱 推荐饵料</view>
-  <view class="bait-row">
-    <text class="tag-{{item.tier}}" wx:for="{{fish.bait}}" wx:key="name">{{item.name}}</text>
-  </view>
-</view>
-
-<view class="card">
-  <view class="section-title">🎣 作钓思路</view>
-  <text class="body-text">{{fish.technique}}</text>
-  <view class="tips-box">💡 {{fish.tips}}</view>
 </view>
