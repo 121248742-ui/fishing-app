@@ -102,15 +102,15 @@
       <text style="font-size:64rpx;">📝</text>
       <text style="font-size:28rpx;margin-top:16rpx;">还没有发过帖子</text>
     </view>
-    <view class="mp-item" wx:for="{{myPosts}}" wx:key="time">
+    <view class="mp-item" wx:for="{{myPosts}}" wx:key="time" bindtap="openMyPost" data-idx="{{index}}">
       <image wx:if="{{item.photo}}" src="{{item.photo}}" mode="aspectFill" class="mp-thumb"/>
       <view wx:else class="mp-thumb-empty">🎣</view>
       <view class="mp-info">
         <text class="mp-name">{{item.fishType || '渔获分享'}}</text>
         <text class="mp-note" wx:if="{{item.note}}">{{item.note}}</text>
-        <text class="mp-meta">{{item.weight ? '⚖️' + item.weight + '斤  ' : ''}}{{item.timeAgo}}  ❤️ {{item.likes || 0}}</text>
+        <text class="mp-meta">{{item.weight ? '⚖️' + item.weight + '斤  ' : ''}}{{item.timeAgo}}  ❤️ {{item.likes || 0}}  💬 {{item.comments ? item.comments.length : 0}}</text>
       </view>
-      <button class="mp-del-btn" catchtap="delMyPost" data-idx="{{index}}">删除</button>
+      <text class="mp-arrow">›</text>
     </view>
   </scroll-view>
 </view>
@@ -140,4 +140,63 @@
       <text style="font-size:28rpx;margin-top:16rpx;">还没有收到赞</text>
     </view>
   </scroll-view>
+</view>
+
+<!-- My Post Detail + Edit Overlay -->
+<view wx:if="{{viewPost}}" class="overlay">
+  <view class="overlay-mask" bindtap="closeViewPost"></view>
+  <view class="overlay-panel">
+    <view class="overlay-head">
+      <text class="overlay-title">{{editing ? '编辑帖子' : '帖子详情'}}</text>
+      <text class="overlay-close" bindtap="closeViewPost">✕</text>
+    </view>
+    <scroll-view scroll-y class="overlay-body">
+      <view wx:if="{{editing}}">
+        <view class="photo-upload" bindtap="editChoosePhoto">
+          <image wx:if="{{editPhoto || viewPost.photo}}" src="{{editPhoto || viewPost.photo}}" mode="aspectFill" class="photo-preview"/>
+          <view wx:else class="photo-placeholder"><text style="font-size:48rpx;">📷</text><text style="font-size:22rpx;color:#ccc;">点击更换照片</text></view>
+        </view>
+        <input class="form-input" placeholder="鱼种名称" value="{{editFishType}}" bindinput="onEditInput" data-field="editFishType"/>
+        <input class="form-input" placeholder="重量（斤）" value="{{editWeight}}" bindinput="onEditInput" data-field="editWeight"/>
+        <input class="form-input" placeholder="钓点名称" value="{{editSpot}}" bindinput="onEditInput" data-field="editSpot"/>
+        <textarea class="form-input form-textarea" placeholder="说点什么..." value="{{editNote}}" bindinput="onEditInput" data-field="editNote"/>
+        <view style="display:flex;gap:16rpx;margin-top:24rpx;">
+          <button class="pub-btn" style="flex:1;background:#999;" bindtap="closeViewPost">取消</button>
+          <button class="pub-btn" style="flex:1;" bindtap="saveEdit">保存</button>
+        </view>
+      </view>
+      <view wx:else>
+        <image wx:if="{{viewPost.photo}}" src="{{viewPost.photo}}" mode="widthFix" class="detail-photo"/>
+        <view class="detail-info">
+          <view class="detail-user">
+            <view class="detail-avatar-em">🎣</view>
+            <view><text class="detail-username">{{userInfo.nickName || '钓鱼人'}}</text><text class="detail-time">{{viewPost.timeAgo}}</text></view>
+            <text class="tag tag-green" wx:if="{{viewPost.fishType}}">{{viewPost.fishType}}</text>
+          </view>
+          <text wx:if="{{viewPost.note}}" class="detail-note">{{viewPost.note}}</text>
+          <view class="detail-meta" wx:if="{{viewPost.weight || viewPost.spot}}">
+            <text wx:if="{{viewPost.weight}}">⚖️ {{viewPost.weight}}斤  </text><text wx:if="{{viewPost.spot}}">📍 {{viewPost.spot}}</text>
+          </view>
+          <view class="detail-actions">
+            <text class="detail-like">❤️ {{viewPost.likes || 0}}</text>
+            <text style="font-size:24rpx;color:#1AAD5F;margin-left:auto;margin-right:16rpx;" bindtap="startEdit">✏️ 编辑</text>
+            <text style="font-size:24rpx;color:#FA5151;" catchtap="delMyPost" data-idx="{{viewPostIdx}}">🗑️ 删除</text>
+          </view>
+        </view>
+        <view class="comment-section">
+          <text class="comment-title">💬 评论 ({{viewPost.comments ? viewPost.comments.length : 0}})</text>
+          <view class="comment-item" wx:for="{{viewPost.comments}}" wx:key="time" wx:for-item="c" bindtap="replyToComment" data-name="{{c.userName}}">
+            <text class="comment-user">{{c.userName}}</text>
+            <text wx:if="{{c.replyTo}}" class="comment-reply"> 回复 {{c.replyTo}}</text>
+            <text class="comment-text">: {{c.text}}</text>
+            <text class="comment-time">{{c.timeAgo}}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+    <view wx:if="{{!editing}}" class="comment-bar">
+      <input class="comment-input" placeholder="{{replyTo ? '回复 ' + replyTo + '...' : '写评论...'}}" value="{{commentText}}" bindinput="onCommentInput" confirm-type="send" bindconfirm="sendMyComment"/>
+      <text class="comment-send" bindtap="sendMyComment">发送</text>
+    </view>
+  </view>
 </view>
