@@ -768,8 +768,7 @@ function renderFishDetail(f) {
   // Large hero image
   var heroHtml = f.image
     ? '<div class="fish-detail-hero">' +
-        '<img src="' + f.image + '" alt="' + f.name + '" onclick="viewFullImage(this.src)">' +
-        '<div class="fish-detail-hero-tip">点击查看大图</div>' +
+        '<img src="' + f.image + '" alt="' + f.name + '">' +
       '</div>'
     : '<div class="fish-detail-hero fish-detail-hero-empty">' +
         '<span style="font-size:64px;">🐟</span>' +
