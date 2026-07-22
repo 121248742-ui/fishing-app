@@ -24,7 +24,7 @@
 <view class="header-banner login-banner" wx:else>
   <image class="login-bg" src="/images/user-bg.jpg" mode="aspectFill"/>
   <view class="login-inner">
-    <text class="login-welcome">欢迎来到钓鱼助手</text>
+    <text class="login-welcome">解锁生涯钓鱼图鉴</text>
     <button class="avatar-zone" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
       <image wx:if="{{tempAvatar}}" src="{{tempAvatar}}" mode="aspectFill" class="avatar-preview"/>
       <view wx:else class="avatar-empty"><text>📷</text></view>

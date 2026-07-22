@@ -5,7 +5,11 @@
 }
 .login-bg {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  z-index: 0; border-radius: var(--radius); pointer-events: none;
+  z-index: 0; border-radius: var(--radius);
+}
+.header-banner::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: var(--radius); background: rgba(0,0,0,0.35); z-index: 0;
 }
 
 .header-banner .user-row,
@@ -13,6 +17,7 @@
 .header-banner .stats-row,
 .header-banner .logout-row,
 .header-banner .login-box,
+.header-banner .login-inner,
 .header-banner .progress-section { position: relative; z-index: 2; }
 
 /* Login Card - shares header-banner base */
