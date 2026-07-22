@@ -15,32 +15,30 @@
 .header-banner .login-box,
 .header-banner .progress-section { position: relative; z-index: 2; }
 
-/* Login Card - no absolute positioning */
-.login-card {
-  margin: 24rpx 16rpx; padding: 56rpx 32rpx; border-radius: var(--radius);
-  background: linear-gradient(135deg, #1A7A3D, #1AAD5F); color: #fff;
-}
-.login-inner { display: flex; flex-direction: column; align-items: center; gap: 20rpx; }
+/* Login Card - shares header-banner base */
+.login-banner { padding: 56rpx 32rpx; background: rgba(0,0,0,0.4); }
+.login-inner { display: flex; flex-direction: column; align-items: center; gap: 20rpx; position: relative; z-index: 2; }
+.login-welcome { font-size: 28rpx; font-weight: 600; opacity: 0.9; margin-bottom: 8rpx; }
 .avatar-zone {
   width: 140rpx; height: 140rpx; border-radius: 50%; padding: 0;
-  background: rgba(255,255,255,0.25); border: 3rpx dashed rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.2); border: 3rpx dashed rgba(255,255,255,0.45);
   display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
 .avatar-zone::after { border: none; }
 .avatar-preview { width: 140rpx; height: 140rpx; border-radius: 50%; }
 .avatar-empty { font-size: 56rpx; }
-.avatar-tip { font-size: 24rpx; opacity: 0.85; }
+.avatar-tip { font-size: 24rpx; opacity: 0.8; }
 .avatar-row { display: flex; align-items: center; gap: 12rpx; }
-.avatar-or { font-size: 22rpx; opacity: 0.4; }
+.avatar-or { font-size: 22rpx; opacity: 0.35; }
 .avatar-custom { font-size: 24rpx; opacity: 0.8; text-decoration: underline; }
 .name-input {
-  background: rgba(255,255,255,0.25); color: #fff; text-align: center;
-  padding: 16rpx 40rpx; border-radius: 40rpx; font-size: 28rpx; width: 400rpx;
+  background: rgba(255,255,255,0.2); color: #fff; text-align: center;
+  padding: 16rpx 40rpx; border-radius: 40rpx; font-size: 28rpx; width: 420rpx;
 }
-.name-input::placeholder { color: rgba(255,255,255,0.55); }
+.name-input::placeholder { color: rgba(255,255,255,0.5); }
 .submit-btn {
   background: #fff; color: #1AAD5F; font-size: 30rpx; font-weight: 700;
-  padding: 18rpx 80rpx; border-radius: 44rpx; line-height: 1; margin-top: 8rpx;
+  padding: 18rpx 100rpx; border-radius: 44rpx; line-height: 1; margin-top: 12rpx;
 }
 
 /* Logged in */
