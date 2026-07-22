@@ -29,10 +29,32 @@ Page({
     wx.navigateTo({ url: '/pages/detail/detail?id=' + e.currentTarget.dataset.id })
   },
   onChooseAvatar: function(e) {
-    var avatarUrl = e.detail.avatarUrl
-    var userInfo = this.data.userInfo || {}
-    userInfo.avatarUrl = avatarUrl
-    this.setData({ 'userInfo.avatarUrl': avatarUrl })
+    var that = this
+    var tempPath = e.detail.avatarUrl
+    // Copy temp file to persistent storage
+    var fs = wx.getFileSystemManager()
+    var savedPath = wx.env.USER_DATA_PATH + '/avatar_' + Date.now() + '.png'
+    fs.copyFile({
+      srcPath: tempPath,
+      destPath: savedPath,
+      success: function() {
+        // Remove old avatar if exists
+        var oldInfo = wx.getStorageSync('userInfo') || {}
+        if (oldInfo.avatarUrl && oldInfo.avatarUrl.indexOf(wx.env.USER_DATA_PATH) === 0) {
+          try { fs.unlinkSync(oldInfo.avatarUrl) } catch(e) {}
+        }
+        var userInfo = oldInfo
+        userInfo.avatarUrl = savedPath
+        wx.setStorageSync('userInfo', userInfo)
+        that.setData({ userInfo: userInfo, 'userInfo.avatarUrl': savedPath })
+      },
+      fail: function() {
+        // Fallback: store temp path directly
+        var userInfo = that.data.userInfo || {}
+        userInfo.avatarUrl = tempPath
+        that.setData({ userInfo: userInfo, 'userInfo.avatarUrl': tempPath })
+      }
+    })
   },
   onNicknameInput: function(e) {
     var userInfo = this.data.userInfo || {}
@@ -41,10 +63,14 @@ Page({
   },
   doLogin: function() {
     var that = this
+    // Ensure userInfo from data is synced to storage
+    var userInfo = that.data.userInfo || wx.getStorageSync('userInfo') || {}
+    if (!userInfo.nickName) {
+      userInfo.nickName = '钓鱼达人'
+    }
     wx.login({
       success: function(res) {
         if (res.code) {
-          var userInfo = that.data.userInfo || {}
           userInfo.code = res.code
           userInfo.loginTime = new Date().toLocaleString('zh-CN')
           wx.setStorageSync('userInfo', userInfo)
