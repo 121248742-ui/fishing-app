@@ -1,0 +1,11 @@
+images/
+*.png
+*.jpg
+*.jpeg
+*.svg
+index.html
+*.py
+*.sh
+*.md
+docs/
+auth-qr.png
