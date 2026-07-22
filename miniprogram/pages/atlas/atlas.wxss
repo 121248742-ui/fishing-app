@@ -1,7 +1,13 @@
 .header-banner {
   margin: 24rpx 16rpx; padding: 32rpx; border-radius: var(--radius);
-  background: linear-gradient(135deg, #1AAD5F, #2BD472); color: #fff;
+  background: url('/images/user-bg.jpg') center/cover no-repeat;
+  color: #fff; position: relative;
 }
+.header-banner::after {
+  content: ''; position: absolute; inset: 0; border-radius: var(--radius);
+  background: rgba(0,0,0,0.25); z-index: 0;
+}
+.header-banner > * { position: relative; z-index: 1; }
 
 /* Login */
 .login-box { display: flex; flex-direction: column; align-items: center; gap: 16rpx; }

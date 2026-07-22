@@ -161,62 +161,21 @@ Page({
     }})
   },
 
-  // Login - one click
-  doLogin: function() {
-    var that = this
-    wx.getUserProfile({
-      desc: '用于展示用户头像和昵称',
-      success: function(profileRes) {
-        var userInfo = profileRes.userInfo
-        // Save avatar to persistent storage
-        if (userInfo.avatarUrl) {
-          wx.downloadFile({
-            url: userInfo.avatarUrl,
-            success: function(dfRes) {
-              var savedPath = wx.env.USER_DATA_PATH + '/avatar.png'
-              try { wx.getFileSystemManager().copyFileSync(dfRes.tempFilePath, savedPath) } catch(e) {}
-              userInfo.avatarUrl = savedPath
-              that._finishLogin(userInfo)
-            },
-            fail: function() { that._finishLogin(userInfo) }
-          })
-        } else {
-          that._finishLogin(userInfo)
-        }
-      },
-      fail: function() {
-        that.setData({ showLoginDetail: true })
-      }
-    })
-  },
-  _finishLogin: function(userInfo) {
-    var that = this
-    wx.login({
-      success: function(res) {
-        if (res.code) {
-          userInfo.code = res.code
-          userInfo.loginTime = new Date().toLocaleString('zh-CN')
-          wx.setStorageSync('userInfo', userInfo)
-          that.setData({ userInfo: userInfo, hasLogin: true, showLoginDetail: false, tempAvatar: '', tempNickname: '' })
-          wx.showToast({ title: '登录成功', icon: 'success' })
-        }
-      }
-    })
-  },
+  // Login
   onChooseAvatar: function(e) {
     var that=this; var tp=e.detail.avatarUrl; var fs=wx.getFileSystemManager()
     var sp=wx.env.USER_DATA_PATH+'/avatar.png'
     try{fs.copyFileSync(tp,sp);that.setData({tempAvatar:sp})}catch(e){that.setData({tempAvatar:tp})}
   },
   onNicknameInput: function(e) { this.setData({tempNickname: e.detail.value}) },
-  doLoginManual: function() {
+  doLogin: function() {
     var that=this; var a=this.data.tempAvatar; var n=this.data.tempNickname
     if(!a&&!n){var s=wx.getStorageSync('userInfo')||{}; a=s.avatarUrl||''; n=s.nickName||''}
     if(!n) n='钓鱼达人'
     wx.login({success:function(r){
       if(r.code){
         wx.setStorageSync('userInfo',{avatarUrl:a,nickName:n,code:r.code,loginTime:new Date().toLocaleString('zh-CN')})
-        that.setData({userInfo:{avatarUrl:a,nickName:n,code:r.code},hasLogin:true,showLoginDetail:false,tempAvatar:'',tempNickname:''})
+        that.setData({userInfo:{avatarUrl:a,nickName:n,code:r.code},hasLogin:true,tempAvatar:'',tempNickname:''})
         wx.showToast({title:'登录成功',icon:'success'})
       }
     }})

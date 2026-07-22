@@ -30,20 +30,14 @@
 </view>
 
 <view class="header-banner" wx:else>
-  <view class="login-box" wx:if="{{!showLoginDetail}}">
-    <view class="avatar-placeholder">🎣</view>
-    <view class="login-title">钓鱼助手</view>
-    <view class="login-sub">登录后记录你的钓鱼旅程</view>
-    <button class="login-btn" bindtap="doLogin">一键获取微信头像昵称</button>
-  </view>
-  <view class="login-box" wx:else>
+  <view class="login-box">
     <button class="avatar-pick-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
       <image wx:if="{{tempAvatar}}" src="{{tempAvatar}}" class="pick-avatar-preview" mode="aspectFill"/>
       <view wx:else class="avatar-placeholder">📷</view>
     </button>
-    <view class="pick-hint">点击头像获取微信头像</view>
+    <view class="pick-hint">点击获取微信头像</view>
     <input type="nickname" class="nickname-input" placeholder="点击获取微信昵称" bindinput="onNicknameInput" value="{{tempNickname}}"/>
-    <button class="login-btn" bindtap="doLoginManual">完成登录</button>
+    <button class="login-btn" bindtap="doLogin">登录</button>
   </view>
 </view>
 
