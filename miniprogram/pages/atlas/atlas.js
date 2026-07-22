@@ -177,6 +177,19 @@ Page({
       }
     }})
   },
+  shareAtlas: function() {
+    var that = this
+    wx.showModal({
+      title: '分享图鉴',
+      content: '已解锁 ' + this.data.unlockedCount + '/' + this.data.totalCount + ' 种鱼，完成度 ' + Math.round(this.data.unlockedCount/this.data.totalCount*100) + '%',
+      confirmText: '去分享',
+      success: function(res) {
+        if (res.confirm) {
+          that.setData({ subPage: 'share' })
+        }
+      }
+    })
+  },
   doLogout: function() {
     var that=this
     wx.showModal({title:'退出登录？',success:function(r){if(r.confirm){wx.removeStorageSync('userInfo');that.setData({userInfo:null,hasLogin:false,subPage:''})}}})

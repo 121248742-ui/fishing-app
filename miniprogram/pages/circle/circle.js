@@ -89,6 +89,10 @@ Page({
     } else { doSave('') }
   },
 
+  previewPhoto: function(e) {
+    var src = e.currentTarget.dataset.src
+    if (src) wx.previewImage({ urls: [src], current: src })
+  },
   openLocation: function(e) {
     var p = this.data.detailPost
     if (!p || !p.spot) return
