@@ -54,6 +54,9 @@ Page({
 
   openSubPage: function(e) {
     var page = e.currentTarget.dataset.page
+    if (page === 'share') {
+      wx.showShareMenu({ withShareTicket: true, menus: ['shareAppMessage', 'shareTimeline'] })
+    }
     if (page === 'likes') {
       var ap = wx.getStorageSync('circle_posts') || []
       var likes = ap.reduce(function(s,p){return s+(p.likes||0)},0)
@@ -178,17 +181,20 @@ Page({
     }})
   },
   shareAtlas: function() {
-    var that = this
-    wx.showModal({
-      title: '分享图鉴',
-      content: '已解锁 ' + this.data.unlockedCount + '/' + this.data.totalCount + ' 种鱼，完成度 ' + Math.round(this.data.unlockedCount/this.data.totalCount*100) + '%',
-      confirmText: '去分享',
-      success: function(res) {
-        if (res.confirm) {
-          that.setData({ subPage: 'share' })
-        }
-      }
-    })
+    this.setData({ subPage: 'share' })
+  },
+  onShareAppMessage: function() {
+    return {
+      title: '🎣 我的钓鱼图鉴 - 已解锁' + this.data.unlockedCount + '/' + this.data.totalCount + '种鱼',
+      path: '/pages/atlas/atlas',
+      imageUrl: this.data.unlocked.length > 0 ? this.data.unlocked[0].image : ''
+    }
+  },
+  onShareTimeline: function() {
+    return {
+      title: '🎣 已解锁' + this.data.unlockedCount + '/' + this.data.totalCount + '种鱼，完成度' + Math.round(this.data.unlockedCount/this.data.totalCount*100) + '%',
+      query: 'share=1'
+    }
   },
   doLogout: function() {
     var that=this
