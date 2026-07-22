@@ -224,7 +224,6 @@ Page({
         advice.push('🎯 建议作钓鱼种：')
         topFish.forEach(function(f, i) {
           advice.push((i+1) + '. ' + f.name + ' — ' + f.bait)
-          advice.push('   ' + f.reason)
         })
 
         that.setData({ weather: weather, forecast: forecast, score: score, advice: advice, loading: false })
