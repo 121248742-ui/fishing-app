@@ -45,8 +45,9 @@
   },
   "permission": {
     "scope.userLocation": {
-      "desc": "用于在地图上选择钓点位置并获取当地天气"
+      "desc": "需要获取位置信息来在地图上选择钓点，并查看钓点当地的实时天气和钓鱼指数"
     }
   },
-  "requiredPrivateInfos": ["chooseLocation", "getLocation"]
+  "requiredPrivateInfos": ["chooseLocation"],
+  "__usePrivacyCheck__": true
 }
