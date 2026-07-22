@@ -57,7 +57,7 @@
   background: #fff; border-radius: 14rpx; overflow: hidden;
   box-shadow: 0 1px 6px rgba(0,0,0,0.04);
 }
-.wf-img { width: 100%; display: block; }
+.wf-img { width: 100%; height: 320rpx; display: block; object-fit: cover; }
 .wf-img-empty {
   width: 100%; height: 280rpx; background: linear-gradient(135deg, #E8F8EF, #C6F0D8);
   display: flex; align-items: center; justify-content: center; font-size: 64rpx;

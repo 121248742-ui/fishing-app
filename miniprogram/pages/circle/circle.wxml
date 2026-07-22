@@ -40,7 +40,7 @@
   <view class="wf-col">
     <block wx:for="{{posts}}" wx:key="time" wx:if="{{index % 2 === 0}}">
       <view class="wf-card" bindtap="openDetail" data-idx="{{index}}">
-        <image wx:if="{{item.photo}}" src="{{item.photo}}" mode="widthFix" class="wf-img"/>
+        <image wx:if="{{item.photo}}" src="{{item.photo}}" mode="aspectFill" class="wf-img"/>
         <view wx:else class="wf-img-empty">🎣</view>
         <view class="wf-body">
           <text class="wf-title">{{item.fishType || '渔获分享'}}</text>
@@ -58,7 +58,7 @@
   <view class="wf-col">
     <block wx:for="{{posts}}" wx:key="time" wx:if="{{index % 2 === 1}}">
       <view class="wf-card" bindtap="openDetail" data-idx="{{index}}">
-        <image wx:if="{{item.photo}}" src="{{item.photo}}" mode="widthFix" class="wf-img"/>
+        <image wx:if="{{item.photo}}" src="{{item.photo}}" mode="aspectFill" class="wf-img"/>
         <view wx:else class="wf-img-empty">🎣</view>
         <view class="wf-body">
           <text class="wf-title">{{item.fishType || '渔获分享'}}</text>
