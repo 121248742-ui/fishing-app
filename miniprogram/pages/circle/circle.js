@@ -129,6 +129,32 @@ Page({
     this.setData({ detailPost: dp, commentText: '' })
   },
 
+  // ---- Edit ----
+  editDetailPost: function() {
+    var that = this
+    var p = this.data.detailPost
+    wx.showModal({
+      title: '编辑帖子',
+      editable: true,
+      placeholderText: '输入鱼种、重量、钓点、描述',
+      content: [p.fishType, p.weight ? p.weight+'斤' : '', p.spot, p.note].filter(Boolean).join(' | '),
+      success: function(res) {
+        if (!res.confirm || !res.content) return
+        var parts = res.content.split('|').map(function(s){return s.trim()})
+        var posts = wx.getStorageSync('circle_posts') || []
+        var realIdx = posts.length - 1 - that.data.detailIdx
+        if (realIdx >= 0 && realIdx < posts.length) {
+          posts[realIdx].fishType = parts[0] || ''
+          posts[realIdx].weight = parts[1] ? parts[1].replace('斤','') : ''
+          posts[realIdx].spot = parts[2] || ''
+          posts[realIdx].note = parts[3] || ''
+          wx.setStorageSync('circle_posts', posts)
+          that.closeDetail()
+        }
+      }
+    })
+  },
+
   // ---- Delete ----
   delDetailPost: function(e) {
     var that = this

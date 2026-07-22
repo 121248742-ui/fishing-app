@@ -79,7 +79,8 @@
 .wf-like { font-size: 20rpx; color: #999; }
 
 /* Detail */
-.detail-photo { width: 100%; display: block; border-radius: var(--radius-sm); margin-bottom: 20rpx; }
+.detail-photo { max-width: 80%; display: block; border-radius: var(--radius-sm); margin: 0 auto 20rpx; }
+.detail-actions { display: flex; align-items: center; justify-content: center; gap: 16rpx; padding: 0 8rpx 16rpx; border-bottom: 1px solid #F0F2F5; }
 .detail-info { margin-bottom: 20rpx; }
 .detail-user { display: flex; align-items: center; gap: 12rpx; margin-bottom: 12rpx; }
 .detail-avatar { width: 64rpx; height: 64rpx; border-radius: 50%; border: 2rpx solid #E8F8EF; }
