@@ -22,7 +22,10 @@
       <text class="stat-lbl">获赞</text>
     </view>
   </view>
-  <view class="share-row" bindtap="shareAtlas"><text>📤 分享我的图鉴</text></view>
+  <view class="share-banner" bindtap="shareAtlas">
+    <text class="share-banner-icon">📤</text>
+    <text class="share-banner-text">分享我的图鉴给好友</text>
+  </view>
   <view class="logout-row" bindtap="doLogout"><text>退出登录</text></view>
 </view>
 
