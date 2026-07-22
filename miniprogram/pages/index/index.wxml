@@ -1,5 +1,5 @@
 <view class="search-bar">
-  <input class="search-input" placeholder="搜索33种中国淡水鱼..." bindinput="onSearch" value="{{keyword}}"/>
+  <input class="search-input" placeholder="搜索40种中国淡水鱼..." bindinput="onSearch" value="{{keyword}}"/>
 </view>
 
 <view wx:if="{{list.length === 0}}" class="empty-state">
