@@ -1,0 +1,32 @@
+<view class="header-banner">
+  <view class="user-row">
+    <view class="avatar">🎣</view>
+    <view class="user-info">
+      <text class="user-name">钓鱼达人</text>
+      <text class="user-sub">已登录 · 图鉴收藏中</text>
+    </view>
+  </view>
+  <view class="stats">
+    <text class="count">{{unlockedCount}}/{{totalCount}}</text>
+    <view class="progress-bar">
+      <view class="progress-fill" style="width:{{pct}}%"></view>
+    </view>
+  </view>
+</view>
+
+<view wx:if="{{unlocked.length}}" class="section-label">已解锁 ({{unlocked.length}})</view>
+<view class="grid">
+  <view class="cell unlocked" wx:for="{{unlocked}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+    <image src="{{item.image}}" mode="aspectFit" class="cell-img"/>
+    <text class="cell-name">{{item.name}}</text>
+    <text class="cell-check">✅</text>
+  </view>
+</view>
+
+<view wx:if="{{locked.length}}" class="section-label dim">未解锁 ({{locked.length}})</view>
+<view class="grid">
+  <view class="cell locked" wx:for="{{locked}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+    <image src="{{item.image}}" mode="aspectFit" class="cell-img"/>
+    <text class="cell-name">{{item.name}}</text>
+  </view>
+</view>

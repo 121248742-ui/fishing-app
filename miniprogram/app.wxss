@@ -1,0 +1,61 @@
+page {
+  --green-500: #1AAD5F;
+  --green-50: #E8F8EF;
+  --green-600: #158F4E;
+  --text: #1F2937;
+  --text-secondary: #8B919E;
+  --border: #EBEDF0;
+  --bg: #F0F2F5;
+  --warning: #FF9A3C;
+  --danger: #FA5151;
+  --info: #3B82F6;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 28rpx;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.card {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 24rpx;
+  margin: 0 16rpx 20rpx 16rpx;
+  box-shadow: var(--shadow-sm);
+}
+
+.tag {
+  display: inline-flex;
+  padding: 4rpx 14rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.tag-green { background: #E8F8EF; color: #10703D; }
+.tag-red { background: #FDE8E8; color: #C62828; }
+.tag-blue { background: #EFF6FF; color: #1E40AF; }
+.tag-orange { background: #FFF3E0; color: #E65100; }
+.tag-gray { background: #F0F2F5; color: #6B7280; }
+
+.tag-best { background: #E8F8EF; color: #10703D; font-size: 24rpx; padding: 8rpx 20rpx; }
+.tag-good { background: #FFF8E1; color: #B45309; font-size: 24rpx; padding: 8rpx 20rpx; }
+.tag-ok { background: #F5F5F5; color: #999; font-size: 24rpx; padding: 8rpx 20rpx; }
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  margin-bottom: 16rpx;
+  color: var(--text);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100rpx 40rpx;
+  color: #ccc;
+}

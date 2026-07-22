@@ -1,0 +1,40 @@
+.search-bar {
+  background: #fff; border-radius: 40rpx; margin: 20rpx 16rpx;
+  padding: 24rpx 30rpx; border: 1px solid #EBEDF0;
+}
+.search-input { font-size: 30rpx; width: 100%; }
+
+.fish-list { padding: 0 16rpx; }
+.fish-item {
+  display: flex; gap: 24rpx; align-items: center; padding: 28rpx 24rpx;
+  background: #fff; border-radius: var(--radius); margin-bottom: 16rpx;
+  box-shadow: var(--shadow-sm);
+}
+.fish-item.hot {
+  border: 2rpx solid #9BE6BA;
+  box-shadow: 0 4rpx 20rpx rgba(26,173,95,0.12);
+}
+
+.fish-img-wrap {
+  width: 140rpx; height: 140rpx; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden;
+}
+.img-bg-1 { background: linear-gradient(135deg, #FFF3E0, #FFE0B2); }
+.img-bg-2 { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); }
+.img-bg-3 { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); }
+.img-bg-4 { background: linear-gradient(135deg, #FCE4EC, #F8BBD0); }
+.img-bg-5 { background: linear-gradient(135deg, #F3E5F5, #E1BEE7); }
+.img-bg-6 { background: linear-gradient(135deg, #E0F7FA, #B2EBF2); }
+
+.fish-img { width: 120rpx; height: 120rpx; }
+
+.fish-info { flex: 1; min-width: 0; }
+.fish-name-row { display: flex; align-items: center; gap: 12rpx; flex-wrap: wrap; }
+.fish-name { font-size: 32rpx; font-weight: 700; }
+.fish-meta { display: flex; gap: 20rpx; margin-top: 8rpx; font-size: 22rpx; color: var(--text-secondary); }
+.stars { color: #FF9800; }
+.diff { color: #E53935; }
+.fish-desc { font-size: 22rpx; color: var(--text-secondary); margin-top: 8rpx;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.arrow { color: #ccc; font-size: 40rpx; flex-shrink: 0; }

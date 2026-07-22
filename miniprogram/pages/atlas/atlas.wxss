@@ -1,0 +1,26 @@
+.header-banner {
+  position: relative; margin: 24rpx 16rpx; padding: 32rpx; border-radius: var(--radius);
+  background: linear-gradient(135deg, #1AAD5F, #2BD472); color: #fff; min-height: 280rpx;
+}
+.user-row { display: flex; align-items: center; gap: 20rpx; }
+.avatar {
+  width: 96rpx; height: 96rpx; border-radius: 50%; border: 4rpx solid rgba(255,255,255,0.9);
+  background: linear-gradient(135deg, #E8F8EF, #C6F0D8);
+  display: flex; align-items: center; justify-content: center; font-size: 44rpx;
+}
+.user-name { font-size: 32rpx; font-weight: 700; display: block; }
+.user-sub { font-size: 22rpx; opacity: 0.85; }
+.stats { position: absolute; bottom: 28rpx; right: 28rpx; text-align: right; }
+.count { font-size: 56rpx; font-weight: 800; line-height: 1; }
+.progress-bar { width: 200rpx; height: 10rpx; background: rgba(255,255,255,0.3); border-radius: 6rpx; margin-top: 16rpx; overflow: hidden; }
+.progress-fill { height: 100%; background: #fff; border-radius: 6rpx; }
+
+.section-label { font-size: 28rpx; font-weight: 700; margin: 0 16rpx 16rpx; }
+.section-label.dim { color: var(--text-secondary); }
+
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16rpx; padding: 0 16rpx 24rpx; }
+.cell { background: #fff; border-radius: var(--radius); padding: 24rpx 12rpx; text-align: center; position: relative; box-shadow: var(--shadow-sm); }
+.cell.locked { opacity: 0.4; }
+.cell-img { width: 140rpx; height: 140rpx; display: block; margin: 0 auto; }
+.cell-name { font-size: 24rpx; font-weight: 600; margin-top: 12rpx; display: block; }
+.cell-check { position: absolute; top: 12rpx; right: 16rpx; font-size: 28rpx; }

@@ -1,1 +1,32 @@
-<web-view src="{{url}}" />
+<view class="search-bar">
+  <input class="search-input" placeholder="搜索33种中国淡水鱼..." bindinput="onSearch" value="{{keyword}}"/>
+</view>
+
+<view wx:if="{{list.length === 0}}" class="empty-state">
+  <text style="font-size:80rpx;">🔍</text>
+  <text style="font-size:28rpx;margin-top:16rpx;">未找到匹配鱼种</text>
+</view>
+
+<view wx:else class="fish-list">
+  <view class="fish-item {{item.hot ? 'hot' : ''}}" wx:for="{{list}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+    <view class="fish-img-wrap img-bg-{{item.bgIdx}}">
+      <image src="{{item.image}}" mode="aspectFit" class="fish-img"/>
+    </view>
+    <view class="fish-info">
+      <view class="fish-name-row">
+        <text class="fish-name">{{item.name}}</text>
+        <text class="tag tag-green" wx:if="{{item.diet.indexOf('草食')!==-1}}">{{item.diet}}</text>
+        <text class="tag tag-red" wx:elif="{{item.diet.indexOf('肉食')!==-1}}">{{item.diet}}</text>
+        <text class="tag tag-blue" wx:elif="{{item.diet.indexOf('滤食')!==-1}}">{{item.diet}}</text>
+        <text class="tag tag-orange" wx:else>{{item.diet}}</text>
+        <text class="tag tag-gray">{{item.type}}</text>
+      </view>
+      <view class="fish-meta">
+        <text class="stars">🎯 {{item.rarityStars}}</text>
+        <text class="diff">⚡ {{item.diffDots}}</text>
+      </view>
+      <view class="fish-desc">{{item.habitatShort}}...</view>
+    </view>
+    <text class="arrow">›</text>
+  </view>
+</view>

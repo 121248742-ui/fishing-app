@@ -1,5 +1,26 @@
 {
   "pages": [
-    "pages/index/index"
-  ]
+    "pages/index/index",
+    "pages/circle/circle",
+    "pages/weather/weather",
+    "pages/atlas/atlas",
+    "pages/detail/detail"
+  ],
+  "tabBar": {
+    "color": "#B0B6C0",
+    "selectedColor": "#1AAD5F",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "🐟 鱼种百科" },
+      { "pagePath": "pages/circle/circle", "text": "💬 钓鱼圈" },
+      { "pagePath": "pages/weather/weather", "text": "☀️ 天气" },
+      { "pagePath": "pages/atlas/atlas", "text": "👤 我的" }
+    ]
+  },
+  "window": {
+    "navigationBarBackgroundColor": "#1AAD5F",
+    "navigationBarTitleText": "钓鱼助手",
+    "navigationBarTextStyle": "white"
+  }
 }

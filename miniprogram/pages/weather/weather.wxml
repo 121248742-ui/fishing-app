@@ -1,0 +1,46 @@
+<view class="weather-card card">
+  <view class="weather-main">
+    <text class="weather-icon">{{weather.icon}}</text>
+    <text class="weather-temp">{{weather.temp}}°</text>
+    <view class="weather-divider"></view>
+    <view>
+      <text class="weather-desc">{{weather.desc}}</text>
+      <text class="weather-feel">体感 {{weather.temp - 2}}°</text>
+    </view>
+  </view>
+
+  <view class="weather-metrics">
+    <view class="metric">
+      <text class="metric-icon">🌡️</text>
+      <view><text class="metric-val">{{weather.pressure}} <text class="metric-unit">hPa</text></text><text class="metric-lbl">气压</text></view>
+    </view>
+    <view class="metric">
+      <text class="metric-icon">💧</text>
+      <view><text class="metric-val">{{weather.humidity}}<text class="metric-unit">%</text></text><text class="metric-lbl">湿度</text></view>
+    </view>
+    <view class="metric">
+      <text class="metric-icon">🌬️</text>
+      <view><text class="metric-val metric-sm">{{weather.wind}}</text><text class="metric-lbl">风力风向</text></view>
+    </view>
+    <view class="metric">
+      <text class="metric-icon">🌡️</text>
+      <view><text class="metric-val">{{forecast[0].hi}}°/<text class="metric-unit">{{forecast[0].lo}}°</text></text><text class="metric-lbl">最高/最低</text></view>
+    </view>
+  </view>
+
+  <view class="forecast-row">
+    <view class="fc-item" wx:for="{{forecast}}" wx:key="day" wx:if="{{index > 0}}">
+      <text class="fc-day">{{item.day}}</text>
+      <text class="fc-icon">{{item.icon}}</text>
+      <text class="fc-temp">{{item.hi}}°/{{item.lo}}°</text>
+    </view>
+  </view>
+</view>
+
+<view class="score-card {{score >= 80 ? 'good' : (score >= 55 ? 'ok' : 'bad')}}">
+  <text class="score-label">今日出钓指数</text>
+  <text class="score-value">{{score}}</text>
+  <view class="score-advice">
+    <text wx:for="{{advice}}" wx:key="*this">{{item}}</text>
+  </view>
+</view>
