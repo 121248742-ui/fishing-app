@@ -36,7 +36,11 @@ Page({
   },
 
   // ---- Create Post ----
-  openForm: function() { this.setData({ showForm: true, photo: '', fishType: '', weight: '', spot: '', note: '' }) },
+  openForm: function() {
+    var u = wx.getStorageSync('userInfo')
+    if (!u || !u.code) { wx.showToast({ title: '请先登录', icon: 'none' }); return }
+    this.setData({ showForm: true, photo: '', fishType: '', weight: '', spot: '', note: '' })
+  },
   closeForm: function() { this.setData({ showForm: false }) },
   onInput: function(e) { var d = {}; d[e.currentTarget.dataset.field] = e.detail.value; this.setData(d) },
   chooseSpot: function() {
@@ -65,6 +69,8 @@ Page({
     })
   },
   publish: function() {
+    var u = wx.getStorageSync('userInfo')
+    if (!u || !u.code) { wx.showToast({ title: '请先登录', icon: 'none' }); return }
     var that = this
     var d = this.data
     if (!d.photo && !d.fishType) { wx.showToast({ title: '至少上传照片或填写鱼种', icon: 'none' }); return }
