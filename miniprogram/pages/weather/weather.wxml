@@ -20,6 +20,14 @@
   </scroll-view>
 </view>
 
+<view wx:if="{{activeSpot && weather}}" class="score-card card {{score >= 80 ? 'good' : (score >= 55 ? 'ok' : 'bad')}}">
+  <text class="score-label">今日出钓指数</text>
+  <text class="score-value">{{score}}</text>
+  <view class="score-advice">
+    <text wx:for="{{advice}}" wx:key="*this">{{item}}</text>
+  </view>
+</view>
+
 <view wx:if="{{activeSpot && weather}}" class="weather-card card">
   <view class="weather-location">{{activeSpot.name}}</view>
   <view class="weather-main">
@@ -79,14 +87,6 @@
 <view wx:elif="{{spots.length === 0}}" class="card" style="text-align:center;padding:60rpx;">
   <text style="font-size:40rpx;">☀️</text>
   <view style="font-size:24rpx;color:#ccc;margin-top:12rpx;">添加钓点查看当地天气</view>
-</view>
-
-<view wx:if="{{activeSpot && weather}}" class="score-card card {{score >= 80 ? 'good' : (score >= 55 ? 'ok' : 'bad')}}">
-  <text class="score-label">今日出钓指数</text>
-  <text class="score-value">{{score}}</text>
-  <view class="score-advice">
-    <text wx:for="{{advice}}" wx:key="*this">{{item}}</text>
-  </view>
 </view>
 
 <!-- Target Fish Selector -->
