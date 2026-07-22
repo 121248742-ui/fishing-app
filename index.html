@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>钓鱼助手 - 你的AI钓鱼指导</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+:root {
+  --primary: #1AAD5F;
+  --primary-light: #E8F8EF;
+  --primary-dark: #158F4E;
+  --bg: #F0F2F5;
+  --card: #FFFFFF;
+  --text: #1F2937;
+  --text-secondary: #8B919E;
+  --border: #EBEDF0;
+  --danger: #FA5151;
+  --orange: #FF9A3C;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+  --radius: 14px;
+  --tab-height: 60px;
+  --header-height: 48px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #E0E4E9;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+.app {
+  width: 100%;
+  max-width: 100%;
+  background: var(--bg);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.header {
+  background: linear-gradient(135deg, #1AAD5F, #2BD472);
+  color: #fff;
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.tab-content { display: none; padding: 10px 10px calc(var(--tab-height) + var(--safe-bottom) + 14px); }
+.tab-content.active { display: block; }
+.tab-bar {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 100%;
+  height: calc(var(--tab-height) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 0.5px solid rgba(0,0,0,0.06);
+  display: flex;
+  z-index: 100;
+}
+.tab-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: #B0B6C0; font-size: 10px; font-weight: 500; cursor: pointer;
+  transition: all 0.25s; gap: 3px; position: relative;
+}
+.tab-item.active { color: var(--primary); }
+.tab-item.active::before {
+  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 24px; height: 3px; background: var(--primary); border-radius: 0 0 3px 3px;
+}
+.tab-item .icon { font-size: 22px; transition: transform 0.25s; }
+.tab-item.active .icon { transform: scale(1.1); }
+
+/* Cards */
+.card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-sm);
+}
+
+/* Fish List */
+.fish-list-item {
+  display: flex; gap: 18px; align-items: center; padding: 20px 18px;
+  background: #fff; border-radius: var(--radius); margin-bottom: 12px;
+  cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm);
+}
+.fish-list-item:active { background: #F5F7FA; transform: scale(0.985); }
+.fish-icon-circle {
+  width: 88px; height: 88px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; flex-shrink: 0;
+}
+.fish-icon-circle.fish-bg-1 { background: linear-gradient(135deg, #FFF3E0, #FFE0B2); }
+.fish-icon-circle.fish-bg-2 { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); }
+.fish-icon-circle.fish-bg-3 { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); }
+.fish-icon-circle.fish-bg-4 { background: linear-gradient(135deg, #FCE4EC, #F8BBD0); }
+.fish-icon-circle.fish-bg-5 { background: linear-gradient(135deg, #F3E5F5, #E1BEE7); }
+.fish-icon-circle.fish-bg-6 { background: linear-gradient(135deg, #E0F7FA, #B2EBF2); }
+.fish-mini-tag {
+  font-size: 11px; padding: 3px 8px; border-radius: 10px; font-weight: 600;
+}
+.fish-mini-tag.bottom { background: #FFF3E0; color: #E65100; }
+.fish-mini-tag.mid { background: #E8F5E9; color: #2E7D32; }
+.fish-mini-tag.top { background: #E3F2FD; color: #1565C0; }
+.fish-mini-tag.meat { background: #FCE4EC; color: #C62828; }
+.fish-mini-tag.plant { background: #E8F5E9; color: #2E7D32; }
+.fish-mini-tag.mix { background: #FFF8E1; color: #E65100; }
+.fish-search {
+  display: flex; gap: 10px; background: #fff; border-radius: 24px;
+  padding: 18px 20px; align-items: center; margin-bottom: 16px;
+  border: 1.5px solid var(--border); box-shadow: var(--shadow-sm);
+}
+.fish-search input { flex: 1; border: none; outline: none; font-size: 18px; background: transparent; }
+.fish-search span { font-size: 18px; }
+.fish-detail-overlay {
+  position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 100%; height: 100vh; background: var(--bg);
+  z-index: 200; overflow-y: auto; display: none;
+}
+.fish-detail-overlay.show { display: block; animation: slideIn 0.25s ease; }
+@keyframes slideIn { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+.fish-detail-header {
+  background: linear-gradient(135deg, #1AAD5F, #2BD472);
+  color: #fff; padding: 12px 16px;
+  display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 10;
+}
+.fish-detail-header .back-btn {
+  background: none; border: none; color: #fff; font-size: 22px;
+  cursor: pointer; padding: 4px 8px; border-radius: 8px;
+}
+.fish-detail-header .back-btn:active { background: rgba(255,255,255,0.2); }
+.fish-detail-content { padding: 16px; }
+.fish-detail-section {
+  background: #fff; border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+  box-shadow: var(--shadow-sm);
+}
+.fish-detail-section h3 { font-size: 15px; margin-bottom: 10px; color: var(--text); }
+
+/* Weather */
+.weather-main { display: flex; align-items: center; gap: 20px; padding: 4px 0; }
+.weather-icon { font-size: 56px; }
+.weather-temp { font-size: 48px; font-weight: 200; color: var(--text); }
+.weather-details { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-top: 14px; }
+.weather-item { text-align: center; padding: 8px 4px; }
+.weather-item .val { font-size: 18px; font-weight: 700; color: var(--text); }
+.weather-item .lbl { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.fishing-score {
+  text-align: center; padding: 20px; border-radius: var(--radius);
+  margin-top: 12px; color: #fff;
+}
+.fishing-score.good { background: linear-gradient(135deg, #1AAD5F, #2BD472); }
+.fishing-score.ok { background: linear-gradient(135deg, #FF9A3C, #FFB84D); }
+.fishing-score.bad { background: linear-gradient(135deg, #909399, #B0B3BB); }
+
+/* Atlas Grid */
+.atlas-header {
+  background: url('images/atlas_bg.jpg') center/cover no-repeat;
+  border-radius: var(--radius); padding: 20px; color: #fff; margin-bottom: 14px;
+  position: relative; min-height: 200px;
+}
+.atlas-header::before {
+  content: ''; position: absolute; inset: 0; border-radius: var(--radius);
+  background: rgba(0,0,0,0.35);
+}
+.atlas-header-title {
+  position: absolute; top: 16px; left: 18px; font-size: 16px; font-weight: 600;
+  z-index: 1; opacity: 0.95;
+}
+.atlas-header-stats {
+  position: absolute; bottom: 16px; right: 18px; text-align: right; z-index: 1;
+}
+.atlas-progress { font-size: 36px; font-weight: 800; line-height: 1; }
+.atlas-progress-bar {
+  height: 6px; background: rgba(255,255,255,0.3); border-radius: 3px;
+  margin-top: 10px; overflow: hidden;
+}
+.atlas-progress-fill { height: 100%; background: #fff; border-radius: 3px; transition: width 0.5s; }
+.atlas-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.atlas-cell {
+  background: #fff; border-radius: var(--radius); padding: 16px 8px; text-align: center;
+  cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.atlas-cell:active { transform: scale(0.95); }
+.atlas-cell.unlocked { box-shadow: 0 3px 12px rgba(26,173,95,0.15); }
+.atlas-cell.locked { opacity: 0.4; filter: grayscale(1); }
+.atlas-cell .cell-emoji { font-size: 34px; }
+.atlas-cell .cell-name { font-size: 12px; font-weight: 600; margin-top: 8px; color: #333; }
+.atlas-cell .cell-check { position: absolute; top: 6px; right: 8px; font-size: 14px; }
+.atlas-cell .cell-photo { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; margin: 0 auto; }
+.atlas-detail-overlay {
+  position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 100%; height: 100vh; background: var(--bg);
+  z-index: 200; overflow-y: auto; display: none;
+}
+.atlas-detail-overlay.show { display: block; }
+.atlas-detail-header {
+  background: linear-gradient(135deg, #1AAD5F, #2BD472);
+  color: #fff; padding: 12px 16px;
+  display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 10;
+}
+.atlas-detail-header .back-btn {
+  background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 4px 8px;
+}
+.atlas-detail-content { padding: 12px; }
+.atlas-detail-section {
+  background: #fff; border-radius: var(--radius); padding: 14px; margin-bottom: 10px;
+  box-shadow: var(--shadow-sm);
+}
+.atlas-detail-section h3 { font-size: 14px; margin-bottom: 8px; color: var(--text); }
+.atlas-upload-area {
+  border: 2px dashed #D0D5DD; border-radius: var(--radius); padding: 24px;
+  text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.atlas-upload-area:hover { border-color: var(--primary); background: var(--primary-light); }
+.atlas-btn {
+  background: var(--primary); color: #fff; border: none; border-radius: 10px;
+  padding: 12px 24px; font-size: 15px; font-weight: 600; cursor: pointer;
+  width: 100%; margin-top: 8px;
+}
+.atlas-btn.unlock { background: linear-gradient(135deg, #FF9A3C, #FFB84D); }
+.atlas-btn:active { opacity: 0.85; }
+
+/* Inputs & Buttons */
+input[type="text"], input[type="number"], input[type="date"], textarea, select {
+  border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px;
+  font-size: 14px; outline: none; font-family: inherit; background: #F9FAFB;
+  transition: border-color 0.2s;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--primary); background: #fff; }
+button {
+  font-family: inherit; cursor: pointer; border: none; outline: none;
+}
+
+/* Toast */
+.toast {
+  position: fixed; top: 56px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.78); color: #fff; padding: 10px 22px;
+  border-radius: 20px; font-size: 13px; z-index: 999; pointer-events: none;
+  opacity: 0; transition: opacity 0.3s;
+}
+.toast.show { opacity: 1; }
+
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <div class="header" id="headerTitle">钓鱼助手</div>
+
+  <!-- Tab 0: 鱼种百科 -->
+  <div class="tab-content active" id="tab-fish">
+    <div class="fish-search">
+      <span style="font-size:16px; color:#999;">🔍</span>
+      <input type="text" id="fishSearch" placeholder="搜索33种中国淡水鱼..." oninput="renderFishList()">
+    </div>
+    <div id="fishList"></div>
+  </div>
+  <!-- Fish Detail Overlay -->
+  <div class="fish-detail-overlay" id="fishDetail">
+    <div class="fish-detail-header">
+      <button class="back-btn" onclick="closeFishDetail()">←</button>
+      <span id="fishDetailTitle" style="font-size:16px;font-weight:600;"></span>
+    </div>
+    <div class="fish-detail-content" id="fishDetailContent"></div>
+  </div>
+
+  <!-- Tab 1: 钓鱼圈 -->
+  <div class="tab-content" id="tab-circle">
+    <div style="margin-bottom:12px;">
+      <button onclick="openCirclePost()" style="width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;">📸 分享渔获</button>
+    </div>
+    <div id="circleFeed"></div>
+  </div>
+  <!-- Circle Post Overlay -->
+  <div class="fish-detail-overlay" id="circlePostOverlay">
+    <div class="fish-detail-header">
+      <button class="back-btn" onclick="closeCirclePost()">←</button>
+      <span style="font-size:16px;font-weight:600;">分享渔获</span>
+    </div>
+    <div class="fish-detail-content">
+      <div class="fish-detail-section">
+        <label style="display:block;cursor:pointer;text-align:center;padding:20px;border:2px dashed #ddd;border-radius:12px;" id="circlePhotoLabel">
+          <input type="file" accept="image/*" onchange="previewCirclePhoto(this)" style="display:none;">
+          <div id="circlePhotoPreview" style="font-size:40px;color:#ccc;">📷</div>
+          <div style="font-size:12px;color:#999;margin-top:4px;">点击上传渔获照片</div>
+        </label>
+      </div>
+      <div class="fish-detail-section">
+        <input type="text" id="circleFishType" placeholder="鱼种名称（如：鲫鱼）" style="width:100%;padding:10px;border:1px solid #E5E5E5;border-radius:8px;font-size:14px;margin-bottom:8px;">
+        <input type="text" id="circleWeight" placeholder="重量（斤）" style="width:100%;padding:10px;border:1px solid #E5E5E5;border-radius:8px;font-size:14px;margin-bottom:8px;">
+        <input type="text" id="circleSpot" placeholder="钓点名称" style="width:100%;padding:10px;border:1px solid #E5E5E5;border-radius:8px;font-size:14px;margin-bottom:8px;">
+        <textarea id="circleNote" placeholder="说点什么..." rows="3" style="width:100%;padding:10px;border:1px solid #E5E5E5;border-radius:8px;font-size:14px;font-family:inherit;resize:none;"></textarea>
+        <button onclick="publishCirclePost()" style="width:100%;margin-top:8px;background:var(--primary);color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:600;">发布</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2: 天气 -->
+  <div class="tab-content" id="tab-weather">
+    <div class="card" style="margin-bottom:10px;">
+      <div style="font-size:13px;color:#999;margin-bottom:6px;">我的钓点</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;" id="mySpotTags"></div>
+      <div style="display:flex;gap:6px;margin-bottom:6px;">
+        <input type="text" id="newSpotName" placeholder="钓点名称（如：密云水库北岸）" style="flex:1;padding:8px;border:1px solid #E5E5E5;border-radius:8px;font-size:13px;">
+        <button onclick="addCustomSpot()" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;white-space:nowrap;">+ 添加</button>
+      </div>
+      <button onclick="getCurrentLocation()" style="background:none;border:1px solid var(--primary);color:var(--primary);border-radius:8px;padding:6px 14px;font-size:12px;width:100%;">🗺️ 从地图选择位置</button>
+    </div>
+<div class="card" id="weatherCard"></div>
+    <div id="fishingAdvice"></div>
+  </div>
+
+  <!-- Tab 3: 我的图鉴 -->
+  <div class="tab-content" id="tab-catch">
+    <div class="atlas-header">
+      <div class="atlas-header-title">我的图鉴</div>
+      <div class="atlas-header-stats">
+        <div class="atlas-progress" id="atlasCount">0/48</div>
+        <div class="atlas-progress-bar" style="width:120px;"><div class="atlas-progress-fill" id="atlasBar" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div id="atlasGrid"></div>
+  </div>
+  <!-- Map Picker Overlay -->
+  <div class="fish-detail-overlay" id="mapPicker">
+    <div class="fish-detail-header">
+      <button class="back-btn" onclick="closeMapPicker()">←</button>
+      <span style="font-size:16px;font-weight:600;">在地图上点选钓点</span>
+    </div>
+    <div id="mapContainer" style="height:calc(100vh - 48px);width:100%;"></div>
+    <div style="position:absolute;bottom:80px;left:50%;transform:translateX(-50%);z-index:9999;background:#fff;border-radius:12px;padding:12px 20px;box-shadow:0 4px 20px rgba(0,0,0,0.2);max-width:380px;width:90%;">
+      <div id="mapPinCoords" style="font-size:12px;color:#999;margin-bottom:8px;">👆 点击地图放置标记</div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="mapPinName" placeholder="钓点名称" style="flex:1;padding:8px;border:1px solid #E5E5E5;border-radius:8px;font-size:13px;">
+        <button onclick="confirmMapPin()" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:600;white-space:nowrap;">确认添加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Atlas Detail Overlay -->
+  <div class="atlas-detail-overlay" id="atlasDetail">
+    <div class="atlas-detail-header">
+      <button class="back-btn" onclick="closeAtlasDetail()">←</button>
+      <span id="atlasDetailTitle" style="font-size:16px;font-weight:600;"></span>
+    </div>
+    <div class="atlas-detail-content" id="atlasDetailContent"></div>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <div class="tab-item active" onclick="switchTab(0)" data-tab="0">
+      <span class="icon">🐟</span><span>鱼种百科</span>
+    </div>
+    <div class="tab-item" onclick="switchTab(1)" data-tab="1">
+      <span class="icon">💬</span><span>钓鱼圈</span>
+    </div>
+    <div class="tab-item" onclick="switchTab(2)" data-tab="2">
+      <span class="icon">☀️</span><span>天气</span>
+    </div>
+    <div class="tab-item" onclick="switchTab(3)" data-tab="3">
+      <span class="icon">🎣</span><span>图鉴</span>
+    </div>
+  </div>
+</div>
+
+<!-- Fullscreen Image Viewer -->
+<div class="fish-detail-overlay" id="imageViewer" style="background:rgba(0,0,0,0.95);z-index:300;" onclick="closeImageViewer()">
+  <div style="position:absolute;top:16px;right:20px;color:#fff;font-size:28px;z-index:301;cursor:pointer;" onclick="closeImageViewer()">✕</div>
+  <img id="imageViewerImg" src="" style="width:100%;height:100%;object-fit:contain;padding:40px;" onclick="event.stopPropagation()" alt="">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ===== DATA =====
+const SPOTS = [
+  { id:1, name:"千岛湖水库", type:"reservoir", province:"浙江", city:"杭州", fish:["鲫鱼","鲤鱼","鳊鱼","白条"], fee:"免费", rating:4.5, desc:"华东最大人工湖，水质一流，鱼种丰富。推荐钓点：排岭半岛、姜家镇段。", tips:"建议5-10月前往，夏秋夜间垂钓效果最佳" },
+  { id:2, name:"丹江口水库", type:"reservoir", province:"湖北", city:"十堰", fish:["翘嘴","鲤鱼","草鱼","鳜鱼"], fee:"免费", rating:4.7, desc:"南水北调水源地，亚洲最大人工淡水湖，翘嘴资源全国闻名。", tips:"春季翘嘴上滩，秋季深水大物" },
+  { id:3, name:"万峰湖", type:"reservoir", province:"贵州", city:"兴义", fish:["罗非鱼","草鱼","鲢鳙","鲤鱼"], fee:"免费", rating:4.6, desc:"五大淡水湖之一，钓鱼人天堂。水质清澈，全年可钓。", tips:"罗非鱼全年有口，冬季宜钓深水区" },
+  { id:4, name:"莱芜雪野湖", type:"reservoir", province:"山东", city:"济南", fish:["鲫鱼","鲤鱼","草鱼"], fee:"50元/天", rating:4.0, desc:"济南周边热门野钓点，交通便利，适合周末出行。", tips:"推荐使用商品饵，蚯蚓也有不错效果" },
+  { id:5, name:"密云水库", type:"reservoir", province:"北京", city:"北京", fish:["鲫鱼","鲤鱼","草鱼","鲢鱼"], fee:"免费(限区域)", rating:4.2, desc:"北京最大水库，部分区域开放垂钓。水质好，风景优美。", tips:"需注意禁钓区域，建议工作日前往避开人流" },
+  { id:6, name:"大红门黑坑", type:"pond", province:"北京", city:"北京", fish:["鲤鱼","鲫鱼"], fee:"200元/天", rating:3.8, desc:"京城知名黑坑，放鱼频率高，水面适中。适合竞技练竿。", tips:"正钓日需提前占位，推荐用散炮打窝" },
+  { id:7, name:"昆承湖钓场", type:"pond", province:"江苏", city:"苏州", fish:["鲫鱼","鳊鱼","青鱼"], fee:"100元/天", rating:4.3, desc:"苏州周边精品钓场，环境好，设施齐全，适合休闲垂钓。", tips:"青鱼需用螺蛳打窝，鲫鱼推荐米饭饵" },
+  { id:8, name:"东江湖", type:"wild", province:"湖南", city:"郴州", fish:["翘嘴","鳜鱼","鲈鱼","鲶鱼"], fee:"免费", rating:4.4, desc:"湖南著名野生钓场，水质极佳，路亚天堂。", tips:"路亚钓翘嘴推荐清晨和傍晚窗口期" },
+  { id:9, name:"黄河小浪底", type:"wild", province:"河南", city:"洛阳", fish:["鲤鱼","鲫鱼","鲶鱼","黄颡"], fee:"免费", rating:4.1, desc:"黄河中游经典钓点，调水调沙后鱼情更佳。", tips:"涨水期好钓鱼，退水期需谨慎选位" },
+  { id:10, name:"鄱阳湖钓区", type:"wild", province:"江西", city:"九江", fish:["鲤鱼","草鱼","鲢鱼","鳜鱼"], fee:"免费", rating:4.3, desc:"中国最大淡水湖，野生鱼类资源丰富，传统钓圣地。", tips:"枯水期鱼群集中，涨水期需找洄水湾" },
+  { id:11, name:"松山湖", type:"wild", province:"广东", city:"东莞", fish:["罗非鱼","鲮鱼","鲤鱼","草鱼"], fee:"免费", rating:3.9, desc:"东莞最大天然湖泊，周边工业发展快但鱼情依然不错。", tips:"罗非鱼占主导，推荐用冷冻饵" },
+  { id:12, name:"长寿湖", type:"reservoir", province:"重庆", city:"重庆", fish:["鲫鱼","鲤鱼","草鱼","翘嘴"], fee:"30元/天", rating:4.2, desc:"重庆后花园，周围青山环绕，水质上乘。", tips:"春季是黄金季节，推荐夜钓" },
+];
+
+const QUICK_ASKS = [
+  "今天适合钓鱼吗", "鲫鱼用什么饵料最好",
+  "新手入门需要什么装备", "气压低怎么钓鱼",
+  "夏季钓鲤鱼的技巧", "如何选择钓位",
+  "浮漂怎么调最灵敏", "夜钓注意事项",
+];
+
+const FISH_TYPES = ["鲫鱼","鲤鱼","草鱼","鳊鱼","鲢鳙","翘嘴","鳜鱼","罗非鱼","青鱼","鲶鱼","黑鱼","其他"];
+
+// ===== STATE =====
+let currentTab = 0;
+let atlasData = JSON.parse(localStorage.getItem('fish_atlas') || '{}');
+let spotFilter = 'all';
+let isWaitingAI = false;
+
+// ===== INIT =====
+
+// ===== TAB SWITCH =====
+function switchTab(idx) {
+  currentTab = idx;
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(c => c.classList.remove('active'));
+  document.getElementById(['tab-fish','tab-circle','tab-weather','tab-catch'][idx]).classList.add('active');
+  document.querySelectorAll('.tab-item')[idx].classList.add('active');
+  const titles = ['鱼种百科','钓鱼圈','天气指数','我的图鉴'];
+  document.getElementById('headerTitle').textContent = titles[idx];
+  if (idx === 0) renderFishList();
+  if (idx === 2) renderWeather();
+  if (idx === 3) renderAtlas();
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ===== TAB 0: AI CHAT =====
+function renderQuickAsks() {
+  document.getElementById('quickAsks').innerHTML = QUICK_ASKS.map(q =>
+    `<span class="quick-ask" onclick="askQuick('${q}')">${q}</span>`
+  ).join('');
+}
+
+function askQuick(q) {
+  document.getElementById('chatInput').value = q;
+  sendMessage();
+}
+
+async function sendMessage() {
+  if (isWaitingAI) return;
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  const chatList = document.getElementById('chatList');
+  chatList.innerHTML += `
+    <div class="msg user">
+      <div class="avatar">&#x1F3A3;</div>
+      <div class="bubble">${escapeHtml(msg)}</div>
+    </div>`;
+
+  // AI typing indicator
+  const aiMsgId = 'ai-' + Date.now();
+  chatList.innerHTML += `
+    <div class="msg ai" id="${aiMsgId}">
+      <div class="avatar">&#x1F916;</div>
+      <div class="bubble"><div class="loading"><span></span><span></span><span></span></div></div>
+    </div>`;
+  chatList.scrollTop = chatList.scrollHeight;
+  isWaitingAI = true;
+
+  try {
+    const response = await callClaudeAI(msg);
+    const bubble = document.querySelector(`#${aiMsgId} .bubble`);
+    bubble.innerHTML = formatAIResponse(response);
+    chatList.scrollTop = chatList.scrollHeight;
+  } catch (e) {
+    const bubble = document.querySelector(`#${aiMsgId} .bubble`);
+    bubble.innerHTML = getFallbackResponse(msg);
+    chatList.scrollTop = chatList.scrollHeight;
+  }
+  isWaitingAI = false;
+}
+
+function callClaudeAI(question) {
+  // Try Claude API if key is set, otherwise use built-in knowledge base
+  const apiKey = localStorage.getItem('claude_api_key');
+  if (apiKey) {
+    return fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 800,
+        messages: [{
+          role: 'user',
+          content: `你是中国钓鱼专家，精通各种钓法（台钓、传统钓、路亚、海钓等），熟悉全国各大钓点和鱼种习性。请用专业且接地气的中文回答钓鱼问题。问题：${question}`
+        }]
+      })
+    }).then(r => r.json()).then(d => d.content[0].text);
+  }
+  return Promise.reject(new Error('no key'));
+}
+
+function getFallbackResponse(msg) {
+  const kb = {
+    '鲫鱼': '鲫鱼推荐用**红虫/蚯蚓**（活饵）或**腥香商品饵**（如蓝鲫+九一八）。冬天偏腥，夏天偏香。窝料用酒米打窝效果最好，补窝要少量勤补。钓底为主，子线0.4-0.6号足够。',
+    '鲤鱼': '鲤鱼饵料推荐**螺鲤+九一八+速攻**经典配方（3:2:1）。也可用玉米粒、红薯块。打窝推荐老玉米+麦粒混合发酵。钓法以底钓为主，钓钝不钓灵，子线1.0-2.0号。',
+    '装备': '新手入门装备清单：\n1. **鱼竿**：3.6-4.5米综合竿（推荐光威/汉鼎，100-300元）\n2. **线组**：主线1.5号+子线0.8号\n3. **浮漂**：吃铅1.5-2.0g的枣核漂\n4. **钩**：伊势尼3-5号\n5. 钓椅/钓箱、鱼护、抄网、饵料盆\n总预算500-800元可配齐一套能用的。',
+    '气压': '气压对鱼口影响很大：\n- **1000hPa以上**：鱼口活跃，适合出钓\n- **980-1000hPa**：正常，鱼口中等\n- **980hPa以下**：鱼上浮不沉底，口差\n\n低气压时建议：钓浮/钓半水、用更细的线组、选择流水或入水口等溶氧高的位置。',
+    '夏季': '夏季钓鱼要点：\n1. **时间**：早5-9点、晚5-8点是黄金窗口\n2. **位置**：深水区、树荫下、桥墩旁\n3. **饵料**：偏淡偏香，少用腥（招小鱼）\n4. **目标鱼**：草鱼、鲢鳙（耐高温）\n5. 夜钓效果远好于白天',
+    '钓位': '选钓位口诀：**春钓滩、夏钓潭、秋钓荫、冬钓阳**\n\n具体技巧：\n- 进水口/出水口附近氧气充足\n- 水草边缘是鱼道\n- 铧尖（伸入水中的半岛）是经典好位\n- 桥墩、倒树等结构处藏鱼\n- 下风口比上风口好（食物多）',
+    '浮漂': '调漂基础步骤（调四钓二）：\n1. 重铅找底，浮漂露出1目\n2. 下拉浮漂（子线长度+10cm）\n3. 修剪铅皮至浮漂露出4目（调四）\n4. 挂饵后上拉浮漂至露出2目（钓二）\n\n新手记一句话：调低钓低=灵敏，调高钓高=迟钝。',
+    '夜钓': '夜钓必备装备：\n1. **夜钓灯**（蓝光最常用）或电子漂\n2. 防蚊喷雾（夏天必备）\n3. 头灯（方便操作）\n4. 备用电池/充电宝\n5. 厚衣服（夜里温度下降快）\n\n夜钓优势：安静、大鱼靠边、夏天不晒。推荐钓近岸浅水。',
+    '适合钓鱼': '判断今天是否适合出钓，看三个指标：\n1. **气压** >1000hPa（最关键）\n2. **温差** <8℃（温差大影响鱼口）\n3. **风力** 2-3级（无风闷热鱼不开口，大风不好抛竿）\n\n另外连续晴天或阴天后突然出太阳也是好时机。"久雨初晴，钓鱼不行；久晴初雨，钓到手软"。',
+  };
+
+  for (const [keyword, answer] of Object.entries(kb)) {
+    if (msg.includes(keyword)) return answer;
+  }
+
+  return '这个问题我需要更多上下文来回答。建议你告诉我：\n1. 你在哪个城市/钓点？\n2. 目标鱼种是什么？\n3. 是用手竿、海竿还是路亚？\n\n或者你也可以点击下方的快捷问题，看看有没有你关心的内容。';
+}
+
+function formatAIResponse(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>')
+    .replace(/(\d+)\./g, '<br>$1.');
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ===== TAB 1: CIRCLE =====
+let circlePosts = JSON.parse(localStorage.getItem('circle_posts') || '[]');
+let circlePhotoData = null;
+
+function renderCircle() {
+  var feed = document.getElementById('circleFeed');
+  if (circlePosts.length === 0) {
+    feed.innerHTML = '<div style="text-align:center;padding:50px 20px;color:#ccc;"><div style="font-size:48px;">💬</div><div style="font-size:14px;margin-top:8px;">还没有渔获分享</div><div style="font-size:12px;margin-top:4px;">点击上方按钮，晒出你的渔获吧</div></div>';
+    return;
+  }
+  var html = '';
+  for (var i = circlePosts.length - 1; i >= 0; i--) {
+    var p = circlePosts[i];
+    html += '<div class="card" style="margin-bottom:12px;">';
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">';
+    html += '<div style="width:36px;height:36px;border-radius:50%;background:#E8F8EF;display:flex;align-items:center;justify-content:center;font-size:18px;">🎣</div>';
+    html += '<div><div style="font-size:14px;font-weight:600;">钓鱼人</div><div style="font-size:11px;color:#999;">' + p.time + '</div></div>';
+    html += '</div>';
+    if (p.photo) html += '<img src="' + p.photo + '" style="width:100%;border-radius:8px;margin-bottom:8px;max-height:300px;object-fit:contain;" alt="">';
+    html += '<div style="font-size:13px;color:#555;line-height:1.6;">';
+    if (p.fishType) html += '🐟 <strong>' + p.fishType + '</strong>';
+    if (p.weight) html += ' · ' + p.weight + '斤';
+    if (p.spot) html += '<br>📍 ' + p.spot;
+    if (p.note) html += '<br>💬 ' + p.note;
+    html += '</div>';
+    html += '<div style="margin-top:8px;display:flex;gap:12px;font-size:12px;color:#999;">';
+    html += '<span>❤️ 0</span><span>💬 0</span>';
+    html += '<span style="margin-left:auto;cursor:pointer;color:#FA5151;" onclick="deleteCirclePost(' + i + ')">删除</span>';
+    html += '</div></div>';
+  }
+  feed.innerHTML = html;
+}
+
+function openCirclePost() {
+  circlePhotoData = null;
+  document.getElementById('circlePhotoPreview').innerHTML = '📷';
+  document.getElementById('circleFishType').value = '';
+  document.getElementById('circleWeight').value = '';
+  document.getElementById('circleSpot').value = '';
+  document.getElementById('circleNote').value = '';
+  document.getElementById('circlePostOverlay').classList.add('show');
+}
+
+function closeCirclePost() {
+  document.getElementById('circlePostOverlay').classList.remove('show');
+}
+
+function previewCirclePhoto(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    circlePhotoData = e.target.result;
+    document.getElementById('circlePhotoPreview').innerHTML = '<img src="' + circlePhotoData + '" style="width:120px;height:120px;border-radius:8px;object-fit:contain;">';
+  };
+  reader.readAsDataURL(file);
+}
+
+function publishCirclePost() {
+  var post = {
+    photo: circlePhotoData,
+    fishType: document.getElementById('circleFishType').value.trim(),
+    weight: document.getElementById('circleWeight').value.trim(),
+    spot: document.getElementById('circleSpot').value.trim(),
+    note: document.getElementById('circleNote').value.trim(),
+    time: new Date().toLocaleString('zh-CN')
+  };
+  if (!post.photo && !post.fishType) { alert('至少上传照片或填写鱼种'); return; }
+  circlePosts.push(post);
+  localStorage.setItem('circle_posts', JSON.stringify(circlePosts));
+  closeCirclePost();
+  renderCircle();
+}
+
+function deleteCirclePost(idx) {
+  if (!confirm('删除这条分享？')) return;
+  circlePosts.splice(idx, 1);
+  localStorage.setItem('circle_posts', JSON.stringify(circlePosts));
+  renderCircle();
+}
+
+// Spots stubs
+function renderSpots() { renderCircle(); }
+window.SPOTS = [];
+// ===== TAB 2: WEATHER =====
+// Custom weather spots with geo coordinates
+let mySpots = JSON.parse(localStorage.getItem('my_weather_spots') || '[]');
+let weatherSelSpot = null;  // currently selected spot name
+
+function renderWeather() {
+  var now = new Date();
+
+  // My spots tags
+  var tagsHtml = '';
+  for (var k = 0; k < mySpots.length; k++) {
+    var s = mySpots[k];
+    var isSel = weatherSelSpot && weatherSelSpot.name === s.name;
+    tagsHtml += '<span style="padding:5px 10px;background:' + (isSel ? '#07C160' : '#E8F8EF') + ';color:' + (isSel ? '#fff' : '#07C160') + ';border-radius:14px;font-size:11px;cursor:pointer;margin-bottom:4px;" onclick="selectMySpot(' + k + ')">' + s.name + ' <span onclick="event.stopPropagation();removeMySpot(' + k + ')" style="margin-left:2px;opacity:0.5;">×</span></span>';
+  }
+  if (mySpots.length === 0) tagsHtml = '<span style="color:#999;font-size:11px;">添加上方自定义钓点或使用📍获取当前位置</span>';
+  document.getElementById('mySpotTags').innerHTML = tagsHtml;
+
+  // Selected fish tag
+
+  // Find weather base from spot's lat/lon
+  var spotName = weatherSelSpot ? weatherSelSpot.name : '';
+  var base = weatherSelSpot && weatherSelSpot.lat ? Math.abs(Math.round(weatherSelSpot.lat)) % 5 : 2;
+  var temps = [[30,22],[28,20],[32,24],[26,19],[29,23]];
+  var t = temps[base];
+  var weatherIcons = ['☀️','⛅','🌤','🌧','🌦'];
+  var weatherDescs = ['晴','多云','晴间多云','小雨','阵雨'];
+  var winds = ['东南风 2级','北风 3级','西南风 2级','东风 1级','西北风 3级'];
+
+  var mockWeather = {
+    temp: t[0], humidity: 60 + base * 8, pressure: 998 + base * 4,
+    wind: winds[base], icon: weatherIcons[base], desc: weatherDescs[base],
+    forecast: [
+      { day:'今天', hi:t[0]+3, lo:t[1], icon:weatherIcons[base] },
+      { day:'明天', hi:t[0]+1, lo:t[1]-1, icon:weatherIcons[(base+1)%5] },
+      { day:'后天', hi:t[0]+2, lo:t[1]+1, icon:weatherIcons[(base+2)%5] },
+    ]
+  };
+
+  // Score & advice
+  var isGood = mockWeather.pressure >= 1005 && mockWeather.humidity < 80;
+  var score;
+  if (isGood) score = 85;
+  else if (mockWeather.pressure >= 995) score = 60;
+  else score = 30;
+  score = Math.min(98, Math.round(score));
+
+  var parts = [];
+  if (weatherSelSpot) {
+    parts.push('📍 ' + weatherSelSpot.name + (weatherSelSpot.lat ? '（' + weatherSelSpot.lat.toFixed(1) + '°N, ' + weatherSelSpot.lon.toFixed(1) + '°E）' : ''));
+  } else {
+    parts.push('📌 请添加我的钓点查看当地天气');
+  }
+  if (isGood) {
+    parts.push('✅ 天气条件优良，适合出钓');
+    parts.push('⏰ 推荐时段：早晨5-9点、傍晚5-8点');
+  } else if (score >= 60) {
+    parts.push('🤔 天气条件一般，可选择出钓');
+  } else {
+    parts.push('❌ 天气不太理想，建议改天');
+  }
+
+  // Weather card
+  document.getElementById('weatherCard').innerHTML =
+    '<div>' +
+      '<div style="font-size:14px;color:#999;">' + now.toLocaleDateString('zh-CN',{weekday:'long'}) + (spotName ? ' · ' + spotName : '') + '</div>' +
+      '<div class="weather-main">' +
+        '<span class="weather-icon">' + mockWeather.icon + '</span>' +
+        '<span class="weather-temp">' + mockWeather.temp + '°</span>' +
+      '</div>' +
+      '<div style="font-size:14px;color:#555;">' + mockWeather.desc + '</div>' +
+    '</div>' +
+    '<div class="weather-details">' +
+      '<div class="weather-item"><div class="val">' + mockWeather.pressure + '<span style="font-size:12px;color:#999;"> hPa</span></div><div class="lbl">气压</div></div>' +
+      '<div class="weather-item"><div class="val">' + mockWeather.humidity + '<span style="font-size:12px;color:#999;">%</span></div><div class="lbl">湿度</div></div>' +
+      '<div class="weather-item"><div class="val">' + mockWeather.wind + '</div><div class="lbl">风力风向</div></div>' +
+      '<div class="weather-item"><div class="val">' + mockWeather.forecast[0].hi + '°/' + mockWeather.forecast[0].lo + '°</div><div class="lbl">最高/最低温</div></div>' +
+    '</div>' +
+    '<div style="display:flex;gap:8px;margin-top:12px;">' +
+      mockWeather.forecast.slice(1).map(function(f) {
+        return '<div style="flex:1;text-align:center;padding:8px;background:#F8F8F8;border-radius:8px;">' +
+          '<div style="font-size:12px;color:#999;">' + f.day + '</div>' +
+          '<div style="font-size:20px;">' + f.icon + '</div>' +
+          '<div style="font-size:12px;">' + f.hi + '°/' + f.lo + '°</div></div>';
+      }).join('') +
+    '</div>';
+
+  var levelClass = score >= 80 ? 'good' : (score >= 55 ? 'ok' : 'bad');
+  document.getElementById('fishingAdvice').innerHTML =
+    '<div class="fishing-score ' + levelClass + '">' +
+      '<div style="font-size:14px;">今日出钓指数</div>' +
+      '<div style="font-size:42px;font-weight:700;">' + score + '</div>' +
+      '<div style="font-size:13px;margin-top:8px;line-height:1.8;text-align:left;white-space:pre-line;">' + parts.join('\n') + '</div>' +
+    '</div>';
+}
+
+
+// Custom spot management
+function addCustomSpot() {
+  var nameEl = document.getElementById('newSpotName');
+  var name = nameEl.value.trim();
+  if (!name) return;
+  // Check duplicate
+  for (var i = 0; i < mySpots.length; i++) {
+    if (mySpots[i].name === name) { nameEl.value = ''; return; }
+  }
+  mySpots.push({ name: name, lat: null, lon: null });
+  localStorage.setItem('my_weather_spots', JSON.stringify(mySpots));
+  weatherSelSpot = mySpots[mySpots.length - 1];
+  nameEl.value = '';
+  renderWeather();
+}
+
+function selectMySpot(idx) {
+  weatherSelSpot = mySpots[idx];
+  renderWeather();
+}
+
+function removeMySpot(idx) {
+  if (weatherSelSpot && weatherSelSpot.name === mySpots[idx].name) weatherSelSpot = null;
+  mySpots.splice(idx, 1);
+  localStorage.setItem('my_weather_spots', JSON.stringify(mySpots));
+  renderWeather();
+}
+
+// Map picker
+var mapPickerInst = null;
+var mapPinMarker = null;
+
+function openMapPicker() {
+  document.getElementById('mapPicker').classList.add('show');
+  if (!mapPickerInst) {
+    mapPickerInst = L.map('mapContainer').setView([35, 110], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap',
+      maxZoom: 19
+    }).addTo(mapPickerInst);
+    mapPickerInst.on('click', function(e) {
+      if (mapPinMarker) mapPickerInst.removeLayer(mapPinMarker);
+      mapPinMarker = L.marker(e.latlng).addTo(mapPickerInst);
+      document.getElementById('mapPinCoords').textContent = e.latlng.lat.toFixed(4) + '°N, ' + e.latlng.lng.toFixed(4) + '°E';
+    });
+  }
+  // Try to go to user's location
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      mapPickerInst.setView([pos.coords.latitude, pos.coords.longitude], 13);
+    }, function(){});
+  }
+  setTimeout(function() { mapPickerInst.invalidateSize(); }, 300);
+}
+
+function closeMapPicker() {
+  document.getElementById('mapPicker').classList.remove('show');
+}
+
+function confirmMapPin() {
+  var name = document.getElementById('mapPinName').value.trim();
+  if (!name) { alert('请输入钓点名称'); return; }
+  if (!mapPinMarker) { alert('请在地图上点击选择位置'); return; }
+  var ll = mapPinMarker.getLatLng();
+  for (var i = 0; i < mySpots.length; i++) {
+    if (mySpots[i].name === name) return; // dup
+  }
+  mySpots.push({ name: name, lat: ll.lat, lon: ll.lng });
+  localStorage.setItem('my_weather_spots', JSON.stringify(mySpots));
+  weatherSelSpot = mySpots[mySpots.length - 1];
+  document.getElementById('mapPinName').value = '';
+  closeMapPicker();
+  renderWeather();
+}
+
+function getCurrentLocation() {
+  openMapPicker();
+}
+
+
+// ===== TAB 3: MY ATLAS =====
+function renderAtlas() {
+  const unlocked = atlasData || {};
+  const total = FISH_SPECIES.length;
+  const count = Object.keys(unlocked).filter(k => unlocked[k] && unlocked[k].unlocked).length;
+  const pct = Math.round(count / total * 100);
+
+  document.getElementById('atlasCount').textContent = count + '/' + total;
+  document.getElementById('atlasBar').style.width = pct + '%';
+
+  const unlockedList = FISH_SPECIES.filter(f => unlocked[f.id] && unlocked[f.id].unlocked);
+  const lockedList = FISH_SPECIES.filter(f => !unlocked[f.id] || !unlocked[f.id].unlocked);
+
+  const renderCell = (f, idx) => {
+    const rec = unlocked[f.id];
+    const isUnlocked = rec && rec.unlocked;
+    const cls = isUnlocked ? 'unlocked' : 'locked';
+    const emoji = FISH_EMOJI[(f.id-1) % FISH_EMOJI.length];
+    return `
+    <div class="atlas-cell ${cls}" onclick="openAtlasDetail(${f.id})">
+      ${isUnlocked && rec.photo
+        ? `<img src="${rec.photo}" style="width:88px;height:88px;border-radius:50%;object-fit:cover;margin:0 auto;" alt="">`
+        : isUnlocked
+          ? (f.image ? `<img src="${f.image}" style="width:88px;height:88px;border-radius:50%;object-fit:cover;margin:0 auto;" alt="" onerror="this.parentElement.innerHTML='<div class=\'cell-emoji\'>${emoji}</div>'">`
+            : `<div class="cell-emoji">${emoji}</div>`)
+          : (f.image ? `<img src="${f.image}" style="width:88px;height:88px;border-radius:50%;object-fit:contain;margin:0 auto;background:#f0f0f0;" alt="" onerror="this.parentElement.innerHTML='<div class=\'cell-emoji\'>${emoji}</div>'">`
+            : `<div class="cell-emoji">${emoji}</div>`)}
+      <div class="cell-name">${f.name}</div>
+      ${isUnlocked ? '<div class="cell-check">✅</div>' : ''}
+    </div>`;
+  };
+
+  var html = '';
+  if (unlockedList.length > 0) {
+    html += '<div style="font-size:14px;font-weight:600;color:var(--text);margin:0 0 10px 2px;">已解锁 (' + unlockedList.length + ')</div>';
+    html += '<div class="atlas-grid">' + unlockedList.map(renderCell).join('') + '</div>';
+  }
+  if (lockedList.length > 0) {
+    html += '<div style="font-size:14px;font-weight:600;color:var(--text-secondary);margin:16px 0 10px 2px;">未解锁 (' + lockedList.length + ')</div>';
+    html += '<div class="atlas-grid">' + lockedList.map(renderCell).join('') + '</div>';
+  }
+  document.getElementById('atlasGrid').innerHTML = html;
+}
+
+function openAtlasDetail(id) {
+  var f = FISH_SPECIES.find(function(x) { return x.id === id; });
+  if (!f) return;
+  var rec = atlasData[id] || {};
+  var isUnlocked = !!rec.unlocked;
+  document.getElementById('atlasDetailTitle').textContent = f.name;
+  document.getElementById('atlasDetail').classList.add('show');
+
+  var html = '';
+  html += '<div class="atlas-detail-section" style="display:flex;align-items:center;gap:16px;">';
+  if (f.image) {
+    html += '<img src="' + f.image + '" style="width:72px;height:72px;border-radius:50%;object-fit:contain;flex-shrink:0;" onerror="this.style.display=\'none\'">';
+  }
+  html += '<div style="flex:1;min-width:0;">';
+  html += '<div style="font-size:18px;font-weight:700;">' + f.name + '</div>';
+  html += '<div style="font-size:12px;color:#999;margin-top:2px;">' + f.type + ' · ' + f.diet + '</div>';
+  html += '<div style="display:flex;gap:12px;margin-top:6px;">';
+  html += '<div><div style="font-size:10px;color:#999;">稀有程度</div>';
+  html += '<div style="color:#FF9800;font-size:12px;">' + starStr(f.rarity) + '</div></div>';
+  html += '<div><div style="font-size:10px;color:#999;">作钓难度</div>';
+  html += '<div style="color:#E53935;font-size:12px;">' + diffStr(f.difficulty) + '</div></div>';
+  html += '</div></div></div>';
+
+  if (isUnlocked) {
+    html += '<div class="atlas-detail-section" style="text-align:center;">';
+    html += '<div style="font-size:12px;font-weight:600;color:#333;margin-bottom:6px;">我的渔获照片</div>';
+    if (rec.photo) {
+      html += '<img src="' + rec.photo + '" onclick="viewFullImage(this.src)" style="width:100%;max-height:320px;border-radius:10px;object-fit:contain;display:block;margin:0 auto;cursor:pointer;background:#f5f5f5;" alt="">';
+    } else {
+      html += '<div style="color:#ccc;padding:20px;font-size:13px;">暂无照片，点击下方上传</div>';
+    }
+    html += '<div style="margin-top:6px;font-size:13px;color:#555;">';
+    if (rec.weight) html += '🎣 ' + rec.weight + '斤 · ';
+    html += (rec.date || '') + (rec.spot ? ' · ' + rec.spot : '') + '</div>';
+    html += '<div style="margin-top:8px;">';
+    html += '<label class="atlas-upload-area" style="display:block;cursor:pointer;">';
+    html += '<input type="file" accept="image/*" onchange="updateAtlasPhoto(' + f.id + ', this)" style="display:none;">📷 更换照片</label>';
+    html += '<button class="atlas-btn" style="background:#FA5151;margin-top:6px;" onclick="lockAtlasFish(' + f.id + ')">🔒 重新锁定</button></div></div>';
+  } else {
+    html += '<div class="atlas-detail-section" style="text-align:center;">';
+    html += '<div style="font-size:32px;color:#ccc;margin-bottom:8px;">🔒</div>';
+    html += '<div style="font-size:13px;color:#999;margin-bottom:12px;">尚未解锁，上传渔获照片来解锁此鱼种</div>';
+    html += '<label class="atlas-upload-area" style="display:block;cursor:pointer;">';
+    html += '<input type="file" accept="image/*" onchange="unlockWithPhoto(' + f.id + ', this)" style="display:none;">';
+    html += '<div style="font-size:28px;">📷</div>';
+    html += '<div style="font-size:12px;color:#999;margin-top:2px;">上传渔获照片</div></label>';
+    html += '<div style="margin-top:10px;text-align:left;">';
+    html += '<div style="font-size:11px;color:#999;margin-bottom:4px;">渔获信息（选填）</div>';
+    html += '<input type="number" id="atlasWeight_' + f.id + '" placeholder="重量（斤）" step="0.1" style="width:100%;padding:8px;border:1px solid #E5E5E5;border-radius:8px;font-size:13px;margin-bottom:4px;">';
+    html += '<input type="text" id="atlasSpot_' + f.id + '" placeholder="钓点名称" style="width:100%;padding:8px;border:1px solid #E5E5E5;border-radius:8px;font-size:13px;margin-bottom:4px;">';
+    html += '<input type="date" id="atlasDate_' + f.id + '" value="' + new Date().toISOString().split('T')[0] + '" style="width:100%;padding:8px;border:1px solid #E5E5E5;border-radius:8px;font-size:13px;">';
+    html += '<button class="atlas-btn unlock" onclick="unlockFish(' + f.id + ')">🔓 解锁此鱼种</button></div></div>';
+  }
+
+  html += '<div class="atlas-detail-section"><h3>📋 基本信息</h3>';
+  html += '<p style="font-size:12px;color:#555;line-height:1.6;">' + f.habitat + '</p>';
+  html += '<div style="margin-top:8px;">';
+  for (var mi = 0; mi < f.peakMonths.length; mi++) {
+    html += '<span style="display:inline-block;padding:2px 6px;background:#E8F8EF;color:#07C160;border-radius:10px;font-size:10px;margin-right:3px;">旺季' + f.peakMonths[mi] + '月</span>';
+  }
+  html += '</div></div>';
+
+  html += '<div class="atlas-detail-section"><h3>🪱 推荐饵料</h3>';
+  html += '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
+  var bc = { best: '#07C160', good: '#F57F17', ok: '#999' };
+  for (var bi = 0; bi < f.bait.length; bi++) {
+    var b = f.bait[bi];
+    html += '<span style="padding:5px 10px;border-radius:14px;font-size:12px;background:' + (b.tier==='best'?'#E8F8EF':b.tier==='good'?'#FFF8E1':'#F5F5F5') + ';color:' + bc[b.tier] + ';">' + b.name + '</span>';
+  }
+  html += '</div></div>';
+
+  html += '<div class="atlas-detail-section"><h3>🎣 作钓思路</h3>';
+  html += '<p style="font-size:12px;color:#555;line-height:1.6;">' + f.technique + '</p></div>';
+
+  document.getElementById('atlasDetailContent').innerHTML = html;
+}
+
+function starStr(n) { n = n || 1; var s = ''; for (var i=0;i<n;i++) s += '★'; for (var i=n;i<5;i++) s += '☆'; return s; }
+function diffStr(n) { n = n || 1; var s = ''; for (var i=0;i<n;i++) s += '◆'; for (var i=n;i<5;i++) s += '◇'; return s; }
+
+function closeAtlasDetail() {
+  document.getElementById('atlasDetail').classList.remove('show');
+  renderAtlas();
+}
+
+function viewFullImage(src) {
+  var overlay = document.getElementById('imageViewer');
+  var img = document.getElementById('imageViewerImg');
+  img.src = src;
+  overlay.classList.add('show');
+}
+function closeImageViewer() {
+  document.getElementById('imageViewer').classList.remove('show');
+}
+
+function unlockWithPhoto(id, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    if (!atlasData[id]) atlasData[id] = {};
+    atlasData[id].photo = e.target.result;
+    atlasData[id].unlocked = true;
+    atlasData[id].date = new Date().toISOString().split('T')[0];
+    saveAtlas();
+    openAtlasDetail(id);
+  };
+  reader.readAsDataURL(file);
+}
+
+function unlockFish(id) {
+  if (!atlasData[id]) atlasData[id] = {};
+  atlasData[id].unlocked = true;
+  atlasData[id].date = document.getElementById('atlasDate_'+id)?.value || new Date().toISOString().split('T')[0];
+  atlasData[id].weight = document.getElementById('atlasWeight_'+id)?.value || '';
+  atlasData[id].spot = document.getElementById('atlasSpot_'+id)?.value || '';
+  saveAtlas();
+  openAtlasDetail(id);
+}
+
+function updateAtlasPhoto(id, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    if (!atlasData[id]) atlasData[id] = {};
+    atlasData[id].photo = e.target.result;
+    saveAtlas();
+    openAtlasDetail(id);
+  };
+  reader.readAsDataURL(file);
+}
+
+function lockAtlasFish(id) {
+  if (confirm('确定要重新锁定 ' + FISH_SPECIES.find(f=>f.id===id)?.name + ' 吗？照片将被清除。')) {
+    delete atlasData[id];
+    saveAtlas();
+    openAtlasDetail(id);
+  }
+}
+
+function saveAtlas() {
+  localStorage.setItem('fish_atlas', JSON.stringify(atlasData));
+}
+
+// Remove old catch stubs
+function showCatchForm() {}
+function saveCatch() {}
+function deleteCatch() {}
+function renderCatches() { renderAtlas(); }
+function previewPhoto() {}
+
+// ===== TAB 4: FISH ENCYCLOPEDIA =====
+const FISH_SPECIES = [
+  {
+    id:1, name:"鲫鱼", image:"images/crucian_carp.png", type:"底层", diet:"杂食",
+    months:[1,2,3,4,5,6,9,10,11,12], peakMonths:[3,4,5,10,11],
+    habitat:"静水或缓流的中下层，水草区、芦苇丛附近，喜在水底淤泥中觅食。中国分布最广的淡水鱼，从南到北无处不在。",
+    bait:[{name:"红虫", tier:"best"}, {name:"蚯蚓", tier:"best"}, {name:"蓝鲫", tier:"good"}, {name:"九一八", tier:"good"}, {name:"酒米", tier:"good"}, {name:"麦粒", tier:"ok"}],
+    technique:"底钓为主，子线0.4-0.6号，袖钩3-5号。打窝用酒米少量勤补，一次乒乓球大小即可。经典漂相为上顶（送漂），看到顶1-2目提竿最佳。冬天鱼口轻，需0.2-0.3号极细子线，看漂要灵敏到半目变化。",
+    tips:"春钓滩、秋钓潭、冬钓阳对鲫鱼最适用。钓鲫贵在精细——线细、钩小、饵轻、漂灵。野生大板鲫（1斤以上）是可遇不可求的好货。",
+    record:"野生常见0.2-0.5斤，1斤以上称大板鲫，养殖鲫可达2-3斤。",
+    rarity:1, difficulty:2
+  },
+  {
+    id:2, name:"鲤鱼", image:"images/carp.png", type:"底层", diet:"杂食",
+    months:[4,5,6,7,8,9,10], peakMonths:[5,6,9],
+    habitat:"水底淤泥处、深潭、水草丛中，喜在有障碍物处栖息。善于拱泥觅食，常在水面冒出一串串气泡（鱼星）。",
+    bait:[{name:"玉米粒", tier:"best"}, {name:"螺鲤", tier:"best"}, {name:"红薯块", tier:"good"}, {name:"颗粒饵", tier:"good"}, {name:"蚯蚓", tier:"ok"}, {name:"麦粒", tier:"ok"}],
+    technique:"底钓，钓钝不钓灵。子线1.0-2.0号，伊势尼5-8号。打窝以发酵老玉米+麦粒为佳。鲤鱼有试口习惯——先轻轻碰饵再吞，漂相为缓慢黑漂，要耐心等待。中鱼后猛烈冲刺，遛鱼稳住方向即可。",
+    tips:"习性谨慎，大鱼尤其狡猾。甜、香、软是鲤鱼饵料三要素。同一钓点连钓几天后鲤鱼会产生警觉，建议换位。",
+    record:"野生常见1-5斤，10斤以上称大鲤，水库记录可达30斤以上。",
+    rarity:1, difficulty:3
+  },
+  {
+    id:3, name:"草鱼", image:"images/grass_carp.png", type:"中下层", diet:"草食",
+    months:[5,6,7,8,9], peakMonths:[6,7,8],
+    habitat:"水草丰富的中下层水域，夏季活跃在中上层。喜在水草区和岸边草丛觅食，也会摄食落入水中的昆虫和果实。",
+    bait:[{name:"玉米粒", tier:"best"}, {name:"草叶", tier:"best"}, {name:"芦苇芯", tier:"good"}, {name:"薯块", tier:"good"}, {name:"颗粒饵", tier:"ok"}, {name:"蚂蚱", tier:"ok"}],
+    technique:"夏季可浮钓（挂水草或芦苇叶），春秋底钓。子线1.5-3.0号，伊势尼7-10号。草鱼吃饵干脆，漂相直接黑漂。大草鱼冲劲十足，第一波冲刺最猛，顶住前10秒就稳了。",
+    tips:"草鱼不怕热——35°C高温其他鱼停口时草鱼照样进食。青草打窝效果显著：割一捆青草系石头扔钓点，半小时后草鱼就来了。",
+    record:"常见3-10斤，大草鱼可达20-30斤，最大记录超50斤。",
+    rarity:2, difficulty:2
+  },
+  {
+    id:4, name:"鳊鱼", image:"images/bream.png", type:"中下层", diet:"杂食",
+    months:[4,5,6,7,8,9,10], peakMonths:[5,6,9],
+    habitat:"江河湖泊中下层，喜欢水流平缓的洄水湾和深潭处集群活动。体型侧扁如菱形，游速较快。",
+    bait:[{name:"红虫", tier:"best"}, {name:"蚯蚓", tier:"best"}, {name:"蓝鲫", tier:"good"}, {name:"腥香饵", tier:"good"}, {name:"麦麸", tier:"ok"}, {name:"饭粒", tier:"ok"}],
+    technique:"钓底或离底10-20cm。口小，用袖钩3-5号，子线0.6-1.0号。集群性强，上一条后往往连杆。漂相为缓慢上顶后横走。千岛湖、丹江口是钓鳊鱼的好去处。",
+    tips:"肉质细嫩，是口感最好的淡水鱼之一。打窝用菜籽饼+麸皮效果极佳，雾化后鳊鱼群聚不散。",
+    record:"常见0.5-2斤，大鳊鱼可达3-5斤。",
+    rarity:2, difficulty:2
+  },
+  {
+    id:5, name:"鲢鱼(白鲢)", image:"images/silver_carp.png", type:"中上层", diet:"滤食",
+    months:[5,6,7,8,9], peakMonths:[6,7,8],
+    habitat:"水域中上层开阔水面，滤食浮游植物。常成群在水面游动，受惊时跃出水面。是中国四大家鱼之一。",
+    bait:[{name:"酸味饵", tier:"best"}, {name:"发酵豆渣", tier:"best"}, {name:"商品鲢鳙饵", tier:"good"}, {name:"麦麸发酵", tier:"good"}, {name:"豆腐渣", tier:"ok"}],
+    technique:"浮钓为主，钓深0.5-1.5米。饵料雾化要快（3-5分钟化完），形成雾化区吸引白鲢。线组要重——主线3.0-5.0号，伊势尼10-14号。中鱼时白鲢会猛烈冲出，常有跳跃洗鳃动作。",
+    tips:"白鲢和花鲢（鳙鱼）常被统称为鲢鳙，但白鲢鳞片银白、头较小。部分水库禁钓白鲢，需提前了解规定。",
+    record:"常见3-8斤，大个体可达15-25斤。",
+    rarity:2, difficulty:3
+  },
+  {
+    id:6, name:"鳙鱼(花鲢)", image:"images/bighead_carp.png", type:"中上层", diet:"滤食",
+    months:[5,6,7,8,9], peakMonths:[6,7,8],
+    habitat:"与白鲢相似，但更偏向深水一点。滤食浮游动物为主，头大身小，是做剁椒鱼头的原料。",
+    bait:[{name:"臭饵", tier:"best"}, {name:"发酵臭豆腐渣", tier:"best"}, {name:"商品鲢鳙饵", tier:"good"}, {name:"蒜味饵", tier:"good"}, {name:"麦麸发酵", tier:"ok"}, {name:"鸡粪发酵", tier:"ok"}],
+    technique:"浮钓钓深1-3米（比白鲢深）。花鲢偏好臭味饵料，饵要发酵充分。中鱼后花鲢力量比白鲢更大更持久。",
+    tips:"花鲢头大，是做剁椒鱼头的顶级食材。和钓白鲢不同，花鲢更喜欢偏深、偏下层的水域。钓花鲢饵要臭、钓要深。",
+    record:"常见3-10斤，大花鲢可达20-40斤。",
+    rarity:2, difficulty:3
+  },
+  {
+    id:7, name:"翘嘴", image:"images/culter.png", type:"中上层", diet:"肉食",
+    months:[3,4,5,6,9,10,11], peakMonths:[4,5,10],
+    habitat:"湖泊水库中上层，清晨傍晚靠近岸边捕食小鱼。典型掠食者，靠视觉追击猎物，水面炸水声是其标志。",
+    bait:[{name:"活泥鳅", tier:"best"}, {name:"小白条", tier:"best"}, {name:"亮片(路亚)", tier:"good"}, {name:"米诺(路亚)", tier:"good"}, {name:"小虾", tier:"ok"}, {name:"蚯蚓", tier:"ok"}],
+    technique:"路亚是首选——清晨傍晚窗口期在水面搜索。手竿挂活饵浮钓1-2米。翘嘴攻击凶猛，咬口后猛烈洗鳃，手感一流。丹江口是中国的翘嘴圣地。",
+    tips:"早口和晚口是关键词——日出前后和日落前后一小时。水面有翘嘴追小鱼翻出的浪花时，就是抛竿的黄金时刻。",
+    record:"常见1-3斤，大翘嘴可达10-15斤，丹江口曾出过20斤+巨翘。",
+    rarity:3, difficulty:3
+  },
+  {
+    id:8, name:"鳜鱼", image:"images/mandarin.png", type:"底层", diet:"肉食",
+    months:[4,5,6,9,10], peakMonths:[5,10],
+    habitat:"水质清澈的江河水库底部，隐藏在石头缝、树根、桥墩等障碍物处伏击猎物。对水质要求极高。",
+    bait:[{name:"活泥鳅", tier:"best"}, {name:"活虾", tier:"best"}, {name:"软虫(路亚)", tier:"good"}, {name:"卷尾蛆", tier:"good"}, {name:"铅头钩", tier:"ok"}, {name:"小活鱼", tier:"ok"}],
+    technique:"路亚——铅头钩+软虫慢拖底部障碍区。活饵钓法用泥鳅或小虾底钓。有领地意识，一处中鱼后附近往往还有。背鳍尖刺有毒，取鱼务必用毛巾包裹！",
+    tips:"西塞山前白鹭飞，桃花流水鳜鱼肥。中国最名贵淡水食用鱼之一，野生的价格不菲。水质好的水库和江河才能钓到。",
+    record:"常见0.5-2斤，大鳜鱼可达5-8斤，极少数10斤以上。",
+    rarity:4, difficulty:4
+  },
+  {
+    id:9, name:"罗非鱼", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Til%C3%A1pia_ou_Sarotherodon_niloticus_2.jpg/1280px-Til%C3%A1pia_ou_Sarotherodon_niloticus_2.jpg", type:"底层", diet:"杂食",
+    months:[4,5,6,7,8,9,10,11], peakMonths:[5,6,7,8],
+    habitat:"温水性鱼类，15°C以上活跃。喜水底泥沙处集群，适应力极强。南方广泛归化，北方水库不能越冬。",
+    bait:[{name:"冷冻饵", tier:"best"}, {name:"蚯蚓", tier:"best"}, {name:"肝味饵", tier:"good"}, {name:"腥香商品饵", tier:"good"}, {name:"虾肉", tier:"ok"}, {name:"麦粒", tier:"ok"}],
+    technique:"底钓，子线0.8-1.5号（罗非牙利易切线，建议加防咬线）。吃食凶猛干脆、直接黑漂。集群性强，找对窝能连杆。背鳍和鳃盖有尖刺，务必用毛巾包裹取鱼。",
+    tips:"全年耐高温但怕冷，广东/海南/广西是最佳钓区。肉质细嫩，南方餐桌常见。罗非鱼也吃水草和藻类，能净化水质。",
+    record:"常见0.3-1斤，大罗非可达2-3斤，极少5斤以上。",
+    rarity:2, difficulty:2
+  },
+  {
+    id:10, name:"青鱼", image:"https://upload.wikimedia.org/wikipedia/commons/8/8a/Schwarzer_Amur_%28Mylopharyngodon_piceus%29%2C_juvenile.jpg", type:"底层", diet:"肉食(螺类)",
+    months:[5,6,7,8,9], peakMonths:[6,7,8],
+    habitat:"大江大河和大型水库深水区底部，喜螺蛳丰富的区域。四大家鱼中体型最大的一种。",
+    bait:[{name:"螺蛳肉", tier:"best"}, {name:"田螺", tier:"best"}, {name:"玉米粒", tier:"good"}, {name:"颗粒饵", tier:"good"}, {name:"蚌肉", tier:"ok"}, {name:"蚯蚓", tier:"ok"}],
+    technique:"重装备底钓——主线5.0-8.0号，子线3.0-5.0号，伊势尼12-16号，大物竿必备。打窝用螺蛳（敲碎壳散发味道）。中鱼后是持久战，青鱼耐力一流，遛30分钟-1小时很正常。",
+    tips:"淡水钓的终极Boss。大型水库巨青可达50-100斤。一整天可能只有一口，但这口值了。钓青鱼需要顶级装备和极大耐心。",
+    record:"常见5-20斤，大青鱼可达50-80斤，最大记录超200斤。",
+    rarity:3, difficulty:5
+  },
+  {
+    id:11, name:"鲶鱼", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Silurus.jpg/1280px-Silurus.jpg", type:"底层", diet:"肉食",
+    months:[5,6,7,8,9], peakMonths:[6,7,8],
+    habitat:"水底泥洞、石缝、桥墩下、倒树旁。夜行性鱼类，白天隐蔽，夜晚出来觅食。",
+    bait:[{name:"鸡肝", tier:"best"}, {name:"泥鳅", tier:"best"}, {name:"猪肝", tier:"good"}, {name:"大蚯蚓", tier:"good"}, {name:"小鱼段", tier:"ok"}, {name:"虾", tier:"ok"}],
+    technique:"夜钓底钓。主线3.0-5.0号，伊势尼10-14号。饵料用腥味重的动物内脏。选桥墩、倒树等障碍物旁。鲶鱼口大，吞饵后直接拖走，手感沉重。",
+    tips:"夏季暴雨后河水变浑时鲶鱼异常活跃。黄河鲶鱼和南方大口鲶是两大品种。鲶鱼炖茄子是东北名菜。",
+    record:"常见1-5斤，大鲶鱼可达10-20斤，南方大口鲶可达30斤以上。",
+    rarity:2, difficulty:2
+  },
+  {
+    id:12, name:"黑鱼", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Channa_asiatica_red.jpg/330px-Channa_asiatica_red.jpg", type:"中下层", diet:"肉食",
+    months:[5,6,7,8,9], peakMonths:[6,7,8],
+    habitat:"水草丛生的浅水区、芦苇荡、荷塘。伏击型掠食者，有护仔习性。能用鳃上器官直接呼吸空气，离水可活数小时。",
+    bait:[{name:"雷蛙(路亚)", tier:"best"}, {name:"青蛙(拟饵)", tier:"best"}, {name:"活泥鳅", tier:"good"}, {name:"软虫", tier:"good"}, {name:"波趴", tier:"ok"}, {name:"小鱼", tier:"ok"}],
+    technique:"雷强钓法——用雷蛙在水草区慢拖，黑鱼从草洞中突然冲出攻击。中鱼后猛力扬竿刺穿硬嘴、快速拉出草区。传统钓用长竿短线挂活饵在草洞中逗钓也很有效。",
+    tips:"淡水顶级掠食者，攻击性极强，咬口视觉冲击力十足。有领地意识，被打扰后会回来。黑鱼做酸菜鱼口感极好。可离水活数小时——因为能呼吸空气！",
+    record:"常见1-3斤，大黑鱼可达5-10斤，极少数15斤以上。",
+    rarity:3, difficulty:4
+  },
+  {
+    id:13, name:"白条", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Hemiculter_leucisculus_Taijiang_National_Park.jpg/330px-Hemiculter_leucisculus_Taijiang_National_Park.jpg", type:"中上层", diet:"杂食",
+    months:[3,4,5,6,7,8,9,10,11], peakMonths:[4,5,6,9,10],
+    habitat:"水域中上层，常在岸边水面成群觅食。中国最常见的小型鱼类，几乎所有水域都存在。",
+    bait:[{name:"腥香面饵", tier:"best"}, {name:"苍蝇", tier:"best"}, {name:"小白条亮片", tier:"good"}, {name:"面包屑", tier:"good"}, {name:"米粒", tier:"ok"}, {name:"蚯蚓尖", tier:"ok"}],
+    technique:"浮钓水面30cm内。极轻钓组——袖钩1-2号，0.2-0.3号子线。钓白条讲究快——饵一入水就来抢，快速连续抛竿。飞蝇钓法或微型路亚钓白条也很有趣。油炸白条是经典下酒菜。",
+    tips:"很多人嫌弃白条闹窝，但专钓白条也别有趣味，是练习抛竿看漂的好方法。油炸酥脆，不少老钓友专门刷白条下酒。",
+    record:"常见10-20cm，大个体可达25-30cm，重约3-5两。",
+    rarity:1, difficulty:1
+  },
+  {
+    id:14, name:"黄颡鱼", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Yellow_catfish_Pelteobagrus_fulvidraco_3.JPG/330px-Yellow_catfish_Pelteobagrus_fulvidraco_3.JPG", type:"底层", diet:"肉食",
+    months:[5,6,7,8,9], peakMonths:[6,7,8],
+    habitat:"水底石缝、泥洞中，夜间觅食。江河湖泊缓流区底部常见，群居性。",
+    bait:[{name:"黑蚯蚓", tier:"best"}, {name:"鸡肝", tier:"best"}, {name:"红虫", tier:"good"}, {name:"虾肉", tier:"good"}, {name:"猪肝", tier:"ok"}, {name:"小鱼段", tier:"ok"}],
+    technique:"夜钓底钓为主，串钩或多钩钓组。务必用长柄钩（黄颡嘴小但吞钩深），用钳子取钩不用手——胸鳍背鳍有毒刺，扎到剧痛！子线0.8-1.5号。",
+    tips:"别名黄辣丁、嘎牙子，炖汤鲜美无比。同一个钓点可连上多条——它们是群居鱼类。夜钓时最活跃。",
+    record:"常见2-5两，大个体可达1-2斤。",
+    rarity:2, difficulty:2
+  },
+  {
+    id:15, name:"大口鲈", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Largemouth_Bass_%28Micropterus_salmoides%29_June_2023_%28cropped%29.jpg/1280px-Largemouth_Bass_%28Micropterus_salmoides%29_June_2023_%28cropped%29.jpg", type:"中下层", diet:"肉食",
+    months:[3,4,5,6,9,10,11], peakMonths:[4,5,10],
+    habitat:"水质清澈水域的结构区（石头堆、树桩、水草边缘）。伏击型掠食者，对结构区依赖极强。加州鲈已在中国广泛归化。",
+    bait:[{name:"软虫", tier:"best"}, {name:"卷尾蛆", tier:"best"}, {name:"铅头钩", tier:"good"}, {name:"米诺", tier:"good"}, {name:"亮片", tier:"ok"}, {name:"VIB", tier:"ok"}],
+    technique:"路亚——铅头钩+软虫在底部跳底搜索结构区。水面系（清晨）、中层米诺（阴天）、底层软虫（晴天）轮换尝试。中鱼后鲈鱼会猛烈洗鳃跳跃，压低竿尖防止脱钩。读水能力是钓鲈鱼的核心。",
+    tips:"路亚爱好者最爱的对象鱼之一。找倒树和石头堆就找到了鲈鱼。著名路亚赛事B.A.S.S.的核心目标鱼。",
+    record:"常见0.5-2斤，大个体可达3-5斤。",
+    rarity:3, difficulty:3
+  },
+  {
+    id:16, name:"鳡鱼", image:"https://upload.wikimedia.org/wikipedia/commons/b/b4/%D0%96%D0%B5%D0%BB%D1%82%D0%BE%D1%89%D1%91%D0%BA_%28Elopichthys_bambusa%29.JPG", type:"中上层", diet:"肉食",
+    months:[4,5,6,9,10], peakMonths:[5,10],
+    habitat:"大型江河和水库广阔水面，中国淡水顶级掠食者。游泳速度极快，可达60km/h以上。",
+    bait:[{name:"大亮片", tier:"best"}, {name:"大型米诺", tier:"best"}, {name:"铁板", tier:"good"}, {name:"波趴", tier:"good"}, {name:"VIB", tier:"ok"}, {name:"活鱼", tier:"ok"}],
+    technique:"路亚远投——8-15g亮片远投后快速收线。MH或H调竿，3000-4000型轮，PE线2.0-3.0号。中鱼后冲刺速度淡水鱼中无出其右，100米线几秒就能清杯，务必调好泄力！",
+    tips:"淡水鲨鱼，路亚的终极挑战。100米线几秒清杯的感觉只有钓过鳡鱼的人才知道。有鳡鱼的地方水质和水生态一定不错。",
+    record:"常见3-10斤，大鳡鱼可达20-40斤，最大记录超100斤。",
+    rarity:5, difficulty:5
+  },
+  {
+    id:17, name:"鲮鱼", image:"https://upload.wikimedia.org/wikipedia/commons/1/1c/HK_food_steamed_Minced_mud_carp_%E9%AF%AA%E9%AD%9A_Dace_fish_meat_%E8%82%89%E9%AD%9A_Bean_Curd_Tufo_product_%E8%B1%86%E8%85%90%E8%A3%BD%E5%93%81_Chinese_spring_onion_Jan-2016_dinner_%284%29.JPG", type:"底层", diet:"杂食",
+    months:[4,5,6,7,8,9,10], peakMonths:[5,6,9],
+    habitat:"中国华南（广东、广西、海南）的江河水库，喜沙石底质流水区。北方没有。",
+    bait:[{name:"冷冻饵", tier:"best"}, {name:"虾粉饵", tier:"best"}, {name:"蚯蚓", tier:"good"}, {name:"肝味饵", tier:"good"}, {name:"麦麸", tier:"ok"}, {name:"米饭", tier:"ok"}],
+    technique:"底钓，钓组要灵敏。鲮鱼口小但拉力是同体型鲫鱼的3倍以上！子线1.0-1.5号（不能太细），袖钩4-6号。中鱼后稳住竿子让它自己消耗体力。1斤鲮鱼的拉力≈3斤鲤鱼。",
+    tips:"华南地区特产，一斤鲮三斤鲤。土鲮、泰鲮、麦鲮是三个主要品种。鲮鱼是做鱼丸和鱼腐的上等原料，岭南名菜。",
+    record:"常见0.3-1斤，大鲮鱼可达2-4斤，极少数5斤以上。",
+    rarity:2, difficulty:3
+  },
+
+  {
+    id:18, name:"团头鲂", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Megalobrama_amblycephala_Kasumigaura2.jpg/330px-Megalobrama_amblycephala_Kasumigaura2.jpg", type:"中下层", diet:"草食",
+    months:[4,5,6,7,8,9,10], peakMonths:[5,6,9],
+    habitat:"长江中下游湖泊和水库，水草丰富的中下层水域。俗称武昌鱼，是鳊鱼的近亲但体型更高更扁。",
+    bait:[{name:"玉米粒", tier:"best"}, {name:"草叶", tier:"best"}, {name:"红虫", tier:"good"}, {name:"腥香饵", tier:"good"}, {name:"麦麸", tier:"ok"}, {name:"饭粒", tier:"ok"}],
+    technique:"与鳊鱼相似，底钓或离底。体型更扁、嘴更小，建议用袖钩3-4号。团头鲂集群性强，上鱼后保持安静继续钓。漂相为上顶后横走。",
+    tips:"才饮长沙水，又食武昌鱼——毛泽东笔下的武昌鱼就是团头鲂。肉质细嫩鲜美，是湖北菜的代表食材。",
+    record:"常见0.5-2斤，大团头鲂可达3-5斤。",
+    rarity:2, difficulty:2
+  },
+  {
+    id:19, name:"马口鱼", image:"https://upload.wikimedia.org/wikipedia/commons/c/c2/Opsariichthys_evolans.jpg", type:"中上层", diet:"肉食",
+    months:[3,4,5,6,7,8,9,10], peakMonths:[4,5,6,9],
+    habitat:"山区清澈溪流和河流中上层，水质要求极高。嘴大如马口，是山地溪流中的凶猛掠食者。",
+    bait:[{name:"小亮片", tier:"best"}, {name:"小软虫", tier:"best"}, {name:"蚯蚓", tier:"good"}, {name:"小鱼", tier:"good"}, {name:"苍蝇", tier:"ok"}, {name:"飞蝇", tier:"ok"}],
+    technique:"微型路亚（UL竿+2-5g亮片）在马口水域搜索。溪流钓用轻竿细线（0.2-0.4号子线）挂蚯蚓钓急流处。马口吃食凶猛，攻击瞬间手感极佳。UL钓法在中国近年非常流行。",
+    tips:"马口鱼对水质要求极高，是衡量溪流生态健康的指示物种。有马口的地方，水一定干净。UL钓马口是路亚入门的最佳选择。",
+    record:"常见15-25cm，大马口可达30-40cm，重约0.5-1斤。",
+    rarity:3, difficulty:3
+  },
+  {
+    id:20, name:"花骨鱼", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Hemibarbus_maculatus_Shanghai_Aquarium.jpg/330px-Hemibarbus_maculatus_Shanghai_Aquarium.jpg", type:"底层", diet:"杂食",
+    months:[4,5,6,7,8,9,10], peakMonths:[5,6,9],
+    habitat:"江河湖泊底部沙石区域，喜在流水中觅食。身上有斑点花纹，体型圆筒状。",
+    bait:[{name:"红虫", tier:"best"}, {name:"蚯蚓", tier:"best"}, {name:"腥香饵", tier:"good"}, {name:"虾粉饵", tier:"good"}, {name:"麦粒", tier:"ok"}, {name:"米饭", tier:"ok"}],
+    technique:"底钓，钓组灵敏。嘴小，用袖钩3-5号。花骨鱼吃饵动作轻微，漂相细腻，需要专注看漂。常见于江河急流下方的缓水区。",
+    tips:"花骨鱼在长江流域和东北地区分布较广。体型较小但味道鲜美。对底质有偏好——沙石底的河道最合适。",
+    record:"常见3-8两，大个体可达1-2斤。",
+    rarity:3, difficulty:3
+  },
+  {
+    id:21, name:"赤眼鳟", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Squaliobarbus_curriculus%2C_Seocheon.jpg/330px-Squaliobarbus_curriculus%2C_Seocheon.jpg", type:"中下层", diet:"杂食",
+    months:[4,5,6,7,8,9,10], peakMonths:[5,6,9],
+    habitat:"江河水库中下层，喜水质清澈的水域。眼上缘有红色斑是其标志特征。游动迅速，是敏捷的游猎型鱼类。",
+    bait:[{name:"蚯蚓", tier:"best"}, {name:"小虾", tier:"best"}, {name:"玉米粒", tier:"good"}, {name:"亮片", tier:"good"}, {name:"腥香饵", tier:"ok"}, {name:"麦粒", tier:"ok"}],
+    technique:"底钓或路亚均可。底钓用0.8-1.2号子线、袖钩4-6号。路亚用小亮片或小软虫慢收。赤眼鳟吃饵干脆，漂相直接黑漂。中鱼后冲刺有力，手感良好。",
+    tips:"眼睛上部有红斑，非常好认。常见于南方河流水库，近年来路亚爱好者逐渐将其作为目标鱼。",
+    record:"常见0.5-2斤，大个体可达3-5斤。",
+    rarity:3, difficulty:3
+  },
+  {
+    id:22, name:"太阳鱼", image:"https://upload.wikimedia.org/wikipedia/commons/d/d4/Bluegill_%28cropped%29.jpg", type:"中下层", diet:"杂食",
+    months:[4,5,6,7,8,9,10], peakMonths:[5,6,7,8],
+    habitat:"引进种，原产北美。现已在中国南方自然水域归化。喜静水浅水区，常在岸边活动。",
+    bait:[{name:"蚯蚓", tier:"best"}, {name:"小虫", tier:"best"}, {name:"腥香饵", tier:"good"}, {name:"小亮片", tier:"good"}, {name:"麦粒", tier:"ok"}, {name:"虾肉", tier:"ok"}],
+    technique:"轻型钓组——UL或L调竿，0.4-0.8号子线，袖钩3-5号。太阳鱼攻击性好，会追咬小亮片和软虫。体型虽小但色彩艳丽、拉力不错。是入门路亚和儿童钓鱼的理想对象鱼。",
+    tips:"色彩艳丽（蓝色条纹+橙色腹部），观赏性很强。在南方的池塘水库中很常见。好钓、好看、好吃——三好鱼种。",
+    record:"常见2-5两，大个体可达0.5-1斤。",
+    rarity:2, difficulty:1
+  },
+
+
+  {
+    id:23, name:"虹鳟", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Close_up_of_rainbow_trout_fish_underwater_oncorhynchus_mykiss.jpg/1280px-Close_up_of_rainbow_trout_fish_underwater_oncorhynchus_mykiss.jpg", type:"中下层", diet:"肉食",
+    months:[3,4,5,6,9,10,11], peakMonths:[4,5,10],
+    habitat:"引进种，原产北美。国内在三文鱼养殖基地（青海、甘肃、四川等冷水区）广泛放养。喜清澈、高溶氧、低温的流水环境。",
+    bait:[{name:"飞蝇", tier:"best"}, {name:"小亮片", tier:"best"}, {name:"小软虫", tier:"good"}, {name:"小勺", tier:"good"}, {name:"小虫", tier:"ok"}, {name:"蚯蚓", tier:"ok"}],
+    technique:"飞蝇钓法是钓虹鳟的经典方式，在溪流中使用干蝇或若虫模仿自然食物。路亚用小亮片（2-5g）在激流中搜索。虹鳟攻击时视觉冲击力强、跳跃洗鳃频繁。",
+    tips:"虹鳟是飞蝇钓的核心目标鱼，有专门的飞蝇竞技比赛。三文鱼的淡水近亲，肉质橘红色，是高端食材。冷水区的顶级对象鱼。",
+    record:"常见1-3斤，大个体可达5-10斤。",
+    rarity:3, difficulty:4
+  },
+  {
+    id:24, name:"黄尾鲴", image:"https://upload.wikimedia.org/wikipedia/commons/7/74/%D0%92%D0%B5%D1%80%D1%85%D0%BE%D0%B3%D0%BB%D1%8F%D0%B4_%28%D0%BB%D0%B0%D1%82._Chanodichthys_erythropterus%29.jpg", type:"底层", diet:"杂食",
+    months:[4,5,6,7,8,9,10], peakMonths:[5,6,9],
+    habitat:"长江及以南水域的江河水库，喜沙石底，在水底刮食藻类和有机碎屑。尾鳍下叶黄色，是其标志特征。",
+    bait:[{name:"红虫", tier:"best"}, {name:"腥香饵", tier:"best"}, {name:"蚯蚓", tier:"good"}, {name:"藻粉饵", tier:"good"}, {name:"麦麸", tier:"ok"}, {name:"饭粒", tier:"ok"}],
+    technique:"底钓，钓组灵敏。黄尾鲴嘴小且位于吻部下端（刮食型），用袖钩3-4号。吃饵动作轻微，漂相细腻，需全神贯注。集群性强，找到鱼群能连杆。",
+    tips:"黄尾鲴在长江流域水库中很常见。体型虽小但味道鲜美。钓黄尾鲴考验的是看漂功夫——漂相极其细微。",
+    record:"常见3-8两，大个体可达1-2斤。",
+    rarity:2, difficulty:3
+  },
+  {
+    id:25, name:"红鳍鲌", image:"https://upload.wikimedia.org/wikipedia/commons/7/74/%D0%92%D0%B5%D1%80%D1%85%D0%BE%D0%B3%D0%BB%D1%8F%D0%B4_%28%D0%BB%D0%B0%D1%82._Chanodichthys_erythropterus%29.jpg", type:"中上层", diet:"肉食",
+    months:[4,5,6,7,8,9,10], peakMonths:[5,6,9],
+    habitat:"江河湖泊中上层，喜在开阔水面集群追食小鱼。体型与翘嘴相似但更小更扁，腹鳍呈红色。",
+    bait:[{name:"小亮片", tier:"best"}, {name:"小软虫", tier:"best"}, {name:"活虾", tier:"good"}, {name:"蚯蚓", tier:"good"}, {name:"飞蝇", tier:"ok"}, {name:"小活鱼", tier:"ok"}],
+    technique:"UL路亚——小亮片（2-5g）在水面快速搜索。手竿用活虾浮钓1-2米。红鳍鲌集群性强、攻击积极，窗口期（早晚）口很好。体型虽小但拉力十足、肉质鲜美。",
+    tips:"红鳍鲌和翘嘴很像但体型更小。集群捕食时水面翻腾壮观。是路亚入门和UL钓法的理想对象鱼。",
+    record:"常见0.5-2斤，大个体可达3-5斤。",
+    rarity:2, difficulty:2
+  },
+  {
+    id:26, name:"沙塘鳢", image:"https://upload.wikimedia.org/wikipedia/commons/3/32/Odontobutis_obscura_Isahaya.jpg", type:"底层", diet:"肉食",
+    months:[4,5,6,7,8,9], peakMonths:[5,6,7],
+    habitat:"水底石缝、泥洞和瓦砾中，喜在底层隐蔽处伏击猎物。广泛分布于中国各淡水水域的底部。",
+    bait:[{name:"蚯蚓", tier:"best"}, {name:"红虫", tier:"best"}, {name:"小虾", tier:"good"}, {name:"小鱼段", tier:"good"}, {name:"肝饵", tier:"ok"}, {name:"蛆虫", tier:"ok"}],
+    technique:"底钓，用小钩（袖钩2-3号）和细线（0.3-0.5号子线）。钓点选石头缝旁的沙泥底。沙塘鳢吃口干脆但体型小，需要灵敏的钓组才能感觉到。在南方常和黄颡鱼一起被钓到。",
+    tips:"别名土布鱼、呆子鱼。个头小但味道极鲜。在江浙一带是传统名菜「土步鱼」的原料。野生个体越来越少，价格不菲。",
+    record:"常见5-15cm，大个体可达20-25cm，重约3-5两。",
+    rarity:3, difficulty:2
+  },
+  {
+    id:27, name:"蒙古红鲌", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Chanodichthys_mongolicus_from_the_Lake_Khanka.jpg/330px-Chanodichthys_mongolicus_from_the_Lake_Khanka.jpg", type:"中上层", diet:"肉食",
+    months:[4,5,6,7,8,9,10], peakMonths:[5,6,9],
+    habitat:"东北、内蒙古、新疆等北方冷水区湖泊河流。与翘嘴同属但更耐寒，是北方水域的重要掠食者。",
+    bait:[{name:"亮片", tier:"best"}, {name:"米诺", tier:"best"}, {name:"小活鱼", tier:"good"}, {name:"软虫", tier:"good"}, {name:"飞蝇", tier:"ok"}, {name:"蚯蚓", tier:"ok"}],
+    technique:"路亚——M或ML调竿，亮片5-10g远投搜索。蒙古红鲌攻击凶猛，常在收线中途突然截击。早晚窗口期效果最好。北方秋季水温下降时，红鲌会疯狂进食备战冬季，是黄金钓鱼期。",
+    tips:"蒙古红鲌耐寒性极强，在北方冰封期前活动依然活跃。是东北和内蒙古路亚爱好者的主要目标鱼之一。",
+    record:"常见1-3斤，大个体可达5-8斤。",
+    rarity:3, difficulty:3
+  },
+  {
+    id:28, name:"餐条", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Hemiculter_leucisculus_Taijiang_National_Park.jpg/330px-Hemiculter_leucisculus_Taijiang_National_Park.jpg", type:"中上层", diet:"杂食",
+    months:[3,4,5,6,7,8,9,10,11], peakMonths:[4,5,6,9,10],
+    habitat:"水域表层，常在水面成群游动觅食。中国淡水水域中最常见的小型鱼类之一，和白条并称水面双雄。",
+    bait:[{name:"腥香面饵", tier:"best"}, {name:"米糠", tier:"best"}, {name:"面包屑", tier:"good"}, {name:"苍蝇", tier:"good"}, {name:"饭粒", tier:"ok"}, {name:"蚯蚓尖", tier:"ok"}],
+    technique:"浮钓水面——极轻钓组，0.1-0.2号子线，袖钩0.5-1号。饵料入水即来抢，讲究快速抛竿。刷餐条是很多新手入门的第一课，也是练习快速抛竿和看漂的绝佳方式。油炸餐条酥脆。",
+    tips:"餐条比白条体型更小、更细长。虽然常被嫌弃闹窝，但刷餐条是很多人的入门课和休闲乐趣。",
+    record:"常见8-15cm，最大约20cm，重约1-2两。",
+    rarity:1, difficulty:1
+  },
+
+  {
+    id:29, name:"麦穗鱼", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Pseudorasbora_parva%28edited_version%29.jpg/330px-Pseudorasbora_parva%28edited_version%29.jpg", type:"全水层", diet:"杂食",
+    months:[3,4,5,6,7,8,9,10], peakMonths:[4,5,6],
+    habitat:"岸边浅水区、水草丛中。中国淡水水域中最常见的小型鱼，几乎无处不在。繁殖力极强，种群庞大。",
+    bait:[{name:"腥香面饵", tier:"best"}, {name:"红虫粉", tier:"best"}, {name:"蚯蚓尖", tier:"good"}, {name:"面包屑", tier:"good"}, {name:"饭粒", tier:"ok"}, {name:"米糠", tier:"ok"}],
+    technique:"极细钓组——0.1-0.2号子线、袖钩0.5-1号。虽是闹窝专业户，但高密度钓麦穗也别有乐趣。常作为儿童钓鱼的启蒙鱼。油炸后酥脆可口。",
+    tips:"麦穗鱼是很多农村老钓友的童年记忆。虽小但种群庞大，是衡量水域生物量的基础鱼种。油炸麦穗酥脆，配啤酒正好。",
+    record:"常见5-8cm，最大约12-15cm，重约1两。",
+    rarity:1, difficulty:1
+  },
+  {
+    id:30, name:"黄鳝", image:"https://upload.wikimedia.org/wikipedia/commons/2/2c/Monopterus_albus_2.jpg", type:"底层", diet:"肉食",
+    months:[4,5,6,7,8,9,10], peakMonths:[5,6,7,8],
+    habitat:"稻田、沟渠、池塘的泥底洞穴中，夜行性。广泛分布于中国各地的淡水水域，尤以长江流域最多。",
+    bait:[{name:"黑蚯蚓", tier:"best"}, {name:"泥鳅段", tier:"best"}, {name:"鸡肝", tier:"good"}, {name:"小鱼段", tier:"good"}, {name:"虾肉", tier:"ok"}, {name:"猪肝", tier:"ok"}],
+    technique:"用黄鳝钩（长柄弯钩）穿蚯蚓探入泥洞/石缝中逗钓。也可用竹筒陷阱法——竹筒内放蚯蚓，黄昏放入田埂旁，清晨收。黄鳝吞钩快，手感一顿即提。夜间用手电照稻田，黄鳝遇光不动，可直接夹取。",
+    tips:"黄鳝是最常见的食用鱼之一，肉质滑嫩，是爆炒鳝段、鳝鱼面的原料。稻田和沟渠是钓黄鳝的最佳场所。黄鳝雌雄同体（先雌后雄），生物学非常独特。",
+    record:"常见0.3-1斤，大个体可达2-3斤。",
+    rarity:1, difficulty:2
+  },
+  {
+    id:31, name:"泥鳅", image:"https://inaturalist-open-data.s3.amazonaws.com/photos/26668427/medium.jpeg", type:"底层", diet:"杂食",
+    months:[3,4,5,6,7,8,9,10,11], peakMonths:[5,6,7,8],
+    habitat:"静水底部淤泥中，稻田、沟渠、池塘最常见。耐低氧能力强，可用肠呼吸。遍布中国各地淡水水域。",
+    bait:[{name:"红虫", tier:"best"}, {name:"蚯蚓碎段", tier:"best"}, {name:"腥香面饵", tier:"good"}, {name:"蛆虫", tier:"good"}, {name:"饭粒", tier:"ok"}, {name:"米糠", tier:"ok"}],
+    technique:"微型钓组——袖钩0.5-1号，0.1-0.2号子线。钓浅水底泥区。也可用竹篓陷阱法——竹篓内放饵料沉入水底，泥鳅钻入后提篓。泥鳅吃饵轻、漂相微弱，需要极度灵敏的钓组。",
+    tips:"泥鳅是最常见的淡水小鱼之一，也是很好的活饵（钓翘嘴、鳜鱼等）。泥鳅钻豆腐是一道江南名菜。生命力极强，离水可活很久。",
+    record:"常见10-20cm，大个体可达25-30cm。",
+    rarity:1, difficulty:1
+  },
+  {
+    id:32, name:"中华倒刺鲃", image:"https://upload.wikimedia.org/wikipedia/commons/c/c5/Spinibarbis_sinensis.jpg", type:"中下层", diet:"杂食",
+    months:[5,6,7,8,9], peakMonths:[6,7,8],
+    habitat:"长江及珠江水系的急流和深潭中，喜石底激流环境。俗称青波鱼，是西南地区的名贵鱼种。",
+    bait:[{name:"玉米粒", tier:"best"}, {name:"青苔", tier:"best"}, {name:"蚯蚓", tier:"good"}, {name:"螺肉", tier:"good"}, {name:"麦粒", tier:"ok"}, {name:"红虫", tier:"ok"}],
+    technique:"在急流中钓深潭或洄水处。倒刺鲃拉力极大，同体型力量远超鲤鱼。子线2.0-3.0号，伊势尼7-10号，需要用偏硬的竿子对抗急流。中鱼后会向激流方向冲刺，稳住竿子让它自己消耗体力。",
+    tips:"青波是西南地区（四川、重庆、贵州、云南）钓鱼人的梦幻鱼种。肉质极其鲜美。喜在激流深潭中活动，找水线（主流和回水的交界处）是关键。",
+    record:"常见1-5斤，大个体可达10-15斤。",
+    rarity:4, difficulty:4
+  },
+
+
+
+  {
+    id:33, name:"高体鳑鲏", image:"https://upload.wikimedia.org/wikipedia/commons/b/b1/Rosy_bitterling_%28Rhodeus_ocellatus%29_-_16241287138.jpg", type:"中上层", diet:"杂食",
+    months:[3,4,5,6,7,8,9,10], peakMonths:[4,5,6],
+    habitat:"静水或缓流的浅水区，水草丛中。中国各地广泛分布，体色绚丽，是著名的原生观赏鱼。",
+    bait:[{name:"腥香面饵", tier:"best"}, {name:"红虫", tier:"best"}, {name:"蚯蚓尖", tier:"good"}, {name:"米糠", tier:"good"}, {name:"面包屑", tier:"ok"}, {name:"饭粒", tier:"ok"}],
+    technique:"微型钓组——0.1号子线、袖钩0.3-0.5号。浮钓浅水草丛旁。鳑鲏体型极小但色彩艳丽（繁殖期雄鱼体侧有彩虹色），多是意外钓获。专门钓鳑鲏考验的是极致精细的钓技。",
+    tips:"鳑鲏是著名的原生观赏鱼，繁殖期雄鱼色彩极其绚丽。它们与河蚌有独特的共生关系——雌鱼将卵产在河蚌体内。鳑鲏对水质敏感，是水环境健康的指示生物。",
+    record:"常见3-6cm，最大约8-10cm。",
+    rarity:1, difficulty:3
+  },
+  {
+    id:34, name:"棒花鱼", image:"https://upload.wikimedia.org/wikipedia/commons/4/4a/Abbottina_rivularis_by_OpenCage.jpg", type:"底层", diet:"杂食",
+    months:[3,4,5,6,7,8,9,10,11], peakMonths:[5,6,7],
+    habitat:"江河湖泊的沙石底部，常在水底缓慢游动觅食。遍布中国大部分淡水水域。",
+    bait:[{name:"红虫", tier:"best"}, {name:"蚯蚓碎段", tier:"best"}, {name:"腥香饵", tier:"good"}, {name:"蛆虫", tier:"good"}, {name:"饭粒", tier:"ok"}, {name:"米糠", tier:"ok"}],
+    technique:"底钓，极细钓组——0.1-0.2号子线，袖钩0.5-1号。棒花鱼嘴小且朝下，吃饵动作轻微。多是底钓鲫鱼时意外钓获。雄鱼繁殖期头部出现珠星，是小型原生鱼的爱好者收藏对象。",
+    tips:"棒花鱼是最常见的底层小鱼之一。体型虽小但在生态系统中扮演重要角色——是翘嘴、鳜鱼等掠食者的食物来源。原生鱼爱好者常将其作为鱼缸宠物。",
+    record:"常见6-12cm，最大约15-18cm。",
+    rarity:1, difficulty:1
+  },
+  {
+    id:35, name:"圆尾斗鱼", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Macropodus_ocellatus.png/330px-Macropodus_ocellatus.png", type:"全水层", diet:"肉食",
+    months:[5,6,7,8,9], peakMonths:[6,7,8],
+    habitat:"静水沟渠、稻田、小池塘的水草丛中。中国本土斗鱼，有迷鳃器官可直接呼吸空气。雄鱼色彩绚丽。",
+    bait:[{name:"小虫", tier:"best"}, {name:"蚯蚓尖", tier:"best"}, {name:"蛆虫", tier:"good"}, {name:"红虫", tier:"good"}, {name:"小虾", tier:"ok"}, {name:"苍蝇", tier:"ok"}],
+    technique:"微型钓组在水草丛附近逗钓。圆尾斗鱼体型小（5-8cm），攻击性强，会追逐小虫和蚯蚓尖。钓到后可作为观赏鱼饲养——它们在鱼缸中非常美丽。",
+    tips:"圆尾斗鱼是中国本土的斗鱼品种，和泰国斗鱼是近亲。雄鱼相遇会展开鳍条争斗，极具观赏性。能在低氧水体中生存（可直接呼吸空气）。南方稻田和沟渠中最常见。",
+    record:"常见4-7cm，最大约8-10cm。",
+    rarity:2, difficulty:2
+  },
+  {
+    id:36, name:"月鳢", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Channa_asiatica_red.jpg/330px-Channa_asiatica_red.jpg", type:"底层", diet:"肉食",
+    months:[5,6,7,8,9], peakMonths:[6,7,8],
+    habitat:"南方（广东、广西、海南、福建）的江河、水库底层。俗称七星鱼、山斑鱼。有辅助呼吸器官，可离水活较长时间。",
+    bait:[{name:"蚯蚓", tier:"best"}, {name:"小活鱼", tier:"best"}, {name:"软虫", tier:"good"}, {name:"小虾", tier:"good"}, {name:"鸡肝", tier:"ok"}, {name:"泥鳅", tier:"ok"}],
+    technique:"底钓，选石头缝、树根等隐蔽处。月鳢和黑鱼习性相似，也是伏击型掠食者。子线1.0-2.0号（有利齿），伊势尼5-8号。月鳢攻击凶猛但体型较小，手感不如黑鱼但别有趣味。",
+    tips:"月鳢在华南地区被称为七星鱼，身上有7-8个眼状斑点。肉质鲜美（煲汤尤佳），是广东传统滋补食材。养殖的月鳢较多，野生个体越来越少。",
+    record:"常见0.3-1斤，大个体可达2-3斤。",
+    rarity:3, difficulty:3
+  },
+  {
+    id:37, name:"光倒刺鲃", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Sinwulyu_Gordon_04.jpg/1280px-Sinwulyu_Gordon_04.jpg", type:"中上层", diet:"杂食",
+    months:[5,6,7,8,9], peakMonths:[6,7,8],
+    habitat:"长江以南清澈的江河溪流中上层，喜在急流和深潭交界处活动。俗称军鱼，是南方溪流中的明星鱼种。",
+    bait:[{name:"小亮片", tier:"best"}, {name:"活虾", tier:"best"}, {name:"软虫", tier:"good"}, {name:"玉米粒", tier:"good"}, {name:"蚯蚓", tier:"ok"}, {name:"飞蝇", tier:"ok"}],
+    technique:"路亚——UL或L调竿，小亮片（3-7g）在急流处搜索。光倒刺鲃攻击迅猛、洗鳃频繁，上鱼后视觉效果一流。也可用手竿挂活虾在激流中浮钓。军鱼对水质要求很高，只在清澈的溪流中生存。",
+    tips:"军鱼是南方溪流路亚的头号目标鱼。体侧有蓝色纵纹，阳光下闪闪发光。拉力一流——同体型力量远超鲤鱼。保护等级较高，野钓建议放流。",
+    record:"常见1-3斤，大个体可达5-8斤。",
+    rarity:4, difficulty:4
+  },
+
+
+  {
+    id:38, name:"斑鳢", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Channa_maculata_170712814.jpg/330px-Channa_maculata_170712814.jpg", type:"底层", diet:"肉食",
+    months:[5,6,7,8,9], peakMonths:[6,7,8],
+    habitat:"长江以南的静水水域，水草丛中。与月鳢和黑鱼同属鳢科，身上有不规则黑色斑块。",
+    bait:[{name:"青蛙", tier:"best"}, {name:"小活鱼", tier:"best"}, {name:"软虫", tier:"good"}, {name:"雷蛙", tier:"good"}, {name:"蚯蚓", tier:"ok"}, {name:"小虾", tier:"ok"}],
+    technique:"钓法和黑鱼类似——雷蛙在水草区慢拖，斑鳢从草洞中冲出攻击。体型比黑鱼小但攻击性一点也不差。斑鳢的斑纹比黑鱼更不规则，嘴部更尖。",
+    tips:"斑鳢在东南亚分布更广，中国多见于两广和海南。和黑鱼一样，斑鳢也有辅助呼吸器官，耐低氧能力极强。煲汤是广东人的传统吃法，认为有滋补功效。",
+    record:"常见0.5-2斤，大个体可达3-5斤。",
+    rarity:3, difficulty:3
+  },
+  {
+    id:39, name:"银鲴", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Chanodichthys_mongolicus_from_the_Lake_Khanka.jpg/330px-Chanodichthys_mongolicus_from_the_Lake_Khanka.jpg", type:"底层", diet:"杂食",
+    months:[4,5,6,7,8,9,10], peakMonths:[5,6,9],
+    habitat:"长江及以南水域的江河水库，喜沙石底质，在水底刮食藻类和碎屑。体型与黄尾鲴相似但体色银白。",
+    bait:[{name:"藻粉饵", tier:"best"}, {name:"红虫", tier:"best"}, {name:"腥香饵", tier:"good"}, {name:"蚯蚓", tier:"good"}, {name:"麦麸", tier:"ok"}, {name:"饭粒", tier:"ok"}],
+    technique:"底钓，钓组灵敏。银鲴嘴小且位于吻部下端，用袖钩3-4号。吃饵动作比黄尾鲴更轻微，漂相极其细腻，是考验看漂功夫的终极鱼种。集群性强，找到鱼群能连杆。",
+    tips:"银鲴在有机碎屑丰富的水域中多见。虽然体型不太大，但钓银鲴的技术含量很高。野生银鲴肉质鲜美，适合做小鱼干和炸鱼。",
+    record:"常见3-8两，大个体可达1-1.5斤。",
+    rarity:2, difficulty:3
+  },
+  {
+    id:40, name:"日本鳗鲡", image:"https://upload.wikimedia.org/wikipedia/commons/9/98/Anguilla_japonica.jpg", type:"底层", diet:"肉食",
+    months:[5,6,7,8,9,10], peakMonths:[6,7,8],
+    habitat:"江河湖泊底层，白天隐藏在石缝和泥洞中，夜间出来觅食。是降海洄游鱼类——深海产卵，幼鱼游回淡水生长。",
+    bait:[{name:"黑蚯蚓", tier:"best"}, {name:"鸡肝", tier:"best"}, {name:"泥鳅", tier:"good"}, {name:"小鱼", tier:"good"}, {name:"虾肉", tier:"ok"}, {name:"猪肝", tier:"ok"}],
+    technique:"夜钓底钓。用粗线大钩（主线3.0-5.0号，伊势尼8-12号），因为河鳗中钩后会猛烈翻滚缠绕。钓点选石头缝旁、桥墩下。河鳗吞钩后会迅速缩回洞中，提竿要果断！取鱼用毛巾——体表粘液极滑。",
+    tips:"河鳗（鳗鱼）是日料中蒲烧鳗鱼的原料。野生河鳗越来越稀少，养殖鳗鱼占据了市场主流。河鳗的生命周期至今仍是生物学之谜——它们在深海中产卵的确切地点到近年才被发现。",
+    record:"常见1-3斤，大个体可达5-10斤。",
+    rarity:3, difficulty:3
+  },
+  {
+    id:41, name:"长丰鲫", image:"images/crucian_carp.png", type:"底层", diet:"杂食",
+    months:[3,4,5,6,7,8,9,10,11,12], peakMonths:[4,5,10,11],
+    habitat:"中国水产科学研究院长江所选育的优良鲫鱼品种，已在长江流域广泛养殖和放流。生长快、体型大，在野生水域中也常见。",
+    bait:[{name:"红虫", tier:"best"}, {name:"蚯蚓", tier:"best"}, {name:"蓝鲫", tier:"good"}, {name:"九一八", tier:"good"}, {name:"酒米", tier:"good"}, {name:"麦粒", tier:"ok"}],
+    technique:"与普通鲫鱼钓法相同，底钓为主。长丰鲫体型更大、拉力稍强，子线可用0.6-1.0号。在放流了长丰鲫的水库中，能钓到1-3斤的大个体。",
+    tips:"长丰鲫是人工选育的优良品种，生长速度是普通鲫鱼的2-3倍。在水产养殖和增殖放流中广泛应用。钓到1斤以上的长丰鲫并不稀罕。",
+    record:"常见0.5-2斤，大个体可达3-5斤。",
+    rarity:2, difficulty:2
+  },
+  {
+    id:42, name:"似鳊", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Hemiculter_leucisculus_Taijiang_National_Park.jpg/330px-Hemiculter_leucisculus_Taijiang_National_Park.jpg", type:"中下层", diet:"杂食",
+    months:[4,5,6,7,8,9,10], peakMonths:[5,6,9],
+    habitat:"长江中下游及附属湖泊的中下层，喜在水草区附近活动。外形酷似鳊鱼但更小更细长。",
+    bait:[{name:"红虫", tier:"best"}, {name:"蚯蚓", tier:"best"}, {name:"腥香饵", tier:"good"}, {name:"麦麸", tier:"good"}, {name:"饭粒", tier:"ok"}, {name:"米糠", tier:"ok"}],
+    technique:"底钓或离底，钓法和鳊鱼相似但钓组更小——袖钩2-4号，子线0.4-0.8号。似鳊体型比鳊鱼小很多，但集群性强，找到鱼群可以连杆。漂相为轻微上顶后横走。",
+    tips:"似鳊在长江中下游的湖泊中很常见，是重要的饵料鱼之一。虽然体型小，但油炸后酥脆可口。也是翘嘴、鳜鱼等掠食者的重要食物来源。",
+    record:"常见10-20cm，最大约25cm，重约2-4两。",
+    rarity:1, difficulty:1
+  },
+
+  {
+    id:43, name:"大鳍鱊", image:"https://upload.wikimedia.org/wikipedia/commons/2/27/%E3%82%AA%E3%82%AA%E3%82%BF%E3%83%8A%E3%82%B4%E6%96%B0%E5%88%A9%E6%A0%B9%E5%B7%9D.jpg", type:"中上层", diet:"杂食",
+    months:[3,4,5,6,7,8,9,10], peakMonths:[4,5,6],
+    habitat:"长江流域的静水或缓流水域。体侧扁、鳞片大，繁殖期雄鱼出现艳丽的婚姻色。中国特有的原生观赏鱼类。",
+    bait:[{name:"腥香面饵", tier:"best"}, {name:"红虫", tier:"best"}, {name:"蚯蚓尖", tier:"good"}, {name:"米糠", tier:"good"}, {name:"面包屑", tier:"ok"}, {name:"饭粒", tier:"ok"}],
+    technique:"微型钓组浮钓浅水。同鳑鲏一样，大鳍鱊也是小型鱼类，多是意外钓获。繁殖期雄鱼色彩绚丽，原生鱼爱好者常将其作为观赏鱼。",
+    tips:"大鳍鱊和鳑鲏一样有过人的繁殖方式——雌鱼将卵产在河蚌体内，鱼卵在河蚌的鳃腔中孵化。这种独特的共生关系是淡水生态学的经典案例。",
+    record:"常见6-10cm，最大约12-15cm。",
+    rarity:2, difficulty:2
+  },
+  {
+    id:44, name:"蛇鮈", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Hemibarbus_maculatus_Shanghai_Aquarium.jpg/330px-Hemibarbus_maculatus_Shanghai_Aquarium.jpg", type:"底层", diet:"肉食",
+    months:[4,5,6,7,8,9,10], peakMonths:[5,6,7],
+    habitat:"长江以北的江河沙石底部，喜在流水中觅食。体型细长像蛇，吻部尖而下弯。俗称船丁鱼。",
+    bait:[{name:"红虫", tier:"best"}, {name:"蚯蚓碎段", tier:"best"}, {name:"蛆虫", tier:"good"}, {name:"虾肉碎", tier:"good"}, {name:"腥香饵", tier:"ok"}, {name:"小鱼段", tier:"ok"}],
+    technique:"底钓，极细钓组。蛇鮈嘴小，吃饵轻微。在北方江河中用长竿短线底钓沙石底，常能钓到。蛇鮈体型虽小但味道鲜美，油炸后酥脆。",
+    tips:"蛇鮈是北方江河中最常见的底层小鱼之一。因体型细长像蛇而得名。虽然不起眼，但在北方钓友心中有特殊地位——是童年钓鱼的回忆。",
+    record:"常见8-15cm，最大约20cm。",
+    rarity:1, difficulty:1
+  },
+  {
+    id:45, name:"叉尾斗鱼", image:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Macropodus_opercularis_-_side_%28aka%29_edit.jpg/1280px-Macropodus_opercularis_-_side_%28aka%29_edit.jpg", type:"全水层", diet:"肉食",
+    months:[5,6,7,8,9], peakMonths:[6,7,8],
+    habitat:"华南和西南地区的静水沟渠、稻田、小池塘中。和圆尾斗鱼一样有迷鳃器官，耐低氧。雄鱼尾鳍分叉，比圆尾斗鱼色彩更艳丽。",
+    bait:[{name:"小虫", tier:"best"}, {name:"蚯蚓尖", tier:"best"}, {name:"蛆虫", tier:"good"}, {name:"红虫", tier:"good"}, {name:"苍蝇", tier:"ok"}, {name:"小虾", tier:"ok"}],
+    technique:"微型钓组在水草丛附近逗钓。叉尾斗鱼攻击性极强，看到小虫会毫不犹豫地冲过来咬。雄鱼色彩绚丽——蓝绿色身体配红色鳍条，是顶级原生观赏鱼。钓到后很多人会养在鱼缸里。",
+    tips:"叉尾斗鱼（中国斗鱼/普叉）是中国特有观赏鱼，在国际水族市场上很受欢迎。雄鱼之间的争斗极具观赏性。能在低氧水体中生存，生命力超强。南方的孩子常在稻田里捉斗鱼当宠物。",
+    record:"常见4-7cm，最大约8-10cm。",
+    rarity:3, difficulty:2
+  },
+  {
+    id:46, name:"瓦氏雅罗鱼", image:"https://upload.wikimedia.org/wikipedia/commons/7/7f/Mongolia%2C_the_Tangut_Country_p_879.jpg", type:"中上层", diet:"杂食",
+    months:[5,6,7,8,9], peakMonths:[6,7,8],
+    habitat:"东北、内蒙古的冷水湖泊和河流中上层。耐寒性极强，是北方冰钓的重要对象鱼之一。",
+    bait:[{name:"小亮片", tier:"best"}, {name:"蚯蚓", tier:"best"}, {name:"小软虫", tier:"good"}, {name:"飞蝇", tier:"good"}, {name:"红虫", tier:"ok"}, {name:"麦粒", tier:"ok"}],
+    technique:"路亚（UL或L调竿，2-5g亮片）或飞蝇钓。雅罗鱼攻击积极，会在水面追咬小饵。冰钓时用小亮片上下抖动（jigging），是北方冰钓的主要玩法之一。",
+    tips:"瓦氏雅罗鱼是东北冷水区的代表性鱼种之一。耐寒性极强——零下30度的冬天，它们依然在冰下活跃游动。肉质鲜美，是东北地区的传统食用鱼。",
+    record:"常见0.5-2斤，大个体可达3-5斤。",
+    rarity:3, difficulty:2
+  },
+
+  {
+    id:47, name:"池沼公鱼", image:"https://upload.wikimedia.org/wikipedia/commons/5/58/FMIB_39359_Hypomesus_olidus_%28Pallas%29.jpeg", type:"中上层", diet:"肉食",
+    months:[3,4,5,10,11], peakMonths:[4,5],
+    habitat:"东北冷水湖泊和水库的上层。小型冷水鱼类，春季冰层融化后集群在表层觅食。",
+    bait:[{name:"小飞蝇", tier:"best"}, {name:"红虫", tier:"best"}, {name:"蚯蚓尖", tier:"good"}, {name:"小虫", tier:"good"}, {name:"小亮片", tier:"ok"}, {name:"蛆虫", tier:"ok"}],
+    technique:"飞蝇钓法在冷水湖泊表面搜索。池沼公鱼在春季冰融后集群在水面觅食浮游生物和小虫，是飞蝇钓的绝佳对象。体型虽小但攻击飞蝇时非常积极。",
+    tips:"池沼公鱼是中国东北冷水湖的特有小型鱼类。每年春季冰融后，公鱼集群觅食的景象极为壮观。虽然体型小，但在东北钓友心中地位很高——是冰钓季结束后的第一个目标鱼。",
+    record:"常见8-15cm，最大约20cm。",
+    rarity:3, difficulty:2
+  },
+
+  {
+    id:48, name:"柳根鱼", image:"https://upload.wikimedia.org/wikipedia/commons/d/d3/Phoxinus_lagowskii_steindachneri1.jpg", type:"中上层", diet:"杂食",
+    months:[3,4,5,6,7,8,9,10,11], peakMonths:[5,6,7,8],
+    habitat:"东北、华北、西北的冷水溪流和山涧中，喜清澈、高溶氧、低温的流水环境。常集群在水面附近觅食，是北方冷水溪流的标志性小型鱼类。",
+    bait:[{name:"腥香面饵", tier:"best"},{name:"红虫", tier:"best"},{name:"蚯蚓尖", tier:"good"},{name:"飞蝇", tier:"good"},{name:"小亮片", tier:"ok"},{name:"蛆虫", tier:"ok"}],
+    technique:"微型钓组浮钓水面——袖钩0.5-1号，0.1-0.2号子线。柳根鱼集群性强，找到鱼群后连杆不断，是北方溪流钓的入门经典。也可用UL路亚（1-3g小亮片）或飞蝇钓法。攻击积极、吃口干脆，体型虽小但趣味十足。",
+    tips:"柳根鱼是北方山溪中最常见的小型鱼类，也是冷水生态系统的基石物种。油炸柳根鱼酥脆可口，是东北林区的传统下酒菜。它对水质要求很高——有柳根鱼的山溪，水一定可以直接喝。东北钓友常说：会钓柳根，才算懂溪流钓。",
+    record:"常见8-15cm，大个体可达18-22cm。",
+    rarity:2, difficulty:1
+  }
+];
+
+const FISH_EMOJI = ['🐟','🐋','🐠','🐡','🐳','🦈','🐲','🐙','🦕','🐱','🐍','✨','⚡','🎯','🚀','💪','🐊','🦭','🦞','🦐','🐌','🦑','🐚','🦀','🐬','🦪','🐾','🦂','🦎','🐢','🦩','🐧','🕊'];
+const FISH_BG = ['fish-bg-1','fish-bg-2','fish-bg-3','fish-bg-4','fish-bg-5','fish-bg-6'];
+const TYPE_CLASS = { '底层':'bottom', '中下层':'mid', '中上层':'top', '全水层':'top' };
+const DIET_CLASS = { '肉食':'meat', '肉食(螺类)':'meat', '草食':'plant', '杂食':'mix', '滤食':'mix' };
+
+function renderFishList() {
+  const search = (document.getElementById('fishSearch')?.value || '').toLowerCase();
+  let species = FISH_SPECIES;
+  if (search) {
+    species = species.filter(f =>
+      f.name.includes(search) || (typeof f.habitat==='string' && f.habitat.includes(search))
+    );
+  }
+
+  document.getElementById('fishList').innerHTML = species.map((f, idx) => `
+    <div class="fish-list-item" onclick="openFishDetail(${f.id})">
+      <div class="fish-icon-circle" style="overflow:hidden;padding:0;">
+        ${f.image ? '<img src="' + f.image + '" style="width:88px;height:88px;object-fit:contain;" onerror="this.parentElement.innerHTML=\'' + FISH_EMOJI[idx % FISH_EMOJI.length] + '\'">' : '<span style="font-size:30px;">' + FISH_EMOJI[idx % FISH_EMOJI.length] + '</span>'}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:19px;font-weight:600;">${f.name}</span>
+          <span class="fish-mini-tag ${TYPE_CLASS[f.type] || 'mid'}">${f.type}</span>
+          <span class="fish-mini-tag ${DIET_CLASS[f.diet] || 'mix'}">${f.diet}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:6px;">
+          <span style="font-size:11px;color:#999;">稀有</span>
+          <span style="color:#FF9800;font-size:13px;letter-spacing:1px;">${'★'.repeat(f.rarity||1)}${'☆'.repeat(5-(f.rarity||1))}</span>
+          <span style="font-size:11px;color:#999;margin-left:4px;">难度</span>
+          <span style="color:#E53935;font-size:13px;letter-spacing:1px;">${'◆'.repeat(f.difficulty||1)}${'◇'.repeat(5-(f.difficulty||1))}</span>
+        </div>
+      </div>
+      <span style="color:#ccc;font-size:22px;">›</span>
+    </div>
+  `).join('');
+}
+
+function openFishDetail(id) {
+  const f = FISH_SPECIES.find(x => x.id === id);
+  if (!f) return;
+  document.getElementById('fishDetailTitle').textContent = f.name;
+  const rarityLabel = ['','随处可见','常见','不常见','稀有','极稀有'];
+  const diffLabel = ['','新手友好','需要经验','有一定难度','较难','大师级'];
+  const baitColors = { best: '#07C160', good: '#F57F17', ok: '#999' };
+  document.getElementById('fishDetailContent').innerHTML = `
+    <div class="fish-detail-section" style="text-align:center;padding-bottom:12px;">
+      ${f.image ? '<img src="' + f.image + '" style="width:100%;max-width:300px;max-height:220px;border-radius:14px;object-fit:contain;margin:0 auto 10px;display:block;background:#f8f8f8;" onerror="this.style.display=\'none\'">' : ''}
+      <div style="font-size:18px;font-weight:700;">${f.name}</div>
+      <div style="font-size:13px;color:#999;margin-top:4px;">${f.type} · ${f.diet}</div>
+      <div style="display:flex;gap:14px;margin-top:10px;justify-content:center;">
+        <div>
+          <div style="font-size:10px;color:#999;">稀有程度</div>
+          <div style="color:#FF9800;font-size:14px;letter-spacing:2px;">${'★'.repeat(f.rarity||1)}${'☆'.repeat(5-(f.rarity||1))}</div>
+          <div style="font-size:10px;color:#FF9800;">${rarityLabel[f.rarity||1]}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:#999;">作钓难度</div>
+          <div style="color:#E53935;font-size:14px;letter-spacing:2px;">${'◆'.repeat(f.difficulty||1)}${'◇'.repeat(5-(f.difficulty||1))}</div>
+          <div style="font-size:10px;color:#E53935;">${diffLabel[f.difficulty||1]}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fish-detail-section">
+      <h3>📋 栖息习性</h3>
+      <p style="font-size:14px;color:#555;line-height:1.7;">${f.habitat}</p>
+    </div>
+
+    <div class="fish-detail-section">
+      <h3>🪱 推荐饵料</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${f.bait.map(b => `<span style="padding:6px 14px;border-radius:16px;font-size:13px;background:${b.tier==='best'?'#E8F8EF':b.tier==='good'?'#FFF8E1':'#F5F5F5'};color:${baitColors[b.tier]};font-weight:500;">${b.name}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="fish-detail-section">
+      <h3>🎣 作钓思路</h3>
+      <p style="font-size:14px;color:#555;line-height:1.8;">${f.technique}</p>
+    </div>
+
+    <div class="fish-detail-section">
+      <h3>💡 垂钓要点</h3>
+      <p style="font-size:14px;color:#555;line-height:1.8;">${f.tips}</p>
+    </div>
+
+    <div class="fish-detail-section">
+      <h3>📏 体型参考</h3>
+      <p style="font-size:14px;color:#555;">${f.record}</p>
+    </div>
+
+    <div class="fish-detail-section">
+      <h3>🗓️ 作钓日历</h3>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+        ${[1,2,3,4,5,6,7,8,9,10,11,12].map(m => {
+          const isPeak = f.peakMonths.includes(m);
+          const isActive = f.months.includes(m);
+          let bg, color, label;
+          if (isPeak) { bg = '#07C160'; color = '#fff'; label = '旺季'; }
+          else if (isActive) { bg = '#E8F8EF'; color = '#07C160'; label = '可钓'; }
+          else { bg = '#F0F0F0'; color = '#ccc'; label = '淡季'; }
+          return `<div style="flex:1;text-align:center;padding:8px 4px;border-radius:8px;background:${bg};color:${color};min-width:40px;">
+            <div style="font-size:13px;font-weight:600;">${m}月</div>
+            <div style="font-size:10px;">${label}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+  document.getElementById('fishDetail').classList.add('show');
+}
+
+function closeFishDetail() {
+  document.getElementById('fishDetail').classList.remove('show');
+}
+
+// Shortcut: renderFishList = alias for init
+function renderFish() { renderFishList(); }
+
+// ===== INIT UPDATE =====
+document.addEventListener('DOMContentLoaded', () => {
+  renderFishList();
+  renderCircle();
+  renderAtlas();
+  renderWeather();
+  
+});
+
+
+// ===== EXPORT FOR TESTING =====
+
+window.QUICK_ASKS = QUICK_ASKS;
+window.atlasData = atlasData;
+window.getFallbackResponse = getFallbackResponse;
+</script>
+<!-- v1784610893 -->
+</body>
+</html>
