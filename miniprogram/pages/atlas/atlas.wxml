@@ -2,18 +2,14 @@
   <!-- WeChat Login -->
   <view wx:if="{{!hasLogin}}">
     <view class="login-box">
-      <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-        <image wx:if="{{userInfo.avatarUrl}}" src="{{userInfo.avatarUrl}}" class="avatar-img"/>
-        <view wx:else class="avatar-placeholder">🎣</view>
-      </button>
-      <input type="nickname" class="nickname-input" placeholder="点击设置昵称" bindinput="onNicknameInput" value="{{userInfo.nickName || ''}}"/>
-      <button class="login-btn" bindtap="doLogin">微信一键登录</button>
+      <view class="avatar-placeholder">🎣</view>
+      <button class="login-btn" bindtap="doLogin">一键获取微信头像昵称</button>
     </view>
   </view>
 
   <view wx:else>
     <view class="user-row">
-      <image wx:if="{{userInfo.avatarUrl}}" src="{{userInfo.avatarUrl}}" class="avatar-img"/>
+      <image wx:if="{{userInfo.avatarUrl}}" src="{{userInfo.avatarUrl}}" class="avatar-img" mode="aspectFill"/>
       <view wx:else class="avatar-placeholder small">🎣</view>
       <view class="user-info">
         <text class="user-name">{{userInfo.nickName || '钓鱼达人'}}</text>

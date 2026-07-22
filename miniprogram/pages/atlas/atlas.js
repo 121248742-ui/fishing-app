@@ -63,11 +63,38 @@ Page({
   },
   doLogin: function() {
     var that = this
-    // Ensure userInfo from data is synced to storage
-    var userInfo = that.data.userInfo || wx.getStorageSync('userInfo') || {}
-    if (!userInfo.nickName) {
-      userInfo.nickName = '钓鱼达人'
-    }
+    // One-click: get avatar + nickname via getUserProfile
+    wx.getUserProfile({
+      desc: '用于展示用户头像和昵称',
+      success: function(profileRes) {
+        var userInfo = profileRes.userInfo
+        // Save avatar to persistent storage
+        if (userInfo.avatarUrl) {
+          wx.downloadFile({
+            url: userInfo.avatarUrl,
+            success: function(dfRes) {
+              var fs = wx.getFileSystemManager()
+              var savedPath = wx.env.USER_DATA_PATH + '/avatar_' + Date.now() + '.png'
+              try { fs.copyFileSync(dfRes.tempFilePath, savedPath) } catch(e) {}
+              userInfo.avatarUrl = savedPath
+              that.finishLogin(userInfo)
+            },
+            fail: function() { that.finishLogin(userInfo) }
+          })
+        } else {
+          that.finishLogin(userInfo)
+        }
+      },
+      fail: function(err) {
+        // Fallback: manual login with nickname
+        var userInfo = that.data.userInfo || wx.getStorageSync('userInfo') || {}
+        if (!userInfo.nickName) userInfo.nickName = '钓鱼达人'
+        that.finishLogin(userInfo)
+      }
+    })
+  },
+  finishLogin: function(userInfo) {
+    var that = this
     wx.login({
       success: function(res) {
         if (res.code) {
