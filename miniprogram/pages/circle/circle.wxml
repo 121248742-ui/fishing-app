@@ -11,7 +11,6 @@
       <text class="overlay-title">📸 分享渔获</text>
       <text class="overlay-close" bindtap="closeForm">✕</text>
     </view>
-
     <view class="overlay-body">
       <view class="photo-upload" bindtap="choosePhoto">
         <image wx:if="{{photo}}" src="{{photo}}" mode="aspectFill" class="photo-preview"/>
@@ -20,57 +19,108 @@
           <text style="font-size:24rpx;color:#ccc;">点击上传渔获照片</text>
         </view>
       </view>
-
       <input class="form-input" placeholder="鱼种名称（如：鲫鱼）" value="{{fishType}}" bindinput="onInput" data-field="fishType"/>
       <input class="form-input" placeholder="重量（斤）" value="{{weight}}" bindinput="onInput" data-field="weight"/>
       <input class="form-input" placeholder="钓点名称" value="{{spot}}" bindinput="onInput" data-field="spot"/>
       <textarea class="form-input form-textarea" placeholder="说点什么..." value="{{note}}" bindinput="onInput" data-field="note"/>
-
       <button class="pub-btn" bindtap="publish">发布</button>
     </view>
   </view>
 </view>
 
-<!-- Post List -->
+<!-- Empty State -->
 <view wx:if="{{posts.length === 0}}" class="empty-state">
   <text style="font-size:80rpx;">🎣</text>
   <text style="font-size:28rpx;margin-top:16rpx;">还没有渔获分享</text>
   <text style="font-size:24rpx;color:#ccc;margin-top:8rpx;">点击右下角 + 开始分享</text>
 </view>
 
-<view class="post-list" wx:else>
-  <view class="card post-card" wx:for="{{posts}}" wx:key="time">
-    <view class="post-head">
-      <image wx:if="{{item.userAvatar}}" src="{{item.userAvatar}}" class="post-avatar-img" mode="aspectFill"/>
-      <view wx:else class="post-avatar-em">🎣</view>
-      <view class="post-head-info">
-        <text class="post-uname">{{item.userName}}</text>
-        <text class="post-utime">{{item.timeAgo}}</text>
+<!-- 小红书风格双列瀑布流 -->
+<view wx:else class="waterfall">
+  <view class="wf-col">
+    <block wx:for="{{posts}}" wx:key="time" wx:if="{{index % 2 === 0}}">
+      <view class="wf-card" bindtap="openDetail" data-idx="{{index}}">
+        <image wx:if="{{item.photo}}" src="{{item.photo}}" mode="widthFix" class="wf-img"/>
+        <view wx:else class="wf-img-empty">🎣</view>
+        <view class="wf-body">
+          <text class="wf-title">{{item.fishType || '渔获分享'}}</text>
+          <text class="wf-desc" wx:if="{{item.note}}">{{item.note}}</text>
+          <view class="wf-foot">
+            <image wx:if="{{item.userAvatar}}" src="{{item.userAvatar}}" class="wf-avatar" mode="aspectFill"/>
+            <view wx:else class="wf-avatar-em">🎣</view>
+            <text class="wf-name">{{item.userName}}</text>
+            <text class="wf-like">{{item.liked ? '❤️' : '🤍'}} {{item.likes || 0}}</text>
+          </view>
+        </view>
       </view>
-      <text class="tag tag-green" wx:if="{{item.fishType}}">{{item.fishType}}</text>
-    </view>
-
-    <view wx:if="{{item.photo}}" class="post-photo-wrap">
-      <image src="{{item.photo}}" mode="widthFix" class="post-photo"/>
-      <view class="post-photo-meta" wx:if="{{item.weight || item.spot}}">
-        <text wx:if="{{item.weight}}">⚖️ {{item.weight}}斤</text>
-        <text wx:if="{{item.weight && item.spot}}"> · </text>
-        <text wx:if="{{item.spot}}">📍 {{item.spot}}</text>
+    </block>
+  </view>
+  <view class="wf-col">
+    <block wx:for="{{posts}}" wx:key="time" wx:if="{{index % 2 === 1}}">
+      <view class="wf-card" bindtap="openDetail" data-idx="{{index}}">
+        <image wx:if="{{item.photo}}" src="{{item.photo}}" mode="widthFix" class="wf-img"/>
+        <view wx:else class="wf-img-empty">🎣</view>
+        <view class="wf-body">
+          <text class="wf-title">{{item.fishType || '渔获分享'}}</text>
+          <text class="wf-desc" wx:if="{{item.note}}">{{item.note}}</text>
+          <view class="wf-foot">
+            <image wx:if="{{item.userAvatar}}" src="{{item.userAvatar}}" class="wf-avatar" mode="aspectFill"/>
+            <view wx:else class="wf-avatar-em">🎣</view>
+            <text class="wf-name">{{item.userName}}</text>
+            <text class="wf-like">{{item.liked ? '❤️' : '🤍'}} {{item.likes || 0}}</text>
+          </view>
+        </view>
       </view>
+    </block>
+  </view>
+</view>
+
+<!-- Post Detail Overlay -->
+<view wx:if="{{detailPost}}" class="overlay">
+  <view class="overlay-mask" bindtap="closeDetail"></view>
+  <view class="overlay-panel">
+    <view class="overlay-head">
+      <text class="overlay-title">帖子详情</text>
+      <text class="overlay-close" bindtap="closeDetail">✕</text>
     </view>
-
-    <view wx:elif="{{item.weight || item.spot}}" class="post-info-inline">
-      <text wx:if="{{item.weight}}">⚖️ {{item.weight}}斤  </text>
-      <text wx:if="{{item.spot}}">📍 {{item.spot}}</text>
-    </view>
-
-    <text wx:if="{{item.note}}" class="post-note-text">{{item.note}}</text>
-
-    <view class="post-foot">
-      <view class="post-action {{item.liked ? 'liked' : ''}}" bindtap="toggleLike" data-idx="{{index}}">
-        <text>{{item.liked ? '❤️' : '🤍'}} {{item.likes || 0}}</text>
+    <scroll-view scroll-y class="overlay-body">
+      <image wx:if="{{detailPost.photo}}" src="{{detailPost.photo}}" mode="widthFix" class="detail-photo"/>
+      <view class="detail-info">
+        <view class="detail-user">
+          <image wx:if="{{detailPost.userAvatar}}" src="{{detailPost.userAvatar}}" class="detail-avatar" mode="aspectFill"/>
+          <view wx:else class="detail-avatar-em">🎣</view>
+          <view>
+            <text class="detail-username">{{detailPost.userName}}</text>
+            <text class="detail-time">{{detailPost.timeAgo}}</text>
+          </view>
+          <text class="tag tag-green" wx:if="{{detailPost.fishType}}">{{detailPost.fishType}}</text>
+        </view>
+        <text wx:if="{{detailPost.note}}" class="detail-note">{{detailPost.note}}</text>
+        <view class="detail-meta" wx:if="{{detailPost.weight || detailPost.spot}}">
+          <text wx:if="{{detailPost.weight}}">⚖️ {{detailPost.weight}}斤  </text>
+          <text wx:if="{{detailPost.spot}}">📍 {{detailPost.spot}}</text>
+        </view>
+        <view class="detail-actions">
+          <text class="detail-like {{detailPost.liked ? 'active' : ''}}" bindtap="toggleDetailLike">❤️ {{detailPost.likes || 0}}</text>
+          <text class="detail-del" bindtap="delDetailPost" data-idx="{{detailIdx}}">删除</text>
+        </view>
       </view>
-      <text class="post-del" bindtap="delPost" data-idx="{{index}}">删除</text>
+
+      <!-- Comments -->
+      <view class="comment-section">
+        <text class="comment-title">💬 评论 ({{detailPost.comments ? detailPost.comments.length : 0}})</text>
+        <view class="comment-item" wx:for="{{detailPost.comments}}" wx:key="time" wx:for-item="c">
+          <text class="comment-user">{{c.userName}}: </text>
+          <text class="comment-text">{{c.text}}</text>
+          <text class="comment-time">{{c.timeAgo}}</text>
+        </view>
+        <view wx:if="{{!detailPost.comments || detailPost.comments.length === 0}}" class="comment-empty">暂无评论，来说两句</view>
+      </view>
+    </scroll-view>
+    <!-- Comment Input -->
+    <view class="comment-bar">
+      <input class="comment-input" placeholder="写评论..." value="{{commentText}}" bindinput="onCommentInput" confirm-type="send" bindconfirm="sendComment"/>
+      <text class="comment-send" bindtap="sendComment">发送</text>
     </view>
   </view>
 </view>

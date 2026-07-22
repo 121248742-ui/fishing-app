@@ -29,12 +29,19 @@ Page({
     var totalLikes = allPosts.reduce(function(sum, p) { return sum + (p.likes || 0) }, 0)
     var noLikedPosts = myPosts.every(function(p) { return !p.likes })
 
+    // Notification tracking
+    var lastSeen = wx.getStorageSync('notify_seen') || { likes: 0, comments: 0 }
+    var newLikes = Math.max(0, totalLikes - lastSeen.likes)
+    var allComments = allPosts.reduce(function(sum, p) { return sum + (p.comments ? p.comments.length : 0) }, 0)
+    var newComments = Math.max(0, allComments - lastSeen.comments)
+
     this.setData({
       unlocked: unlocked, locked: locked,
       unlockedCount: unlocked.length, totalCount: all.length,
       userInfo: userInfo, hasLogin: hasLogin,
       myPosts: myPosts, postCount: allPosts.length, totalLikes: totalLikes,
-      noLikedPosts: noLikedPosts
+      noLikedPosts: noLikedPosts,
+      newLikes: newLikes, newComments: newComments, allComments: allComments
     })
   },
   _formatTime: function(timeStr) {
@@ -49,7 +56,16 @@ Page({
     return timeStr.substring(0, 10)
   },
   openSubPage: function(e) {
-    this.setData({ subPage: e.currentTarget.dataset.page })
+    var page = e.currentTarget.dataset.page
+    if (page === 'likes') {
+      // Clear notification
+      var allPosts = wx.getStorageSync('circle_posts') || []
+      var totalLikes = allPosts.reduce(function(s, p) { return s + (p.likes || 0) }, 0)
+      var allComments = allPosts.reduce(function(s, p) { return s + (p.comments ? p.comments.length : 0) }, 0)
+      wx.setStorageSync('notify_seen', { likes: totalLikes, comments: allComments })
+      this.setData({ newLikes: 0, newComments: 0 })
+    }
+    this.setData({ subPage: page })
   },
   closeSubPage: function() {
     this.setData({ subPage: '' })

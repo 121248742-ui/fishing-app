@@ -59,8 +59,9 @@
     <view class="menu-icon orange">❤️</view>
     <view class="menu-info">
       <text class="menu-label">获赞与互动</text>
-      <text class="menu-desc">共 {{totalLikes}} 个赞</text>
+      <text class="menu-desc">{{newLikes > 0 || newComments > 0 ? '有新互动' : '共 ' + totalLikes + ' 个赞'}}</text>
     </view>
+    <text class="menu-badge" wx:if="{{newLikes > 0 || newComments > 0}}">{{newLikes + newComments}}</text>
     <text class="menu-arrow">›</text>
   </view>
 </view>
