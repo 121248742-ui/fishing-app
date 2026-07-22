@@ -49,7 +49,7 @@
             <image wx:if="{{item.userAvatar}}" src="{{item.userAvatar}}" class="wf-avatar" mode="aspectFill"/>
             <view wx:else class="wf-avatar-em">🎣</view>
             <text class="wf-name">{{item.userName}}</text>
-            <text class="wf-like">{{item.liked ? '❤️' : '🤍'}} {{item.likes || 0}}</text>
+            <text class="wf-like" catchtap="toggleLike" data-idx="{{index}}">{{item.liked ? '❤️' : '🤍'}} {{item.likes || 0}}</text>
           </view>
         </view>
       </view>
@@ -67,7 +67,7 @@
             <image wx:if="{{item.userAvatar}}" src="{{item.userAvatar}}" class="wf-avatar" mode="aspectFill"/>
             <view wx:else class="wf-avatar-em">🎣</view>
             <text class="wf-name">{{item.userName}}</text>
-            <text class="wf-like">{{item.liked ? '❤️' : '🤍'}} {{item.likes || 0}}</text>
+            <text class="wf-like" catchtap="toggleLike" data-idx="{{index}}">{{item.liked ? '❤️' : '🤍'}} {{item.likes || 0}}</text>
           </view>
         </view>
       </view>

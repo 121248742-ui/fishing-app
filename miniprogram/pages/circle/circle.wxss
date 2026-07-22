@@ -77,7 +77,7 @@
   justify-content: center; font-size: 20rpx;
 }
 .wf-name { font-size: 20rpx; color: #999; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.wf-like { font-size: 20rpx; color: #999; }
+.wf-like { font-size: 30rpx; padding: 8rpx; }
 
 /* Detail */
 .detail-photo-wrap { display: flex; justify-content: center; margin-bottom: 20rpx; }
