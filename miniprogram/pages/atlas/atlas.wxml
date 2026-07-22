@@ -166,7 +166,7 @@
         </view>
       </view>
       <view wx:else>
-        <image wx:if="{{viewPost.photo}}" src="{{viewPost.photo}}" mode="widthFix" class="detail-photo"/>
+        <view class="detail-photo-wrap"><image wx:if="{{viewPost.photo}}" src="{{viewPost.photo}}" mode="widthFix" class="detail-photo"/></view>
         <view class="detail-info">
           <view class="detail-user">
             <view class="detail-avatar-em">🎣</view>
