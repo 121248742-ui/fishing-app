@@ -5,17 +5,16 @@ Page({
     if (u) this.setData({ hasLogin: true, userInfo: u })
   },
   pickAvatar: function() {
-    wx.showToast({ title: '触发', icon: 'none', duration: 500 })
     var that = this
     wx.chooseMedia({
       count: 1, mediaType: ['image'], sourceType: ['album', 'camera'],
       sizeType: ['compressed'],
-      success: function(res) { that.setData({ tempAvatar: res.tempFiles[0].tempFilePath }) },
+      success: function(res) {
+        that.setData({ tempAvatar: res.tempFiles[0].tempFilePath })
+        wx.showToast({ title: 'OK', icon: 'none' })
+      },
       fail: function(err) {
-        wx.chooseImage({
-          count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'],
-          success: function(res) { that.setData({ tempAvatar: res.tempFilePaths[0] }) }
-        })
+        wx.showToast({ title: 'FAIL: ' + (err.errMsg || 'unknown').substring(0, 20), icon: 'none', duration: 3000 })
       }
     })
   },
