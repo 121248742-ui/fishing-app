@@ -181,7 +181,8 @@ Page({
     }})
   },
   shareAtlas: function() {
-    this.setData({ subPage: 'share' })
+    var pct = this.data.totalCount ? Math.round(this.data.unlockedCount/this.data.totalCount*100) : 0
+    this.setData({ subPage: 'share', sharePct: pct })
   },
   onShareAppMessage: function() {
     return {

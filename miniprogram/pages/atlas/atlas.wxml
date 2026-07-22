@@ -158,7 +158,7 @@
   <scroll-view scroll-y class="sub-body">
     <view class="share-summary">
       <text class="share-title">🎣 {{userInfo.nickName || '钓鱼达人'}} 的图鉴</text>
-      <text class="share-stat">已解锁 {{unlockedCount}}/{{totalCount}} 种 · 完成度 {{Math.round(unlockedCount/totalCount*100)}}%</text>
+      <text class="share-stat">已解锁 {{unlockedCount}}/{{totalCount}} 种 · 完成度 {{sharePct}}%</text>
     </view>
     <view class="grid">
       <view class="cell unlocked" wx:for="{{unlocked}}" wx:key="id">
