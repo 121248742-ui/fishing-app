@@ -33,8 +33,8 @@
         <text style="font-size:24rpx;color:#ccc;">上传渔获照片来解锁</text>
       </view>
     </view>
-    <input class="form-input" placeholder="重量（斤）" value="{{weight}}" bindinput="onInput" data-field="weight"/>
-    <input class="form-input" placeholder="钓点名称" value="{{spot}}" bindinput="onInput" data-field="spot"/>
+    <input class="form-input" placeholder="重量（斤）选填" value="{{weight}}" bindinput="onInput" data-field="weight"/>
+    <input class="form-input" placeholder="钓点名称 选填" value="{{spot}}" bindinput="onInput" data-field="spot"/>
     <button class="pub-btn" bindtap="unlock">🔓 解锁此鱼种</button>
   </view>
 </view>

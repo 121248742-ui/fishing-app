@@ -20,9 +20,9 @@
         </view>
       </view>
       <input class="form-input" placeholder="鱼种名称（如：鲫鱼）" value="{{fishType}}" bindinput="onInput" data-field="fishType"/>
-      <input class="form-input" placeholder="重量（斤）" value="{{weight}}" bindinput="onInput" data-field="weight"/>
-      <input class="form-input" placeholder="钓点名称" value="{{spot}}" bindinput="onInput" data-field="spot"/>
-      <textarea class="form-input form-textarea" placeholder="说点什么..." value="{{note}}" bindinput="onInput" data-field="note"/>
+      <input class="form-input" placeholder="重量（斤）选填" value="{{weight}}" bindinput="onInput" data-field="weight"/>
+      <input class="form-input" placeholder="钓点名称 选填" value="{{spot}}" bindinput="onInput" data-field="spot"/>
+      <textarea class="form-input form-textarea" placeholder="说点什么... 选填" value="{{note}}" bindinput="onInput" data-field="note"/>
       <button class="pub-btn" bindtap="publish">发布</button>
     </view>
   </view>
