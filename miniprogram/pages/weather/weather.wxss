@@ -62,3 +62,31 @@
 .score-value { font-size: 100rpx; font-weight: 800; display: block; line-height: 1.2; }
 .score-advice { font-size: 24rpx; margin-top: 24rpx; line-height: 2.2; text-align: left; }
 .score-advice text { display: block; }
+
+/* Target Fish */
+.fish-target-card { margin-top: 20rpx; }
+.fish-picker {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 22rpx 24rpx; background: #F7F8FA; border-radius: var(--radius-sm);
+  margin-top: 12rpx;
+}
+.picker-text { font-size: 30rpx; font-weight: 600; color: var(--text); }
+.picker-arrow { font-size: 22rpx; color: var(--text-secondary); }
+
+.target-result { margin-top: 24rpx; }
+.target-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20rpx; }
+.target-name { font-size: 34rpx; font-weight: 800; }
+.target-score { font-size: 26rpx; font-weight: 700; padding: 6rpx 20rpx; border-radius: 20rpx; }
+.target-score.hot { background: #E8F8EF; color: #10703D; }
+.target-score.ok { background: #FFF8E1; color: #B45309; }
+.target-score.cold { background: #F5F5F5; color: #999; }
+
+.target-section { margin-bottom: 16rpx; }
+.target-label { font-size: 26rpx; font-weight: 700; display: block; margin-bottom: 8rpx; }
+.target-bait { display: flex; gap: 10rpx; flex-wrap: wrap; }
+.target-text { font-size: 24rpx; color: #555; line-height: 1.8; }
+
+.target-tips {
+  margin-top: 16rpx; padding: 20rpx; background: #E8F8EF;
+  border-radius: var(--radius-sm); font-size: 24rpx; color: #10703D; line-height: 1.6;
+}

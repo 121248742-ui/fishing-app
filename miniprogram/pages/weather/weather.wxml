@@ -88,3 +88,37 @@
     <text wx:for="{{advice}}" wx:key="*this">{{item}}</text>
   </view>
 </view>
+
+<!-- Target Fish Selector -->
+<view wx:if="{{activeSpot && weather}}" class="card fish-target-card">
+  <view class="section-title">🎯 选择目标鱼</view>
+  <picker mode="selector" range="{{fishList}}" value="{{fishIdx}}" bindchange="onFishChange">
+    <view class="fish-picker">
+      <text class="picker-text">{{fishList[fishIdx] || '选择鱼种'}}</text>
+      <text class="picker-arrow">▼</text>
+    </view>
+  </picker>
+
+  <view wx:if="{{activeFish}}" class="target-result">
+    <view class="target-header">
+      <text class="target-name">{{activeFish.name}}</text>
+      <text class="target-score {{fishScore >= 70 ? 'hot' : (fishScore >= 40 ? 'ok' : 'cold')}}">活跃指数 {{fishScore}}</text>
+    </view>
+
+    <view class="target-section">
+      <text class="target-label">🪱 推荐饵料</text>
+      <view class="target-bait">
+        <text class="tag-{{item.tier}}" wx:for="{{activeFish.bait}}" wx:key="name">{{item.name}}</text>
+      </view>
+    </view>
+
+    <view class="target-section">
+      <text class="target-label">🎣 作钓思路</text>
+      <text class="target-text">{{activeFish.technique}}</text>
+    </view>
+
+    <view class="target-tips">
+      <text>💡 {{activeFish.tips}}</text>
+    </view>
+  </view>
+</view>
