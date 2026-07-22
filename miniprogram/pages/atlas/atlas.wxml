@@ -179,8 +179,9 @@
           </view>
           <view class="detail-actions">
             <text class="detail-like">❤️ {{viewPost.likes || 0}}</text>
-            <text style="font-size:24rpx;color:#1AAD5F;margin-left:auto;margin-right:16rpx;" bindtap="startEdit">✏️ 编辑</text>
-            <text style="font-size:24rpx;color:#FA5151;" catchtap="delMyPost" data-idx="{{viewPostIdx}}">🗑️ 删除</text>
+            <view style="flex:1"></view>
+            <text class="act-btn act-edit" bindtap="startEdit">✏️ 编辑</text>
+            <text class="act-btn act-del" catchtap="delMyPost" data-idx="{{viewPostIdx}}">🗑️ 删除</text>
           </view>
         </view>
         <view class="comment-section">

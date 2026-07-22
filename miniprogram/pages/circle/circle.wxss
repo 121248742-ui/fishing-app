@@ -95,7 +95,9 @@
 .detail-actions { display: flex; align-items: center; gap: 24rpx; padding-bottom: 16rpx; border-bottom: 1px solid #F0F2F5; }
 .detail-like { font-size: 28rpx; color: var(--text-secondary); }
 .detail-like.active { color: #FA5151; }
-.detail-del { font-size: 24rpx; color: #ccc; margin-left: auto; }
+.detail-del { font-size: 24rpx; color: #ccc; }
+.act-btn { font-size: 24rpx; padding: 8rpx 24rpx; border-radius: 20rpx; }
+.act-del { color: #FA5151; background: #FDE8E8; }
 
 /* Comments */
 .comment-section { padding: 20rpx 0 100rpx; }
