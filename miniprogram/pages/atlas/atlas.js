@@ -162,6 +162,12 @@ Page({
   },
 
   // Login
+  onChooseAvatar: function(e) {
+    var that = this
+    var sp = wx.env.USER_DATA_PATH + '/avatar.png'
+    try { wx.getFileSystemManager().copyFileSync(e.detail.avatarUrl, sp) } catch(e) {}
+    that.setData({ tempAvatar: sp })
+  },
   pickAvatar: function() {
     var that = this
     wx.chooseMedia({

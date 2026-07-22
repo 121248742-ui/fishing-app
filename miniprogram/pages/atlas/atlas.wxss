@@ -22,13 +22,17 @@
 }
 .login-inner { display: flex; flex-direction: column; align-items: center; gap: 20rpx; }
 .avatar-zone {
-  width: 140rpx; height: 140rpx; border-radius: 50%;
+  width: 140rpx; height: 140rpx; border-radius: 50%; padding: 0;
   background: rgba(255,255,255,0.25); border: 3rpx dashed rgba(255,255,255,0.5);
   display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
+.avatar-zone::after { border: none; }
 .avatar-preview { width: 140rpx; height: 140rpx; border-radius: 50%; }
 .avatar-empty { font-size: 56rpx; }
 .avatar-tip { font-size: 24rpx; opacity: 0.85; }
+.avatar-row { display: flex; align-items: center; gap: 12rpx; }
+.avatar-or { font-size: 22rpx; opacity: 0.4; }
+.avatar-custom { font-size: 24rpx; opacity: 0.8; text-decoration: underline; }
 .name-input {
   background: rgba(255,255,255,0.25); color: #fff; text-align: center;
   padding: 16rpx 40rpx; border-radius: 40rpx; font-size: 28rpx; width: 400rpx;

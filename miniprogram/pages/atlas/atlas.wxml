@@ -23,12 +23,18 @@
 <!-- Login Card -->
 <view class="login-card" wx:else>
   <view class="login-inner">
-    <view class="avatar-zone" bindtap="pickAvatar">
+    <!-- WeChat official avatar -->
+    <button class="avatar-zone" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
       <image wx:if="{{tempAvatar}}" src="{{tempAvatar}}" mode="aspectFill" class="avatar-preview"/>
       <view wx:else class="avatar-empty"><text>📷</text></view>
+    </button>
+    <view class="avatar-row">
+      <text class="avatar-tip">点击获取微信头像</text>
+      <text class="avatar-or">|</text>
+      <text class="avatar-custom" bindtap="pickAvatar">自定义上传</text>
     </view>
-    <text class="avatar-tip">点击上传头像</text>
-    <input class="name-input" placeholder="请输入昵称" bindinput="onNicknameInput" value="{{tempNickname}}"/>
+    <!-- WeChat official nickname -->
+    <input type="nickname" class="name-input" placeholder="点击获取微信昵称" bindinput="onNicknameInput" value="{{tempNickname}}"/>
     <button class="submit-btn" bindtap="doLogin">登录</button>
   </view>
 </view>
