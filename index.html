@@ -7,20 +7,94 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
 :root {
-  --primary: #1AAD5F;
-  --primary-light: #E8F8EF;
-  --primary-dark: #158F4E;
-  --bg: #F0F2F5;
-  --card: #FFFFFF;
-  --text: #1F2937;
-  --text-secondary: #8B919E;
-  --border: #EBEDF0;
+  /* === Brand Green Scale === */
+  --green-50:  #E8F8EF;
+  --green-100: #C6F0D8;
+  --green-200: #9BE6BA;
+  --green-300: #6DD89A;
+  --green-400: #45CA7E;
+  --green-500: #1AAD5F;
+  --green-600: #158F4E;
+  --green-700: #10703D;
+  --green-800: #0B522C;
+  --green-900: #06371D;
+
+  /* === Neutral Gray Scale === */
+  --gray-50:  #F7F8FA;
+  --gray-100: #F0F2F5;
+  --gray-200: #E5E7EB;
+  --gray-300: #D1D5DB;
+  --gray-400: #9CA3AF;
+  --gray-500: #6B7280;
+  --gray-600: #4B5563;
+  --gray-700: #374151;
+  --gray-800: #1F2937;
+  --gray-900: #111827;
+
+  /* === Semantic Colors === */
+  --success: #1AAD5F;
+  --success-light: #E8F8EF;
+  --warning: #FF9A3C;
+  --warning-light: #FFF3E0;
   --danger: #FA5151;
-  --orange: #FF9A3C;
+  --danger-light: #FDE8E8;
+  --info: #3B82F6;
+  --info-light: #EFF6FF;
+
+  /* === Semantic Aliases === */
+  --primary:       var(--green-500);
+  --primary-light: var(--green-50);
+  --primary-dark:  var(--green-600);
+  --bg:            var(--gray-100);
+  --card:          #FFFFFF;
+  --text:          var(--gray-800);
+  --text-secondary:var(--gray-400);
+  --border:        var(--gray-200);
+  --orange:        var(--warning);
+
+  /* === Typography Scale === */
+  --text-xs:   0.75rem;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-lg:   1.125rem;
+  --text-xl:   1.25rem;
+  --text-2xl:  1.5rem;
+  --text-3xl:  2rem;
+  --text-4xl:  2.5rem;
+  --text-5xl:  3rem;
+
+  /* === Spacing Scale (4px base) === */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* === Elevation System === */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.03);
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
   --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
-  --radius: 14px;
+  --shadow-xl: 0 12px 36px rgba(0,0,0,0.12);
+
+  /* === Radii === */
+  --radius-sm: 8px;
+  --radius:    14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  /* === Transitions === */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+
+  /* === Layout === */
   --tab-height: 60px;
   --header-height: 48px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -147,21 +221,56 @@ body {
 }
 .fish-detail-section h3 { font-size: 15px; margin-bottom: 10px; color: var(--text); }
 
-/* Weather */
-.weather-main { display: flex; align-items: center; gap: 20px; padding: 4px 0; }
-.weather-icon { font-size: 56px; }
-.weather-temp { font-size: 48px; font-weight: 200; color: var(--text); }
-.weather-details { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-top: 14px; }
-.weather-item { text-align: center; padding: 8px 4px; }
-.weather-item .val { font-size: 18px; font-weight: 700; color: var(--text); }
-.weather-item .lbl { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
-.fishing-score {
-  text-align: center; padding: 20px; border-radius: var(--radius);
-  margin-top: 12px; color: #fff;
+/* === Weather === */
+.weather-main {
+  display: flex; align-items: center; gap: var(--space-5); padding: var(--space-2) 0;
 }
-.fishing-score.good { background: linear-gradient(135deg, #1AAD5F, #2BD472); }
-.fishing-score.ok { background: linear-gradient(135deg, #FF9A3C, #FFB84D); }
-.fishing-score.bad { background: linear-gradient(135deg, #909399, #B0B3BB); }
+.weather-icon { font-size: 56px; line-height: 1; }
+.weather-temp { font-size: var(--text-5xl); font-weight: 200; color: var(--text); line-height: 1; }
+.weather-desc { font-size: var(--text-sm); color: var(--gray-500); margin-top: 2px; }
+.weather-divider { width: 1px; height: 48px; background: var(--border); border-radius: 1px; }
+.weather-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-top: var(--space-4); }
+.weather-metric {
+  display: flex; align-items: center; gap: var(--space-3);
+  background: var(--gray-50); padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+}
+.weather-metric .metric-icon { font-size: 20px; flex-shrink: 0; }
+.weather-metric .metric-val { font-size: var(--text-lg); font-weight: 700; color: var(--text); }
+.weather-metric .metric-lbl { font-size: var(--text-xs); color: var(--text-secondary); }
+.weather-forecast {
+  display: flex; gap: var(--space-2); margin-top: var(--space-3);
+}
+.weather-forecast-item {
+  flex: 1; text-align: center; padding: var(--space-3) var(--space-1);
+  background: var(--gray-50); border-radius: var(--radius-sm);
+  transition: background var(--duration-fast);
+}
+.weather-forecast-item:hover { background: var(--green-50); }
+.weather-forecast-item .fc-day { font-size: var(--text-xs); color: var(--text-secondary); }
+.weather-forecast-item .fc-icon { font-size: 22px; margin: 4px 0; }
+.weather-forecast-item .fc-temp { font-size: var(--text-sm); font-weight: 600; color: var(--text); }
+
+.fishing-score {
+  text-align: center; padding: var(--space-6) var(--space-4); border-radius: var(--radius);
+  margin-top: var(--space-3); color: #fff; position: relative; overflow: hidden;
+}
+.fishing-score::before {
+  content: ''; position: absolute; top: -30px; right: -30px;
+  width: 100px; height: 100px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+}
+.fishing-score::after {
+  content: ''; position: absolute; bottom: -20px; left: -20px;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+}
+.fishing-score .score-value { font-size: var(--text-5xl); font-weight: 800; line-height: 1; position: relative; z-index: 1; }
+.fishing-score .score-label { font-size: var(--text-sm); opacity: 0.85; margin-top: var(--space-1); position: relative; z-index: 1; }
+.fishing-score .score-advice { font-size: var(--text-sm); margin-top: var(--space-3); line-height: 1.8; text-align: left; position: relative; z-index: 1; }
+.fishing-score.good { background: linear-gradient(135deg, #1AAD5F, #20C96A); }
+.fishing-score.ok   { background: linear-gradient(135deg, #FF9A3C, #FFB84D); }
+.fishing-score.bad  { background: linear-gradient(135deg, #909399, #B0B3BB); }
 
 /* Atlas Grid */
 .atlas-header {
@@ -273,6 +382,92 @@ button {
 }
 .toast.show { opacity: 1; }
 
+/* === Micro-Interactions & Animations === */
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.anim-slide-up  { animation: slideUp 0.35s var(--ease-out) both; }
+.anim-fade-in   { animation: fadeIn  0.3s var(--ease-out) both; }
+.anim-scale-in  { animation: scaleIn 0.3s var(--ease-out) both; }
+
+/* Stagger children */
+.stagger > * { animation: slideUp 0.35s var(--ease-out) both; }
+.stagger > *:nth-child(1) { animation-delay: 0s; }
+.stagger > *:nth-child(2) { animation-delay: 0.05s; }
+.stagger > *:nth-child(3) { animation-delay: 0.1s; }
+.stagger > *:nth-child(4) { animation-delay: 0.15s; }
+.stagger > *:nth-child(5) { animation-delay: 0.2s; }
+.stagger > *:nth-child(6) { animation-delay: 0.25s; }
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(90deg, var(--gray-200) 25%, var(--gray-100) 50%, var(--gray-200) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* === Pressable (universal tap feedback) === */
+.pressable {
+  transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+.pressable:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-xs);
+}
+
+/* === Badge / Tag System === */
+.tag {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 2px 8px; border-radius: var(--radius-full);
+  font-size: var(--text-xs); font-weight: 600; white-space: nowrap;
+}
+.tag-green  { background: var(--success-light); color: var(--green-700); }
+.tag-orange { background: var(--warning-light); color: #E65100; }
+.tag-red    { background: var(--danger-light);  color: #C62828; }
+.tag-blue   { background: var(--info-light);    color: #1E40AF; }
+.tag-gray   { background: var(--gray-100);      color: var(--gray-600); }
+.tag-gold   { background: #FFF8E1; color: #B45309; border: 1px solid #FCD34D; }
+
+/* === Highlight Card === */
+.card-highlight {
+  border: 1.5px solid var(--green-300);
+  box-shadow: 0 2px 12px rgba(26,173,95,0.12);
+  position: relative;
+}
+.card-highlight::after {
+  content: '热门'; position: absolute; top: 10px; right: 10px;
+  background: linear-gradient(135deg, var(--warning), #FFB84D);
+  color: #fff; font-size: 10px; font-weight: 700; padding: 2px 8px;
+  border-radius: var(--radius-full); letter-spacing: 0.5px;
+}
+
+/* === Divider === */
+.divider { height: 1px; background: var(--border); margin: var(--space-3) 0; }
+
+/* === Empty State === */
+.empty-state {
+  text-align: center; padding: 50px 20px;
+  color: var(--gray-300);
+}
+.empty-state .empty-icon { font-size: 48px; margin-bottom: var(--space-3); opacity: 0.6; }
+.empty-state .empty-title { font-size: var(--text-sm); margin-bottom: 4px; }
+.empty-state .empty-sub { font-size: var(--text-xs); opacity: 0.7; }
+
 </style>
 </head>
 <body>
@@ -299,7 +494,7 @@ button {
   <!-- Tab 1: 钓鱼圈 -->
   <div class="tab-content" id="tab-circle">
     <div style="margin-bottom:12px;">
-      <button onclick="openCirclePost()" style="width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;">📸 分享渔获</button>
+      <button onclick="openCirclePost()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--green-500),var(--green-400));color:#fff;border:none;border-radius:var(--radius);font-size:var(--text-base);font-weight:700;box-shadow:0 2px 8px rgba(26,173,95,0.25);">📸 分享渔获</button>
     </div>
     <div id="circleFeed"></div>
   </div>
@@ -330,13 +525,13 @@ button {
   <!-- Tab 2: 天气 -->
   <div class="tab-content" id="tab-weather">
     <div class="card" style="margin-bottom:10px;">
-      <div style="font-size:13px;color:#999;margin-bottom:6px;">我的钓点</div>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;" id="mySpotTags"></div>
-      <div style="display:flex;gap:6px;margin-bottom:6px;">
-        <input type="text" id="newSpotName" placeholder="钓点名称（如：密云水库北岸）" style="flex:1;padding:8px;border:1px solid #E5E5E5;border-radius:8px;font-size:13px;">
-        <button onclick="addCustomSpot()" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;white-space:nowrap;">+ 添加</button>
+      <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:8px;font-weight:600;">📍 我的钓点</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;" id="mySpotTags"></div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input type="text" id="newSpotName" placeholder="输入钓点名称" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:var(--text-sm);outline:none;">
+        <button onclick="addCustomSpot()" style="background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);padding:10px 16px;font-size:var(--text-sm);font-weight:600;white-space:nowrap;">+ 添加</button>
       </div>
-      <button onclick="getCurrentLocation()" style="background:none;border:1px solid var(--primary);color:var(--primary);border-radius:8px;padding:6px 14px;font-size:12px;width:100%;">🗺️ 从地图选择位置</button>
+      <button onclick="getCurrentLocation()" style="background:none;border:1.5px solid var(--primary);color:var(--primary);border-radius:var(--radius-sm);padding:8px 14px;font-size:var(--text-sm);width:100%;font-weight:500;">🗺️ 从地图选择位置</button>
     </div>
 <div class="card" id="weatherCard"></div>
     <div id="fishingAdvice"></div>
@@ -479,12 +674,118 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// ===== TAB 0: AI CHAT =====
-function renderQuickAsks() {
-  document.getElementById('quickAsks').innerHTML = QUICK_ASKS.map(q =>
-    `<span class="quick-ask" onclick="askQuick('${q}')">${q}</span>`
-  ).join('');
+// ===== TAB 0: FISH ENCYCLOPEDIA =====
+const HOT_FISH = ['鲫鱼', '鲤鱼', '草鱼', '鳊鱼', '翘嘴'];
+
+function renderFishList() {
+  var search = (document.getElementById('fishSearch')?.value || '').trim().toLowerCase();
+  var filtered = FISH_SPECIES.filter(function(f) {
+    if (!search) return true;
+    return f.name.includes(search) || f.type.includes(search) || f.diet.includes(search);
+  });
+  if (filtered.length === 0) {
+    document.getElementById('fishList').innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">未找到匹配鱼种</div><div class="empty-sub">试试其他关键词</div></div>';
+    return;
+  }
+  var isSearching = search.length > 0;
+  var html = '<div class="' + (isSearching ? '' : 'stagger') + '">';
+  for (var i = 0; i < filtered.length; i++) {
+    var f = filtered[i];
+    var imgTag = f.image
+      ? '<img src="' + f.image + '" alt="" onerror="this.parentElement.innerHTML=\'<span style=font-size:32px>\' + (FISH_EMOJI[(f.id-1)%FISH_EMOJI.length] || \'🐟\') + \'</span>\'" style="width:100%;height:100%;object-fit:contain;border-radius:50%;">'
+      : '<span style="font-size:32px">' + (FISH_EMOJI[(f.id-1)%FISH_EMOJI.length] || '🐟') + '</span>';
+    var bgIdx = (f.id % 6) + 1;
+    var isHot = !isSearching && HOT_FISH.indexOf(f.name) !== -1;
+    var dietaryTag = f.diet.includes('肉食') ? '<span class="tag tag-red" style="margin-left:4px;">肉食</span>' :
+                     f.diet.includes('草食') ? '<span class="tag tag-green" style="margin-left:4px;">草食</span>' :
+                     f.diet.includes('滤食') ? '<span class="tag tag-blue" style="margin-left:4px;">滤食</span>' :
+                     '<span class="tag tag-orange" style="margin-left:4px;">杂食</span>';
+    var depthTag = f.type.includes('上层') ? '<span class="tag tag-blue" style="margin-left:4px;">' + f.type + '</span>' :
+                   f.type.includes('下层') ? '<span class="tag tag-green" style="margin-left:4px;">' + f.type + '</span>' :
+                   '<span class="tag tag-gray" style="margin-left:4px;">' + f.type + '</span>';
+    var rarityStars = '';
+    for (var s = 0; s < 5; s++) rarityStars += s < f.rarity ? '★' : '☆';
+    var diffDots = '';
+    for (var d = 0; d < 5; d++) diffDots += d < f.difficulty ? '◆' : '◇';
+    html += '<div class="fish-list-item pressable' + (isHot ? ' card-highlight' : '') + '" onclick="openFishDetail(' + f.id + ')">' +
+      '<div class="fish-icon-circle fish-bg-' + bgIdx + '">' + imgTag + '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<span style="font-size:16px;font-weight:700;color:var(--text);">' + f.name + '</span>' +
+          dietaryTag + depthTag +
+        '</div>' +
+        '<div style="display:flex;gap:8px;margin-top:6px;font-size:var(--text-xs);color:var(--text-secondary);">' +
+          '<span>🎯 ' + rarityStars + '</span>' +
+          '<span>⚡ ' + diffDots + '</span>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--text-secondary);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (f.habitat || '').substring(0, 30) + '...</div>' +
+      '</div>' +
+      '<span style="color:var(--gray-300);font-size:18px;">›</span>' +
+    '</div>';
+  }
+  html += '</div>';
+  document.getElementById('fishList').innerHTML = html;
 }
+
+function openFishDetail(id) {
+  var f = FISH_SPECIES.find(function(x) { return x.id === id; });
+  if (!f) return;
+  document.getElementById('fishDetailTitle').textContent = f.name;
+  document.getElementById('fishDetail').classList.add('show');
+  var html = renderFishDetail(f);
+  document.getElementById('fishDetailContent').innerHTML = html;
+}
+
+function renderFishDetail(f) {
+  var rec = atlasData[f.id] || {};
+  var isUnlocked = !!rec.unlocked;
+  var imgTag = f.image
+    ? '<img src="' + f.image + '" style="width:80px;height:80px;border-radius:50%;object-fit:contain;background:var(--gray-50);flex-shrink:0;" alt="">'
+    : '<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--green-50),var(--green-100));display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;">🐟</div>';
+
+  return '' +
+    '<div class="fish-detail-section anim-fade-in" style="display:flex;align-items:center;gap:16px;">' +
+      imgTag +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:var(--text-xl);font-weight:700;color:var(--text);">' + f.name + '</div>' +
+        '<div style="font-size:var(--text-xs);color:var(--text-secondary);margin-top:2px;">' + f.type + ' · ' + f.diet + '</div>' +
+        '<div style="display:flex;gap:12px;margin-top:8px;">' +
+          '<div><div style="font-size:10px;color:var(--text-secondary);">稀有程度</div>' +
+          '<div style="color:var(--warning);font-size:var(--text-sm);">' + starStr(f.rarity) + '</div></div>' +
+          '<div><div style="font-size:10px;color:var(--text-secondary);">作钓难度</div>' +
+          '<div style="color:var(--danger);font-size:var(--text-sm);">' + diffStr(f.difficulty) + '</div></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="fish-detail-section anim-slide-up">' +
+      '<h3>📋 基本信息</h3>' +
+      '<p style="font-size:var(--text-sm);color:var(--gray-600);line-height:1.7;">' + f.habitat + '</p>' +
+      '<div style="margin-top:10px;display:flex;gap:4px;flex-wrap:wrap;">' +
+        f.peakMonths.map(function(m) { return '<span class="tag tag-green">旺季' + m + '月</span>'; }).join('') +
+      '</div>' +
+      '<div style="margin-top:8px;font-size:12px;color:var(--text-secondary);">📏 ' + (f.record || '暂无记录') + '</div>' +
+    '</div>' +
+
+    '<div class="fish-detail-section anim-slide-up" style="animation-delay:0.05s;">' +
+      '<h3>🪱 推荐饵料</h3>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+        f.bait.map(function(b) {
+          var cls = b.tier === 'best' ? 'tag-green' : b.tier === 'good' ? 'tag-orange' : 'tag-gray';
+          return '<span class="tag ' + cls + '" style="padding:6px 12px;font-size:var(--text-sm);">' + b.name + '</span>';
+        }).join('') +
+      '</div>' +
+    '</div>' +
+
+    '<div class="fish-detail-section anim-slide-up" style="animation-delay:0.1s;">' +
+      '<h3>🎣 作钓思路</h3>' +
+      '<p style="font-size:var(--text-sm);color:var(--gray-600);line-height:1.7;">' + f.technique + '</p>' +
+      '<div style="margin-top:10px;padding:12px;background:var(--green-50);border-radius:var(--radius-sm);font-size:var(--text-xs);color:var(--green-700);line-height:1.6;">💡 ' + (f.tips || '') + '</div>' +
+    '</div>';
+}
+
+// Remove old AI chat stubs - moved to encyclopedia
+function renderQuickAsks() {}
 
 function askQuick(q) {
   document.getElementById('chatInput').value = q;
@@ -593,29 +894,40 @@ let circlePhotoData = null;
 function renderCircle() {
   var feed = document.getElementById('circleFeed');
   if (circlePosts.length === 0) {
-    feed.innerHTML = '<div style="text-align:center;padding:50px 20px;color:#ccc;"><div style="font-size:48px;">💬</div><div style="font-size:14px;margin-top:8px;">还没有渔获分享</div><div style="font-size:12px;margin-top:4px;">点击上方按钮，晒出你的渔获吧</div></div>';
+    feed.innerHTML = '<div class="empty-state"><div class="empty-icon">🎣</div><div class="empty-title">还没有渔获分享</div><div class="empty-sub">点击上方按钮，晒出你的渔获吧</div></div>';
     return;
   }
-  var html = '';
+  var html = '<div class="stagger">';
   for (var i = circlePosts.length - 1; i >= 0; i--) {
     var p = circlePosts[i];
-    html += '<div class="card" style="margin-bottom:12px;">';
+    html += '<div class="card pressable" style="margin-bottom:12px;overflow:hidden;">';
+    // Header
     html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">';
-    html += '<div style="width:36px;height:36px;border-radius:50%;background:#E8F8EF;display:flex;align-items:center;justify-content:center;font-size:18px;">🎣</div>';
-    html += '<div><div style="font-size:14px;font-weight:600;">钓鱼人</div><div style="font-size:11px;color:#999;">' + p.time + '</div></div>';
+    html += '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--green-50),var(--green-200));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🎣</div>';
+    html += '<div style="flex:1;"><div style="font-size:var(--text-sm);font-weight:700;color:var(--text);">钓鱼人</div><div style="font-size:var(--text-xs);color:var(--text-secondary);">' + p.time + '</div></div>';
+    if (p.fishType) html += '<span class="tag tag-green">' + p.fishType + '</span>';
     html += '</div>';
-    if (p.photo) html += '<img src="' + p.photo + '" style="width:100%;border-radius:8px;margin-bottom:8px;max-height:300px;object-fit:contain;" alt="">';
-    html += '<div style="font-size:13px;color:#555;line-height:1.6;">';
-    if (p.fishType) html += '🐟 <strong>' + p.fishType + '</strong>';
-    if (p.weight) html += ' · ' + p.weight + '斤';
-    if (p.spot) html += '<br>📍 ' + p.spot;
-    if (p.note) html += '<br>💬 ' + p.note;
+    // Photo
+    if (p.photo) {
+      html += '<div style="position:relative;border-radius:var(--radius-sm);overflow:hidden;margin-bottom:10px;">';
+      html += '<img src="' + p.photo + '" style="width:100%;max-height:320px;object-fit:cover;display:block;" alt="">';
+      html += '<div style="position:absolute;bottom:0;left:0;right:0;padding:20px 12px 8px;background:linear-gradient(transparent,rgba(0,0,0,0.5));">';
+      html += '</div></div>';
+    }
+    // Info
+    html += '<div style="font-size:var(--text-sm);color:var(--gray-600);line-height:1.7;">';
+    if (p.weight) html += '⚖️ <strong>' + p.weight + '斤</strong>  ';
+    if (p.spot) html += '📍 ' + p.spot;
+    if (p.note) html += '<div style="margin-top:4px;color:var(--gray-700);">' + p.note + '</div>';
     html += '</div>';
-    html += '<div style="margin-top:8px;display:flex;gap:12px;font-size:12px;color:#999;">';
-    html += '<span>❤️ 0</span><span>💬 0</span>';
-    html += '<span style="margin-left:auto;cursor:pointer;color:#FA5151;" onclick="deleteCirclePost(' + i + ')">删除</span>';
+    // Actions
+    html += '<div class="divider"></div>';
+    html += '<div style="display:flex;gap:16px;font-size:var(--text-xs);color:var(--text-secondary);align-items:center;">';
+    html += '<span style="cursor:pointer;">❤️ 0</span><span style="cursor:pointer;">💬 0</span>';
+    html += '<span style="margin-left:auto;cursor:pointer;color:var(--danger);" onclick="event.stopPropagation();deleteCirclePost(' + i + ')">🗑️ 删除</span>';
     html += '</div></div>';
   }
+  html += '</div>';
   feed.innerHTML = html;
 }
 
@@ -683,9 +995,12 @@ function renderWeather() {
   for (var k = 0; k < mySpots.length; k++) {
     var s = mySpots[k];
     var isSel = weatherSelSpot && weatherSelSpot.name === s.name;
-    tagsHtml += '<span style="padding:5px 10px;background:' + (isSel ? '#07C160' : '#E8F8EF') + ';color:' + (isSel ? '#fff' : '#07C160') + ';border-radius:14px;font-size:11px;cursor:pointer;margin-bottom:4px;" onclick="selectMySpot(' + k + ')">' + s.name + ' <span onclick="event.stopPropagation();removeMySpot(' + k + ')" style="margin-left:2px;opacity:0.5;">×</span></span>';
+    tagsHtml += '<span style="padding:6px 12px;border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;font-weight:600;transition:all var(--duration-fast);' +
+      (isSel ? 'background:var(--primary);color:#fff;box-shadow:0 2px 6px rgba(26,173,95,0.3);' : 'background:var(--green-50);color:var(--green-600);') +
+      '" onclick="selectMySpot(' + k + ')">' + s.name +
+      ' <span onclick="event.stopPropagation();removeMySpot(' + k + ')" style="margin-left:4px;opacity:0.6;font-size:14px;">×</span></span>';
   }
-  if (mySpots.length === 0) tagsHtml = '<span style="color:#999;font-size:11px;">添加上方自定义钓点或使用📍获取当前位置</span>';
+  if (mySpots.length === 0) tagsHtml = '<span style="color:var(--text-secondary);font-size:var(--text-xs);">添加上方自定义钓点，或点击下方按钮选择位置</span>';
   document.getElementById('mySpotTags').innerHTML = tagsHtml;
 
   // Selected fish tag
@@ -733,36 +1048,54 @@ function renderWeather() {
   }
 
   // Weather card
+  var forecastHtml = '';
+  for (var fi = 1; fi < mockWeather.forecast.length; fi++) {
+    var f = mockWeather.forecast[fi];
+    forecastHtml += '<div class="weather-forecast-item">' +
+      '<div class="fc-day">' + f.day + '</div>' +
+      '<div class="fc-icon">' + f.icon + '</div>' +
+      '<div class="fc-temp">' + f.hi + '°/' + f.lo + '°</div></div>';
+  }
+
   document.getElementById('weatherCard').innerHTML =
     '<div>' +
-      '<div style="font-size:14px;color:#999;">' + now.toLocaleDateString('zh-CN',{weekday:'long'}) + (spotName ? ' · ' + spotName : '') + '</div>' +
+      '<div style="font-size:var(--text-sm);color:var(--text-secondary);">' + now.toLocaleDateString('zh-CN', {weekday:'long'}) + (spotName ? ' · 📍 ' + spotName : '') + '</div>' +
       '<div class="weather-main">' +
         '<span class="weather-icon">' + mockWeather.icon + '</span>' +
         '<span class="weather-temp">' + mockWeather.temp + '°</span>' +
+        '<div class="weather-divider"></div>' +
+        '<div>' +
+          '<div class="weather-desc">' + mockWeather.desc + '</div>' +
+          '<div style="font-size:var(--text-xs);color:var(--text-secondary);margin-top:2px;">体感 ' + (mockWeather.temp - 2) + '°</div>' +
+        '</div>' +
       '</div>' +
-      '<div style="font-size:14px;color:#555;">' + mockWeather.desc + '</div>' +
     '</div>' +
-    '<div class="weather-details">' +
-      '<div class="weather-item"><div class="val">' + mockWeather.pressure + '<span style="font-size:12px;color:#999;"> hPa</span></div><div class="lbl">气压</div></div>' +
-      '<div class="weather-item"><div class="val">' + mockWeather.humidity + '<span style="font-size:12px;color:#999;">%</span></div><div class="lbl">湿度</div></div>' +
-      '<div class="weather-item"><div class="val">' + mockWeather.wind + '</div><div class="lbl">风力风向</div></div>' +
-      '<div class="weather-item"><div class="val">' + mockWeather.forecast[0].hi + '°/' + mockWeather.forecast[0].lo + '°</div><div class="lbl">最高/最低温</div></div>' +
+    '<div class="weather-metrics">' +
+      '<div class="weather-metric">' +
+        '<span class="metric-icon">🌡️</span>' +
+        '<div><div class="metric-val">' + mockWeather.pressure + ' <span style="font-size:12px;color:var(--text-secondary);font-weight:400;">hPa</span></div><div class="metric-lbl">气压</div></div>' +
+      '</div>' +
+      '<div class="weather-metric">' +
+        '<span class="metric-icon">💧</span>' +
+        '<div><div class="metric-val">' + mockWeather.humidity + '<span style="font-size:12px;color:var(--text-secondary);font-weight:400;">%</span></div><div class="metric-lbl">湿度</div></div>' +
+      '</div>' +
+      '<div class="weather-metric">' +
+        '<span class="metric-icon">🌬️</span>' +
+        '<div><div class="metric-val" style="font-size:var(--text-sm);">' + mockWeather.wind + '</div><div class="metric-lbl">风力风向</div></div>' +
+      '</div>' +
+      '<div class="weather-metric">' +
+        '<span class="metric-icon">🌡️</span>' +
+        '<div><div class="metric-val">' + mockWeather.forecast[0].hi + '°/<span style="color:var(--text-secondary);">' + mockWeather.forecast[0].lo + '°</span></div><div class="metric-lbl">最高/最低</div></div>' +
+      '</div>' +
     '</div>' +
-    '<div style="display:flex;gap:8px;margin-top:12px;">' +
-      mockWeather.forecast.slice(1).map(function(f) {
-        return '<div style="flex:1;text-align:center;padding:8px;background:#F8F8F8;border-radius:8px;">' +
-          '<div style="font-size:12px;color:#999;">' + f.day + '</div>' +
-          '<div style="font-size:20px;">' + f.icon + '</div>' +
-          '<div style="font-size:12px;">' + f.hi + '°/' + f.lo + '°</div></div>';
-      }).join('') +
-    '</div>';
+    '<div class="weather-forecast">' + forecastHtml + '</div>';
 
   var levelClass = score >= 80 ? 'good' : (score >= 55 ? 'ok' : 'bad');
   document.getElementById('fishingAdvice').innerHTML =
     '<div class="fishing-score ' + levelClass + '">' +
-      '<div style="font-size:14px;">今日出钓指数</div>' +
-      '<div style="font-size:42px;font-weight:700;">' + score + '</div>' +
-      '<div style="font-size:13px;margin-top:8px;line-height:1.8;text-align:left;white-space:pre-line;">' + parts.join('\n') + '</div>' +
+      '<div class="score-label">今日出钓指数</div>' +
+      '<div class="score-value">' + score + '</div>' +
+      '<div class="score-advice">' + parts.join('<br>') + '</div>' +
     '</div>';
 }
 
@@ -1454,120 +1787,11 @@ const FISH_BG = ['fish-bg-1','fish-bg-2','fish-bg-3','fish-bg-4','fish-bg-5','fi
 const TYPE_CLASS = { '底层':'bottom', '中下层':'mid', '中上层':'top', '全水层':'top' };
 const DIET_CLASS = { '肉食':'meat', '肉食(螺类)':'meat', '草食':'plant', '杂食':'mix', '滤食':'mix' };
 
-function renderFishList() {
-  const search = (document.getElementById('fishSearch')?.value || '').toLowerCase();
-  let species = FISH_SPECIES;
-  if (search) {
-    species = species.filter(f =>
-      f.name.includes(search) || (typeof f.habitat==='string' && f.habitat.includes(search))
-    );
-  }
-
-  document.getElementById('fishList').innerHTML = species.map((f, idx) => `
-    <div class="fish-list-item" onclick="openFishDetail(${f.id})">
-      <div class="fish-icon-circle" style="overflow:hidden;padding:0;">
-        ${f.image ? '<img src="' + f.image + '" style="width:88px;height:88px;object-fit:contain;" onerror="this.parentElement.innerHTML=\'' + FISH_EMOJI[idx % FISH_EMOJI.length] + '\'">' : '<span style="font-size:30px;">' + FISH_EMOJI[idx % FISH_EMOJI.length] + '</span>'}
-      </div>
-      <div style="flex:1;min-width:0;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:19px;font-weight:600;">${f.name}</span>
-          <span class="fish-mini-tag ${TYPE_CLASS[f.type] || 'mid'}">${f.type}</span>
-          <span class="fish-mini-tag ${DIET_CLASS[f.diet] || 'mix'}">${f.diet}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;margin-top:6px;">
-          <span style="font-size:11px;color:#999;">稀有</span>
-          <span style="color:#FF9800;font-size:13px;letter-spacing:1px;">${'★'.repeat(f.rarity||1)}${'☆'.repeat(5-(f.rarity||1))}</span>
-          <span style="font-size:11px;color:#999;margin-left:4px;">难度</span>
-          <span style="color:#E53935;font-size:13px;letter-spacing:1px;">${'◆'.repeat(f.difficulty||1)}${'◇'.repeat(5-(f.difficulty||1))}</span>
-        </div>
-      </div>
-      <span style="color:#ccc;font-size:22px;">›</span>
-    </div>
-  `).join('');
-}
-
-function openFishDetail(id) {
-  const f = FISH_SPECIES.find(x => x.id === id);
-  if (!f) return;
-  document.getElementById('fishDetailTitle').textContent = f.name;
-  const rarityLabel = ['','随处可见','常见','不常见','稀有','极稀有'];
-  const diffLabel = ['','新手友好','需要经验','有一定难度','较难','大师级'];
-  const baitColors = { best: '#07C160', good: '#F57F17', ok: '#999' };
-  document.getElementById('fishDetailContent').innerHTML = `
-    <div class="fish-detail-section" style="text-align:center;padding-bottom:12px;">
-      ${f.image ? '<img src="' + f.image + '" style="width:100%;max-width:300px;max-height:220px;border-radius:14px;object-fit:contain;margin:0 auto 10px;display:block;background:#f8f8f8;" onerror="this.style.display=\'none\'">' : ''}
-      <div style="font-size:18px;font-weight:700;">${f.name}</div>
-      <div style="font-size:13px;color:#999;margin-top:4px;">${f.type} · ${f.diet}</div>
-      <div style="display:flex;gap:14px;margin-top:10px;justify-content:center;">
-        <div>
-          <div style="font-size:10px;color:#999;">稀有程度</div>
-          <div style="color:#FF9800;font-size:14px;letter-spacing:2px;">${'★'.repeat(f.rarity||1)}${'☆'.repeat(5-(f.rarity||1))}</div>
-          <div style="font-size:10px;color:#FF9800;">${rarityLabel[f.rarity||1]}</div>
-        </div>
-        <div>
-          <div style="font-size:10px;color:#999;">作钓难度</div>
-          <div style="color:#E53935;font-size:14px;letter-spacing:2px;">${'◆'.repeat(f.difficulty||1)}${'◇'.repeat(5-(f.difficulty||1))}</div>
-          <div style="font-size:10px;color:#E53935;">${diffLabel[f.difficulty||1]}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="fish-detail-section">
-      <h3>📋 栖息习性</h3>
-      <p style="font-size:14px;color:#555;line-height:1.7;">${f.habitat}</p>
-    </div>
-
-    <div class="fish-detail-section">
-      <h3>🪱 推荐饵料</h3>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        ${f.bait.map(b => `<span style="padding:6px 14px;border-radius:16px;font-size:13px;background:${b.tier==='best'?'#E8F8EF':b.tier==='good'?'#FFF8E1':'#F5F5F5'};color:${baitColors[b.tier]};font-weight:500;">${b.name}</span>`).join('')}
-      </div>
-    </div>
-
-    <div class="fish-detail-section">
-      <h3>🎣 作钓思路</h3>
-      <p style="font-size:14px;color:#555;line-height:1.8;">${f.technique}</p>
-    </div>
-
-    <div class="fish-detail-section">
-      <h3>💡 垂钓要点</h3>
-      <p style="font-size:14px;color:#555;line-height:1.8;">${f.tips}</p>
-    </div>
-
-    <div class="fish-detail-section">
-      <h3>📏 体型参考</h3>
-      <p style="font-size:14px;color:#555;">${f.record}</p>
-    </div>
-
-    <div class="fish-detail-section">
-      <h3>🗓️ 作钓日历</h3>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;">
-        ${[1,2,3,4,5,6,7,8,9,10,11,12].map(m => {
-          const isPeak = f.peakMonths.includes(m);
-          const isActive = f.months.includes(m);
-          let bg, color, label;
-          if (isPeak) { bg = '#07C160'; color = '#fff'; label = '旺季'; }
-          else if (isActive) { bg = '#E8F8EF'; color = '#07C160'; label = '可钓'; }
-          else { bg = '#F0F0F0'; color = '#ccc'; label = '淡季'; }
-          return `<div style="flex:1;text-align:center;padding:8px 4px;border-radius:8px;background:${bg};color:${color};min-width:40px;">
-            <div style="font-size:13px;font-weight:600;">${m}月</div>
-            <div style="font-size:10px;">${label}</div>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>
-  `;
-  document.getElementById('fishDetail').classList.add('show');
-}
-
 function closeFishDetail() {
   document.getElementById('fishDetail').classList.remove('show');
 }
 
-// Shortcut: renderFishList = alias for init
-function renderFish() { renderFishList(); }
-
-// ===== INIT UPDATE =====
+// ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
   renderFishList();
   renderCircle();
