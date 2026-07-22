@@ -41,11 +41,6 @@
 
 <!-- Menu -->
 <view wx:if="{{hasLogin}}" class="card menu-card">
-  <view class="menu-item" bindtap="openSubPage" data-page="atlas">
-    <view class="menu-icon green">🐟</view>
-    <view class="menu-info"><text class="menu-label">我的图鉴</text><text class="menu-desc">已解锁 {{unlockedCount}}/{{totalCount}} 种鱼</text></view>
-    <text class="menu-arrow">›</text>
-  </view>
   <view class="menu-item" bindtap="openSubPage" data-page="posts">
     <view class="menu-icon blue">📝</view>
     <view class="menu-info"><text class="menu-label">我的帖子</text><text class="menu-desc">{{postCount}} 篇帖子</text></view>
@@ -62,25 +57,23 @@
   </view>
 </view>
 
-<!-- Sub Pages (unchanged) -->
-<view wx:if="{{subPage === 'atlas'}}" class="sub-page">
-  <view class="sub-head"><text class="sub-back" bindtap="closeSubPage">←</text><text class="sub-title">我的图鉴</text></view>
-  <scroll-view scroll-y class="sub-body">
-    <view wx:if="{{unlocked.length}}" class="section-label">🎯 已解锁 ({{unlocked.length}})</view>
-    <view class="grid">
-      <view class="cell unlocked" wx:for="{{unlocked}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
-        <image src="{{item.image}}" mode="aspectFit" class="cell-img"/><text class="cell-name">{{item.name}}</text><text class="cell-check">✅</text>
-      </view>
+<!-- Atlas Grid on Main Page -->
+<view wx:if="{{hasLogin}}" class="atlas-main">
+  <view wx:if="{{unlocked.length}}" class="section-label">🎯 已解锁 ({{unlocked.length}})</view>
+  <view class="grid">
+    <view class="cell unlocked" wx:for="{{unlocked}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+      <image src="{{item.image}}" mode="aspectFit" class="cell-img"/><text class="cell-name">{{item.name}}</text><text class="cell-check">✅</text>
     </view>
-    <view wx:if="{{locked.length}}" class="section-label dim">🔒 未解锁 ({{locked.length}})</view>
-    <view class="grid">
-      <view class="cell locked" wx:for="{{locked}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
-        <image src="{{item.image}}" mode="aspectFit" class="cell-img"/><text class="cell-name">{{item.name}}</text>
-      </view>
+  </view>
+  <view wx:if="{{locked.length}}" class="section-label dim">🔒 未解锁 ({{locked.length}})</view>
+  <view class="grid">
+    <view class="cell locked" wx:for="{{locked}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+      <image src="{{item.image}}" mode="aspectFit" class="cell-img"/><text class="cell-name">{{item.name}}</text>
     </view>
-  </scroll-view>
+  </view>
 </view>
 
+<!-- Sub Pages -->
 <view wx:if="{{subPage === 'posts'}}" class="sub-page">
   <view class="sub-head"><text class="sub-back" bindtap="closeSubPage">←</text><text class="sub-title">我的帖子</text></view>
   <scroll-view scroll-y class="sub-body">
