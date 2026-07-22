@@ -141,7 +141,75 @@ Page({
         var score = isGood ? 85 : (weather.pressure >= 995 ? 60 : 30)
         score = Math.min(98, Math.max(10, Math.round(score + (weather.temp >= 15 && weather.temp <= 30 ? 5 : -5))))
 
-        var advice = ['📌 天气数据来源: Open-Meteo']
+        // Recommend fish species based on weather
+        var month = new Date().getMonth() + 1
+        var temp = weather.temp
+        var pressure = weather.pressure
+
+        // Build recommendation pool
+        var fishPool = [
+          { name: '鲫鱼', score: 5, bait: '红虫/蚯蚓/酒米打窝', reason: '全年可钓，气压稳定时底钓最佳' },
+          { name: '鲤鱼', score: 5, bait: '玉米粒/螺鲤/红薯块', reason: '温度适宜，活性较高' },
+          { name: '草鱼', score: 5, bait: '玉米粒/草叶/芦苇芯', reason: '高温季节活跃，可浮钓' },
+          { name: '鳊鱼', score: 5, bait: '红虫/蚯蚓/蓝鲫', reason: '集群性强，打窝后连杆' },
+          { name: '翘嘴', score: 5, bait: '活泥鳅/亮片/米诺', reason: '早晚窗口期路亚首选' },
+          { name: '鳜鱼', score: 5, bait: '活泥鳅/活虾/软虫', reason: '水质好时可路亚底钓' },
+          { name: '鲢鳙', score: 5, bait: '酸臭发酵饵/商品鲢鳙饵', reason: '高温浮钓，雾化诱鱼' },
+          { name: '罗非鱼', score: 5, bait: '冷冻饵/蚯蚓/肝味饵', reason: '耐高温，全天有口' },
+          { name: '黑鱼', score: 5, bait: '雷蛙/活泥鳅/软虫', reason: '草区雷强，攻击性强' },
+          { name: '青鱼', score: 5, bait: '螺蛳肉/田螺/玉米粒', reason: '深水底钓大物' },
+        ]
+
+        // Temperature adjustment
+        if (temp >= 30) {
+          fishPool.forEach(function(f) {
+            if (f.name === '草鱼' || f.name === '鲢鳙' || f.name === '罗非鱼') f.score += 3
+            if (f.name === '鲫鱼' || f.name === '鲤鱼') f.score -= 2
+          })
+        } else if (temp >= 20) {
+          fishPool.forEach(function(f) {
+            if (f.name === '鲫鱼' || f.name === '鲤鱼' || f.name === '鳊鱼' || f.name === '翘嘴') f.score += 2
+          })
+        } else {
+          fishPool.forEach(function(f) {
+            if (f.name === '鲫鱼') f.score += 3
+            if (f.name === '鲢鳙' || f.name === '罗非鱼') f.score -= 3
+          })
+        }
+
+        // Pressure adjustment
+        if (pressure >= 1010) {
+          fishPool.forEach(function(f) {
+            if (f.name === '鲫鱼' || f.name === '鲤鱼' || f.name === '青鱼') f.score += 2
+            if (f.name === '鲢鳙') f.score -= 1
+          })
+        } else if (pressure < 1000) {
+          fishPool.forEach(function(f) {
+            if (f.name === '翘嘴' || f.name === '鲢鳙') f.score += 2
+            if (f.name === '青鱼') f.score -= 2
+          })
+        }
+
+        // Month adjustment
+        if (month >= 6 && month <= 8) {
+          fishPool.forEach(function(f) {
+            if (f.name === '草鱼' || f.name === '鲢鳙' || f.name === '黑鱼' || f.name === '罗非鱼') f.score += 2
+          })
+        } else if (month >= 3 && month <= 5) {
+          fishPool.forEach(function(f) {
+            if (f.name === '鲫鱼' || f.name === '翘嘴' || f.name === '鳜鱼') f.score += 3
+          })
+        } else if (month >= 9 && month <= 11) {
+          fishPool.forEach(function(f) {
+            if (f.name === '鲫鱼' || f.name === '鲤鱼' || f.name === '翘嘴' || f.name === '鳊鱼') f.score += 3
+          })
+        }
+
+        // Sort and pick top 3
+        fishPool.sort(function(a, b) { return b.score - a.score })
+        var topFish = fishPool.slice(0, 3)
+
+        var advice = []
         if (score >= 80) {
           advice.push('✅ 气压适宜，鱼口活跃，强烈推荐出钓')
           advice.push('⏰ 黄金窗口：早晨5-9点、傍晚5-8点')
@@ -152,6 +220,12 @@ Page({
           advice.push('❌ 天气不太理想，鱼口可能不佳')
           advice.push('💡 如果出行，建议钓浮或选择活水区域')
         }
+        advice.push('')
+        advice.push('🎯 建议作钓鱼种：')
+        topFish.forEach(function(f, i) {
+          advice.push((i+1) + '. ' + f.name + ' — ' + f.bait)
+          advice.push('   ' + f.reason)
+        })
 
         that.setData({ weather: weather, forecast: forecast, score: score, advice: advice, loading: false })
       },
@@ -176,7 +250,7 @@ Page({
         var isGood = weather.pressure >= 1005 && weather.humidity < 85
         var score = isGood ? 85 : (weather.pressure >= 995 ? 60 : 30)
         score = Math.min(98, Math.round(score))
-        var advice = ['📌 模拟数据（请添加API域名获取真实天气）']
+        var advice = []
         if (isGood) { advice.push('✅ 天气条件优良，适合出钓', '⏰ 推荐时段：早晨5-9点、傍晚5-8点') }
         else if (score >= 60) { advice.push('🤔 天气条件一般，可选择出钓') }
         else { advice.push('❌ 天气不太理想，建议改天') }
