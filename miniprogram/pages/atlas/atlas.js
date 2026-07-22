@@ -162,15 +162,10 @@ Page({
   },
 
   // Login
-  onChooseAvatar: function(e) {
-    var that=this; var tp=e.detail.avatarUrl; var fs=wx.getFileSystemManager()
-    var sp=wx.env.USER_DATA_PATH+'/avatar.png'
-    try{fs.copyFileSync(tp,sp);that.setData({tempAvatar:sp})}catch(e){that.setData({tempAvatar:tp})}
-  },
-  uploadAvatar: function() {
+  pickAvatar: function() {
     var that = this
     wx.chooseMedia({
-      count: 1, mediaType: ['image'], sourceType: ['album'], sizeType: ['compressed'],
+      count: 1, mediaType: ['image'], sourceType: ['album', 'camera'], sizeType: ['compressed'],
       success: function(res) {
         var tp = res.tempFiles[0].tempFilePath
         var sp = wx.env.USER_DATA_PATH + '/avatar.png'
