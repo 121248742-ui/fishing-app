@@ -1,33 +1,73 @@
 /* Spot Section */
-.spot-section { margin-top: 20rpx; }
-.spot-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16rpx; }
-.spot-title { font-size: 28rpx; font-weight: 700; }
-.add-btn {
-  background: var(--green-500); color: #fff; font-size: 24rpx;
-  padding: 10rpx 24rpx; border-radius: 30rpx; line-height: 1; font-weight: 600;
+.spot-area {
+  margin: 20rpx 16rpx 0;
+  background: #fff; border-radius: var(--radius);
+  padding: 24rpx; box-shadow: var(--shadow-sm);
 }
-.empty-spot { text-align: center; padding: 40rpx 0; display: flex; flex-direction: column; align-items: center; }
-
-.spot-scroll { white-space: nowrap; width: 100%; }
-.spot-tag {
-  display: inline-flex; flex-direction: column; align-items: flex-start;
-  padding: 14rpx 24rpx; margin-right: 12rpx; border-radius: 12rpx;
-  background: #F7F8FA; position: relative; min-width: 160rpx;
+.spot-top-bar {
+  display: flex; align-items: center; gap: 16rpx;
 }
-.spot-tag.active { background: var(--green-500); color: #fff; }
-.spot-name {
-  font-size: 26rpx; font-weight: 600; max-width: 200rpx;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+.spot-loc-icon {
+  width: 72rpx; height: 72rpx; border-radius: 50%;
+  background: linear-gradient(135deg, #E8F8EF, #C6F0D8);
+  display: flex; align-items: center; justify-content: center; font-size: 32rpx;
+  flex-shrink: 0;
 }
-.spot-addr {
-  font-size: 20rpx; color: #999; max-width: 200rpx;
+.spot-info { flex: 1; min-width: 0; }
+.spot-cur-name { font-size: 30rpx; font-weight: 700; display: block; }
+.spot-cur-addr {
+  font-size: 22rpx; color: var(--text-secondary); display: block;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 4rpx;
 }
-.spot-tag.active .spot-addr { color: rgba(255,255,255,0.7); }
-.spot-close {
-  position: absolute; top: 4rpx; right: 10rpx;
-  font-size: 28rpx; opacity: 0.4;
+.spot-add-btn {
+  width: 72rpx; height: 72rpx; border-radius: 50%; padding: 0; margin: 0;
+  background: linear-gradient(135deg, #1AAD5F, #2BD472); display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0;
+  box-shadow: 0 4rpx 16rpx rgba(26,173,95,0.3);
 }
+.spot-add-btn::after { border: none; }
+.spot-add-icon { font-size: 40rpx; color: #fff; font-weight: 300; line-height: 1; }
+
+.spot-scroll { white-space: nowrap; width: 100%; margin-top: 20rpx; padding-bottom: 4rpx; }
+.spot-chip {
+  display: inline-flex; flex-direction: column; align-items: flex-start;
+  padding: 16rpx 24rpx; margin-right: 14rpx; border-radius: 14rpx;
+  background: #F7F8FA; min-width: 140rpx;
+  transition: all 0.2s;
+}
+.spot-chip.active { background: var(--green-500); }
+.spot-chip-name {
+  font-size: 26rpx; font-weight: 600; max-width: 180rpx;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.spot-chip.active .spot-chip-name { color: #fff; }
+.spot-chip-addr {
+  font-size: 20rpx; color: #999; max-width: 180rpx;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 4rpx;
+}
+.spot-chip.active .spot-chip-addr { color: rgba(255,255,255,0.7); }
+
+.spot-chip-add {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 16rpx 28rpx; margin-right: 14rpx; border-radius: 14rpx;
+  border: 2rpx dashed #D0D5DD; background: transparent;
+  min-width: 100rpx; gap: 4rpx;
+}
+.spot-chip-plus { font-size: 32rpx; color: #B0B6C0; line-height: 1; }
+.spot-chip-label { font-size: 20rpx; color: #B0B6C0; }
+
+.spot-empty-new { margin-top: 8rpx; }
+.spot-empty-card {
+  background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+  border: 2rpx dashed #86EFAC; border-radius: var(--radius);
+  padding: 40rpx 24rpx; text-align: center; display: flex;
+  flex-direction: column; align-items: center; gap: 8rpx;
+}
+.spot-empty-icon { font-size: 48rpx; }
+.spot-empty-title { font-size: 28rpx; font-weight: 700; color: #166534; }
+.spot-empty-sub { font-size: 22rpx; color: #15803D; opacity: 0.7; }
+
+.spot-divider { height: 1rpx; background: transparent; }
 
 /* Weather Card */
 .weather-card { margin-top: 20rpx; }

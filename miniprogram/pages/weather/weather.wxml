@@ -1,24 +1,40 @@
-<view class="spot-section card">
-  <view class="spot-header">
-    <text class="spot-title">📍 我的钓点</text>
-    <button class="add-btn" bindtap="addSpot">+ 添加钓点</button>
+<view class="spot-area">
+  <view class="spot-top-bar">
+    <view class="spot-loc-icon">📍</view>
+    <view class="spot-info">
+      <text wx:if="{{activeSpot}}" class="spot-cur-name">{{activeSpot.name}}</text>
+      <text wx:else class="spot-cur-name">未选择钓点</text>
+      <text class="spot-cur-addr">{{activeSpot.address || '点击下方按钮在地图上选择钓点'}}</text>
+    </view>
+    <button class="spot-add-btn" bindtap="addSpot">
+      <text class="spot-add-icon">+</text>
+    </button>
   </view>
 
-  <view wx:if="{{spots.length === 0}}" class="empty-spot">
-    <text style="font-size:40rpx;">🗺️</text>
-    <text style="font-size:24rpx;color:#ccc;margin-top:8rpx;">点击"添加钓点"在地图上选择</text>
-  </view>
-
-  <scroll-view scroll-x class="spot-scroll" wx:else>
-    <view class="spot-tag {{activeSpot && activeSpot.name === item.name ? 'active' : ''}}"
+  <scroll-view scroll-x class="spot-scroll" wx:if="{{spots.length > 0}}">
+    <view class="spot-chip {{activeSpot && activeSpot.name === item.name ? 'active' : ''}}"
       wx:for="{{spots}}" wx:key="name"
-      bindtap="selectSpot" data-idx="{{index}}">
-      <text class="spot-name">{{item.name}}</text>
-      <text class="spot-addr">{{item.address}}</text>
-      <text class="spot-close" bindtap="removeSpot" data-idx="{{index}}">×</text>
+      bindtap="selectSpot" data-idx="{{index}}"
+      bindlongpress="removeSpot" data-idx="{{index}}">
+      <text class="spot-chip-name">{{item.name}}</text>
+      <text class="spot-chip-addr" wx:if="{{item.address}}">{{item.address}}</text>
+    </view>
+    <view class="spot-chip-add" bindtap="addSpot">
+      <text class="spot-chip-plus">+</text>
+      <text class="spot-chip-label">新钓点</text>
     </view>
   </scroll-view>
+
+  <view wx:if="{{spots.length === 0}}" class="spot-empty-new">
+    <view class="spot-empty-card" bindtap="addSpot">
+      <text class="spot-empty-icon">🗺️</text>
+      <text class="spot-empty-title">添加我的钓点</text>
+      <text class="spot-empty-sub">使用微信地图选择钓点位置</text>
+    </view>
+  </view>
 </view>
+
+<view class="spot-divider"></view>
 
 <view wx:if="{{activeSpot && weather}}" class="score-card card {{score >= 80 ? 'good' : (score >= 55 ? 'ok' : 'bad')}}">
   <text class="score-label">今日出钓指数</text>
@@ -29,7 +45,6 @@
 </view>
 
 <view wx:if="{{activeSpot && weather}}" class="weather-card card">
-  <view class="weather-location">{{activeSpot.name}}</view>
   <view class="weather-main">
     <text class="weather-icon">{{weather.icon}}</text>
     <text class="weather-temp">{{weather.temp}}°</text>
