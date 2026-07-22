@@ -43,8 +43,8 @@
         <image wx:if="{{item.photo}}" src="{{item.photo}}" mode="aspectFill" class="wf-img"/>
         <view wx:else class="wf-img-empty">🎣</view>
         <view class="wf-body">
-          <text class="wf-title">{{item.fishType || '渔获分享'}}</text>
           <text class="wf-desc" wx:if="{{item.note}}">{{item.note}}</text>
+          <text class="wf-title">{{item.fishType || '渔获分享'}}</text>
           <view class="wf-foot">
             <image wx:if="{{item.userAvatar}}" src="{{item.userAvatar}}" class="wf-avatar" mode="aspectFill"/>
             <view wx:else class="wf-avatar-em">🎣</view>
@@ -61,8 +61,8 @@
         <image wx:if="{{item.photo}}" src="{{item.photo}}" mode="aspectFill" class="wf-img"/>
         <view wx:else class="wf-img-empty">🎣</view>
         <view class="wf-body">
-          <text class="wf-title">{{item.fishType || '渔获分享'}}</text>
           <text class="wf-desc" wx:if="{{item.note}}">{{item.note}}</text>
+          <text class="wf-title">{{item.fishType || '渔获分享'}}</text>
           <view class="wf-foot">
             <image wx:if="{{item.userAvatar}}" src="{{item.userAvatar}}" class="wf-avatar" mode="aspectFill"/>
             <view wx:else class="wf-avatar-em">🎣</view>
