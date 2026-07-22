@@ -1,7 +1,11 @@
 var db = null
-try { db = wx.cloud.database() } catch(e) {}
-
-function getDB() { return db }
+try {
+  wx.cloud.init({ env: 'cloudbase-d1gq1v8xl0c056a2a' })
+  db = wx.cloud.database()
+  console.log('Cloud DB initialized')
+} catch(e) {
+  console.error('Cloud DB init failed:', e)
+}
 
 // Posts
 function getPosts(success, fail) {
@@ -31,20 +35,53 @@ function removePost(id, success, fail) {
   db.collection('posts').doc(id).remove({ success: success, fail: fail })
 }
 
-// Comments
+// Comments - stored directly on post document
 function addComment(postId, comment, success, fail) {
   if (!db) { fail && fail('no cloud'); return }
-  db.collection('comments').add({
-    data: { postId: postId, text: comment.text, userName: comment.userName, replyTo: comment.replyTo || '', createTime: new Date() },
-    success: success, fail: fail
+  // Get current comments, append new one, update post
+  db.collection('posts').doc(postId).get({
+    success: function(res) {
+      var comments = res.data.comments || []
+      comments.push({
+        text: comment.text, userName: comment.userName,
+        replyTo: comment.replyTo || '', createTime: new Date()
+      })
+      db.collection('posts').doc(postId).update({
+        data: { comments: comments },
+        success: success, fail: fail
+      })
+    },
+    fail: function(err) {
+      // Fallback: try adding to comments collection
+      db.collection('comments').add({
+        data: { postId: postId, text: comment.text, userName: comment.userName, replyTo: comment.replyTo || '', createTime: new Date() },
+        success: success, fail: fail
+      })
+    }
   })
 }
 
 function getComments(postId, success, fail) {
   if (!db) { fail && fail('no cloud'); return }
-  db.collection('comments').where({ postId: postId }).orderBy('createTime', 'asc').get({
-    success: function(res) { success(res.data) },
-    fail: fail
+  // First try post document
+  db.collection('posts').doc(postId).get({
+    success: function(res) {
+      if (res.data.comments && res.data.comments.length) {
+        success(res.data.comments)
+      } else {
+        // Try comments collection
+        db.collection('comments').where({ postId: postId }).orderBy('createTime', 'asc').get({
+          success: function(r2) { success(r2.data) },
+          fail: fail
+        })
+      }
+    },
+    fail: function() {
+      db.collection('comments').where({ postId: postId }).orderBy('createTime', 'asc').get({
+        success: function(r2) { success(r2.data) },
+        fail: fail
+      })
+    }
   })
 }
 
