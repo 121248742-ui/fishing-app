@@ -38,3 +38,4 @@
 .fish-desc { font-size: 22rpx; color: var(--text-secondary); margin-top: 8rpx;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .arrow { color: #ccc; font-size: 40rpx; flex-shrink: 0; }
+.unlock-badge { font-size: 24rpx; flex-shrink: 0; margin-right: 4rpx; }

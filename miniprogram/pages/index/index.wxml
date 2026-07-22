@@ -27,6 +27,7 @@
       </view>
       <view class="fish-desc">{{item.habitatShort}}...</view>
     </view>
+    <text wx:if="{{item.unlocked}}" class="unlock-badge">✅</text>
     <text class="arrow">›</text>
   </view>
 </view>

@@ -12,7 +12,7 @@
     "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
     "list": [
-      { "pagePath": "pages/index/index", "text": "🐟 鱼种百科" },
+      { "pagePath": "pages/index/index", "text": "🐟 钓鱼图鉴" },
       { "pagePath": "pages/circle/circle", "text": "💬 钓鱼圈" },
       { "pagePath": "pages/weather/weather", "text": "☀️ 天气" },
       { "pagePath": "pages/atlas/atlas", "text": "👤 我的" }
