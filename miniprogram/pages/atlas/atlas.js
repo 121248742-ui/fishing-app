@@ -14,7 +14,7 @@ Page({
         wx.showToast({ title: 'OK', icon: 'none' })
       },
       fail: function(err) {
-        wx.showToast({ title: 'FAIL: ' + (err.errMsg || 'unknown').substring(0, 20), icon: 'none', duration: 3000 })
+        wx.showModal({ title: '错误', content: err.errMsg || 'unknown', showCancel: false })
       }
     })
   },

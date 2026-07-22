@@ -48,6 +48,5 @@
       "desc": "用于地图选钓点并获取当地天气和钓鱼指数"
     }
   },
-  "requiredPrivateInfos": ["chooseLocation"],
-  "__usePrivacyCheck__": true
+  "requiredPrivateInfos": ["chooseLocation"]
 }
