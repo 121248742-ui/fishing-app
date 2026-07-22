@@ -126,3 +126,4 @@
   border-radius: 40rpx; font-size: 26rpx;
 }
 .comment-send { font-size: 28rpx; color: #1AAD5F; font-weight: 600; flex-shrink: 0; }
+.spot-link { color: #3B82F6; text-decoration: underline; }

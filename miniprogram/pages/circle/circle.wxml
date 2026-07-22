@@ -22,7 +22,7 @@
       <input class="form-input" placeholder="鱼种名称（如：鲫鱼）" value="{{fishType}}" bindinput="onInput" data-field="fishType"/>
       <input class="form-input" placeholder="重量（斤）选填" value="{{weight}}" bindinput="onInput" data-field="weight"/>
       <view class="form-input pick-spot" bindtap="chooseSpot">{{spot || '📍 钓点 选填（点击选择）'}}</view>
-      <textarea class="form-input form-textarea" placeholder="说点什么... 选填" value="{{note}}" bindinput="onInput" data-field="note"/>
+      <textarea class="form-input form-textarea" placeholder="说点什么..." value="{{note}}" bindinput="onInput" data-field="note"/>
       <button class="pub-btn" bindtap="publish">发布</button>
     </view>
   </view>
@@ -98,7 +98,7 @@
         <text wx:if="{{detailPost.note}}" class="detail-note">{{detailPost.note}}</text>
         <view class="detail-meta" wx:if="{{detailPost.weight || detailPost.spot}}">
           <text wx:if="{{detailPost.weight}}">⚖️ {{detailPost.weight}}斤  </text>
-          <text wx:if="{{detailPost.spot}}">📍 {{detailPost.spot}}</text>
+          <text wx:if="{{detailPost.spot}}" class="spot-link" bindtap="openLocation">📍 {{detailPost.spot}}</text>
         </view>
         <view class="detail-actions">
           <text class="detail-like {{detailPost.liked ? 'active' : ''}}" bindtap="toggleDetailLike">{{detailPost.liked ? '❤️' : '🤍'}} {{detailPost.likes || 0}}</text>

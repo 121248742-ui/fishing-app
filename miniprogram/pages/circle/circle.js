@@ -42,7 +42,11 @@ Page({
   chooseSpot: function() {
     var that = this
     wx.chooseLocation({
-      success: function(res) { if (res.name) that.setData({ spot: res.name }) }
+      success: function(res) {
+        if (res.name) {
+          that.setData({ spot: res.name, spotLat: res.latitude, spotLon: res.longitude })
+        }
+      }
     })
   },
   choosePhoto: function() {
@@ -64,11 +68,12 @@ Page({
     var that = this
     var d = this.data
     if (!d.photo && !d.fishType) { wx.showToast({ title: '至少上传照片或填写鱼种', icon: 'none' }); return }
+    if (!d.note.trim()) { wx.showToast({ title: '请说点什么', icon: 'none' }); return }
     var doSave = function(savedPhoto) {
       var posts = wx.getStorageSync('circle_posts') || []
       posts.push({
         photo: savedPhoto, fishType: d.fishType, weight: d.weight,
-        spot: d.spot, note: d.note,
+        spot: d.spot, spotLat: d.spotLat, spotLon: d.spotLon, note: d.note,
         time: new Date().toISOString(),
         liked: false, likes: 0, comments: []
       })
@@ -84,6 +89,12 @@ Page({
     } else { doSave('') }
   },
 
+  openLocation: function(e) {
+    var p = this.data.detailPost
+    if (p && p.spotLat) {
+      wx.openLocation({ latitude: p.spotLat, longitude: p.spotLon, name: p.spot, scale: 14 })
+    }
+  },
   // ---- Post Detail ----
   openDetail: function(e) {
     var idx = e.currentTarget.dataset.idx
