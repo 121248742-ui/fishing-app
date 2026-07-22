@@ -73,15 +73,36 @@
   </view>
 <view wx:if="{{myPosts.length}}" class="section-label" style="margin-top:8rpx;">📝 我的帖子 ({{myPosts.length}})</view>
 <view class="my-post-list">
-  <view class="card my-post" wx:for="{{myPosts}}" wx:key="time">
-    <view class="mp-left">
-      <text class="mp-title">{{item.fishType || '渔获分享'}}</text>
-      <text class="mp-meta">{{item.weight ? item.weight + '斤 · ' : ''}}{{item.timeAgo}}</text>
-      <text class="mp-meta" wx:if="{{item.spot}}">📍 {{item.spot}}</text>
-    </view>
+  <view class="card my-post" wx:for="{{myPosts}}" wx:key="time" bindtap="viewMyPost" data-idx="{{index}}">
     <image wx:if="{{item.photo}}" src="{{item.photo}}" mode="aspectFill" class="mp-thumb"/>
     <view wx:else class="mp-thumb-empty">🎣</view>
-    <text class="mp-del" bindtap="delMyPost" data-idx="{{index}}">✕</text>
+    <view class="mp-center">
+      <text class="mp-title">{{item.fishType || '渔获分享'}}</text>
+      <text class="mp-desc" wx:if="{{item.note}}">{{item.note}}</text>
+      <text class="mp-meta">{{item.weight ? '⚖️' + item.weight + '斤  ' : ''}}{{item.timeAgo}}  ❤️ {{item.likes || 0}}</text>
+    </view>
+    <text class="mp-arrow">›</text>
+    <text class="mp-del" catchtap="delMyPost" data-idx="{{index}}">✕</text>
+  </view>
+</view>
+
+<!-- Post Detail Overlay -->
+<view wx:if="{{viewPost}}" class="overlay">
+  <view class="overlay-mask" bindtap="closeViewPost"></view>
+  <view class="overlay-panel">
+    <view class="overlay-head">
+      <text class="overlay-title">{{viewPost.fishType || '渔获分享'}}</text>
+      <text class="overlay-close" bindtap="closeViewPost">✕</text>
+    </view>
+    <view class="overlay-body">
+      <image wx:if="{{viewPost.photo}}" src="{{viewPost.photo}}" mode="aspectFill" class="view-photo"/>
+      <view class="view-info">
+        <text wx:if="{{viewPost.weight}}">⚖️ {{viewPost.weight}}斤</text>
+        <text wx:if="{{viewPost.spot}}">📍 {{viewPost.spot}}</text>
+        <text class="view-time">{{viewPost.timeAgo}}</text>
+      </view>
+      <text wx:if="{{viewPost.note}}" class="view-note">{{viewPost.note}}</text>
+    </view>
   </view>
 </view>
 </block>

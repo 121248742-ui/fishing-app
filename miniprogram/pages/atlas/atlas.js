@@ -93,6 +93,12 @@ Page({
       }
     })
   },
+  viewMyPost: function(e) {
+    var idx = e.currentTarget.dataset.idx
+    var post = this.data.myPosts[idx]
+    if (post) this.setData({ viewPost: post })
+  },
+  closeViewPost: function() { this.setData({ viewPost: null }) },
   delMyPost: function(e) {
     var that = this
     var idx = e.currentTarget.dataset.idx
