@@ -19,6 +19,7 @@ Page({
     fishList: [], fishIdx: -1, fishScore: 0
   },
   onShow: function() {
+    var that = this
     var spots = wx.getStorageSync('weather_spots') || []
     var activeIdx = wx.getStorageSync('weather_active_spot')
     var activeSpot = (activeIdx !== undefined && spots[activeIdx]) ? spots[activeIdx] : (spots[0] || null)
@@ -27,6 +28,20 @@ Page({
     this.setData({ spots: spots, activeSpot: activeSpot, fishList: fishList, fishIdx: fishIdx })
     if (activeSpot) {
       this.fetchWeather(activeSpot)
+    } else {
+      // No spots, auto-detect location
+      wx.getLocation({
+        type: 'gcj02',
+        success: function(res) {
+          var autoSpot = { name: '当前位置', lat: res.latitude, lon: res.longitude, address: '自动定位', auto: true }
+          that.setData({ activeSpot: autoSpot })
+          that.fetchWeather(autoSpot)
+        },
+        fail: function() {
+          that.setData({ activeSpot: { name: '北京', lat: 39.9, lon: 116.4, address: '默认城市', auto: true } })
+          that.fetchWeather(that.data.activeSpot)
+        }
+      })
     }
   },
   selectSpot: function(e) {
