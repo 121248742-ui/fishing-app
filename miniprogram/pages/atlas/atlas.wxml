@@ -179,8 +179,7 @@
           </view>
           <view class="detail-actions">
             <text class="detail-like">❤️ {{viewPost.likes || 0}}</text>
-            <view style="flex:1"></view>
-            <text class="act-btn act-edit" bindtap="startEdit">✏️ 编辑</text>
+            <text class="act-btn act-edit" bindtap="startEdit">✏️ 重新编辑</text>
             <text class="act-btn act-del" catchtap="delMyPost" data-idx="{{viewPostIdx}}">🗑️ 删除</text>
           </view>
         </view>

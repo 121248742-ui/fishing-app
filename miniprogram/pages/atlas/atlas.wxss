@@ -150,7 +150,7 @@
 .detail-meta {font-size:24rpx;color:var(--text-secondary);margin-bottom:12rpx}
 .detail-actions {display:flex;align-items:center;gap:24rpx;padding:0 8rpx 16rpx;border-bottom:1px solid #F0F2F5}
 .detail-like {font-size:28rpx;color:var(--text-secondary)}
-.act-btn {font-size:24rpx;padding:8rpx 24rpx;border-radius:20rpx;margin-left:12rpx}
+.act-btn {font-size:24rpx;padding:8rpx 24rpx;border-radius:20rpx;margin-left:20rpx}
 .act-edit {color:#1AAD5F;background:#E8F8EF}
 .act-del {color:#FA5151;background:#FDE8E8}
 
