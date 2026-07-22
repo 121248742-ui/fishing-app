@@ -1,0 +1,14 @@
+{
+  "description": "钓鱼助手",
+  "appid": "touristappid",
+  "projectname": "fishing-app",
+  "miniprogramRoot": "./",
+  "compileType": "miniprogram",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": false
+  }
+}
