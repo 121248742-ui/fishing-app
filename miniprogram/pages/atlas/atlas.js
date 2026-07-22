@@ -73,6 +73,15 @@ Page({
     this.setData({viewPost: post, viewPostIdx: idx, editing: false, commentText: '', replyTo: ''})
   },
   closeViewPost: function() { this.setData({viewPost: null, viewPostIdx: -1, editing: false}); this.onShow() },
+  startEditMyPost: function(e) {
+    var idx = e.currentTarget.dataset.idx
+    var post = Object.assign({}, this.data.myPosts[idx], {comments: (this.data.myPosts[idx].comments||[]).slice()})
+    this.setData({
+      viewPost: post, viewPostIdx: idx, editing: true,
+      editFishType: post.fishType||'', editWeight: post.weight||'',
+      editSpot: post.spot||'', editNote: post.note||'', editPhoto: ''
+    })
+  },
   startEdit: function() {
     var p = this.data.viewPost
     this.setData({

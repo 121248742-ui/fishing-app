@@ -110,7 +110,10 @@
         <text class="mp-note" wx:if="{{item.note}}">{{item.note}}</text>
         <text class="mp-meta">{{item.weight ? '⚖️' + item.weight + '斤  ' : ''}}{{item.timeAgo}}  ❤️ {{item.likes || 0}}  💬 {{item.comments ? item.comments.length : 0}}</text>
       </view>
-      <text class="mp-arrow">›</text>
+      <view class="mp-actions">
+        <text class="act-btn act-edit" catchtap="startEditMyPost" data-idx="{{index}}">✏️</text>
+        <text class="act-btn act-del" catchtap="delMyPost" data-idx="{{index}}">🗑️</text>
+      </view>
     </view>
   </scroll-view>
 </view>

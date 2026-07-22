@@ -170,3 +170,4 @@
 
 /* My posts arrow */
 .mp-arrow {font-size:32rpx;color:#ccc;flex-shrink:0}
+.mp-actions {display:flex;flex-direction:column;gap:8rpx;flex-shrink:0}
