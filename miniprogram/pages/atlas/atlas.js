@@ -137,8 +137,21 @@ Page({
   // My Post Detail
   openMyPost: function(e) {
     var idx = e.currentTarget.dataset.idx
-    var post = Object.assign({}, this.data.myPosts[idx], {comments: (this.data.myPosts[idx].comments||[]).slice()})
+    var post = Object.assign({}, this.data.myPosts[idx])
+    post.comments = (post.comments || []).slice()
     this.setData({viewPost: post, viewPostIdx: idx, editing: false, commentText: '', replyTo: ''})
+    // Load cloud comments
+    var that = this
+    if (post._id && post._id.indexOf('local_') !== 0) {
+      CDB.getComments(post._id, function(cloudComments) {
+        var vp = that.data.viewPost
+        vp.comments = cloudComments.map(function(c) {
+          c.timeAgo = that._fmt(c.createTime)
+          return c
+        })
+        that.setData({ viewPost: vp })
+      })
+    }
   },
   closeViewPost: function() { this.setData({viewPost: null, viewPostIdx: -1, editing: false}); this.onShow() },
   startEditMyPost: function(e) {

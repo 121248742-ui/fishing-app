@@ -127,6 +127,18 @@ Page({
     var idx = e.currentTarget.dataset.idx
     var post = Object.assign({}, this.data.posts[idx])
     this.setData({ detailPost: post, detailIdx: idx, commentText: '' })
+    // Load comments from cloud
+    var that = this
+    if (post._id && post._id.indexOf('local_') !== 0) {
+      CDB.getComments(post._id, function(cloudComments) {
+        var dp = that.data.detailPost
+        dp.comments = cloudComments.map(function(c) {
+          c.timeAgo = that._fmt(c.createTime)
+          return c
+        })
+        that.setData({ detailPost: dp })
+      })
+    }
   },
   closeDetail: function() {
     this.setData({ detailPost: null, detailIdx: -1 })
