@@ -34,7 +34,7 @@
       </view>
     </view>
     <input class="form-input" placeholder="重量（斤）选填" value="{{weight}}" bindinput="onInput" data-field="weight"/>
-    <input class="form-input" placeholder="钓点名称 选填" value="{{spot}}" bindinput="onInput" data-field="spot"/>
+    <view class="form-input pick-spot" bindtap="chooseSpot">{{spot || '📍 钓点 选填（点击选择）'}}</view>
     <button class="pub-btn" bindtap="unlock">🔓 解锁此鱼种</button>
   </view>
 </view>

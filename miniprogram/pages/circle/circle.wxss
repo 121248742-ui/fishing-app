@@ -41,6 +41,7 @@
   font-size: 28rpx; margin-bottom: 4rpx;
 }
 .form-textarea { height: 120rpx; }
+.pick-spot { color: #1AAD5F; cursor: pointer; }
 .pub-btn {
   background: linear-gradient(135deg, #1AAD5F, #2BD472); color: #fff;
   margin-top: 24rpx; border-radius: var(--radius-sm);

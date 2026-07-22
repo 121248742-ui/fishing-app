@@ -37,6 +37,7 @@
   width: 100%; padding: 18rpx 0; border-bottom: 1px solid #f0f0f0;
   font-size: 28rpx; margin-bottom: 4rpx;
 }
+.pick-spot { color: #1AAD5F; }
 .pub-btn {
   background: linear-gradient(135deg, #1AAD5F, #2BD472); color: #fff;
   margin-top: 20rpx; border-radius: var(--radius-sm);

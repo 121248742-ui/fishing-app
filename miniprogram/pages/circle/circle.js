@@ -39,6 +39,12 @@ Page({
   openForm: function() { this.setData({ showForm: true, photo: '', fishType: '', weight: '', spot: '', note: '' }) },
   closeForm: function() { this.setData({ showForm: false }) },
   onInput: function(e) { var d = {}; d[e.currentTarget.dataset.field] = e.detail.value; this.setData(d) },
+  chooseSpot: function() {
+    var that = this
+    wx.chooseLocation({
+      success: function(res) { if (res.name) that.setData({ spot: res.name }) }
+    })
+  },
   choosePhoto: function() {
     var that = this
     wx.chooseMedia({

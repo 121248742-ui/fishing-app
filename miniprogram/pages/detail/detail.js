@@ -26,6 +26,12 @@ Page({
     })
     wx.setNavigationBarTitle({ title: f.name })
   },
+  chooseSpot: function() {
+    var that = this
+    wx.chooseLocation({
+      success: function(res) { if (res.name) that.setData({ spot: res.name }) }
+    })
+  },
   choosePhoto: function() {
     var that = this
     wx.chooseMedia({
