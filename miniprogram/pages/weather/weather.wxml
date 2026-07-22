@@ -1,30 +1,65 @@
-<view class="weather-card card">
+<view class="spot-section card">
+  <view class="spot-header">
+    <text class="spot-title">📍 我的钓点</text>
+    <button class="add-btn" bindtap="addSpot">+ 添加钓点</button>
+  </view>
+
+  <view wx:if="{{spots.length === 0}}" class="empty-spot">
+    <text style="font-size:40rpx;">🗺️</text>
+    <text style="font-size:24rpx;color:#ccc;margin-top:8rpx;">点击"添加钓点"在地图上选择</text>
+  </view>
+
+  <scroll-view scroll-x class="spot-scroll" wx:else>
+    <view class="spot-tag {{activeSpot && activeSpot.name === item.name ? 'active' : ''}}"
+      wx:for="{{spots}}" wx:key="name"
+      bindtap="selectSpot" data-idx="{{index}}">
+      <text class="spot-name">{{item.name}}</text>
+      <text class="spot-addr">{{item.address}}</text>
+      <text class="spot-close" bindtap="removeSpot" data-idx="{{index}}">×</text>
+    </view>
+  </scroll-view>
+</view>
+
+<view wx:if="{{activeSpot && weather}}" class="weather-card card">
+  <view class="weather-location">{{activeSpot.name}}</view>
   <view class="weather-main">
     <text class="weather-icon">{{weather.icon}}</text>
     <text class="weather-temp">{{weather.temp}}°</text>
     <view class="weather-divider"></view>
     <view>
       <text class="weather-desc">{{weather.desc}}</text>
-      <text class="weather-feel">体感 {{weather.temp - 2}}°</text>
+      <text class="weather-feel">体感 {{weather.temp - 1}}° ~ {{weather.temp + 2}}°</text>
     </view>
   </view>
 
   <view class="weather-metrics">
     <view class="metric">
       <text class="metric-icon">🌡️</text>
-      <view><text class="metric-val">{{weather.pressure}} <text class="metric-unit">hPa</text></text><text class="metric-lbl">气压</text></view>
+      <view>
+        <text class="metric-val">{{weather.pressure}} <text class="metric-unit">hPa</text></text>
+        <text class="metric-lbl">气压</text>
+      </view>
     </view>
     <view class="metric">
       <text class="metric-icon">💧</text>
-      <view><text class="metric-val">{{weather.humidity}}<text class="metric-unit">%</text></text><text class="metric-lbl">湿度</text></view>
+      <view>
+        <text class="metric-val">{{weather.humidity}}<text class="metric-unit">%</text></text>
+        <text class="metric-lbl">湿度</text>
+      </view>
     </view>
     <view class="metric">
       <text class="metric-icon">🌬️</text>
-      <view><text class="metric-val metric-sm">{{weather.wind}}</text><text class="metric-lbl">风力风向</text></view>
+      <view>
+        <text class="metric-val metric-sm">{{weather.wind}}</text>
+        <text class="metric-lbl">风力风向</text>
+      </view>
     </view>
     <view class="metric">
       <text class="metric-icon">🌡️</text>
-      <view><text class="metric-val">{{forecast[0].hi}}°/<text class="metric-unit">{{forecast[0].lo}}°</text></text><text class="metric-lbl">最高/最低</text></view>
+      <view>
+        <text class="metric-val">{{forecast[0].hi}}°/<text class="metric-unit">{{forecast[0].lo}}°</text></text>
+        <text class="metric-lbl">最高/最低</text>
+      </view>
     </view>
   </view>
 
@@ -37,7 +72,16 @@
   </view>
 </view>
 
-<view class="score-card {{score >= 80 ? 'good' : (score >= 55 ? 'ok' : 'bad')}}">
+<view wx:elif="{{activeSpot}}" class="card" style="text-align:center;padding:60rpx;">
+  <text wx:if="{{loading}}" style="font-size:32rpx;">⏳ 加载天气中...</text>
+</view>
+
+<view wx:elif="{{spots.length === 0}}" class="card" style="text-align:center;padding:60rpx;">
+  <text style="font-size:40rpx;">☀️</text>
+  <view style="font-size:24rpx;color:#ccc;margin-top:12rpx;">添加钓点查看当地天气</view>
+</view>
+
+<view wx:if="{{activeSpot && weather}}" class="score-card card {{score >= 80 ? 'good' : (score >= 55 ? 'ok' : 'bad')}}">
   <text class="score-label">今日出钓指数</text>
   <text class="score-value">{{score}}</text>
   <view class="score-advice">

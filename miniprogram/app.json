@@ -22,5 +22,11 @@
     "navigationBarBackgroundColor": "#1AAD5F",
     "navigationBarTitleText": "钓鱼助手",
     "navigationBarTextStyle": "white"
-  }
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于在地图上选择钓点位置并获取当地天气"
+    }
+  },
+  "requiredPrivateInfos": ["chooseLocation", "getLocation"]
 }

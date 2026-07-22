@@ -1,3 +1,37 @@
+/* Spot Section */
+.spot-section { margin-top: 20rpx; }
+.spot-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16rpx; }
+.spot-title { font-size: 28rpx; font-weight: 700; }
+.add-btn {
+  background: var(--green-500); color: #fff; font-size: 24rpx;
+  padding: 10rpx 24rpx; border-radius: 30rpx; line-height: 1; font-weight: 600;
+}
+.empty-spot { text-align: center; padding: 40rpx 0; display: flex; flex-direction: column; align-items: center; }
+
+.spot-scroll { white-space: nowrap; width: 100%; }
+.spot-tag {
+  display: inline-flex; flex-direction: column; align-items: flex-start;
+  padding: 14rpx 24rpx; margin-right: 12rpx; border-radius: 12rpx;
+  background: #F7F8FA; position: relative; min-width: 160rpx;
+}
+.spot-tag.active { background: var(--green-500); color: #fff; }
+.spot-name {
+  font-size: 26rpx; font-weight: 600; max-width: 200rpx;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.spot-addr {
+  font-size: 20rpx; color: #999; max-width: 200rpx;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 4rpx;
+}
+.spot-tag.active .spot-addr { color: rgba(255,255,255,0.7); }
+.spot-close {
+  position: absolute; top: 4rpx; right: 10rpx;
+  font-size: 28rpx; opacity: 0.4;
+}
+
+/* Weather Card */
+.weather-card { margin-top: 20rpx; }
+.weather-location { font-size: 24rpx; color: var(--text-secondary); margin-bottom: 12rpx; }
 .weather-main { display: flex; align-items: center; gap: 20rpx; }
 .weather-icon { font-size: 100rpx; }
 .weather-temp { font-size: 90rpx; font-weight: 200; }
@@ -19,11 +53,12 @@
 .fc-icon { font-size: 40rpx; margin: 8rpx 0; display: block; }
 .fc-temp { font-size: 26rpx; font-weight: 600; }
 
-.score-card { text-align: center; padding: 40rpx 32rpx; border-radius: var(--radius); margin: 20rpx 16rpx; color: #fff; }
-.score-card.good { background: linear-gradient(135deg, #1AAD5F, #20C96A); }
-.score-card.ok { background: linear-gradient(135deg, #FF9A3C, #FFB84D); }
-.score-card.bad { background: linear-gradient(135deg, #909399, #B0B3BB); }
+/* Score Card */
+.score-card { margin-top: 20rpx; text-align: center; padding: 40rpx 32rpx !important; color: #fff !important; background: #999 !important; }
+.score-card.good { background: linear-gradient(135deg, #1AAD5F, #20C96A) !important; }
+.score-card.ok { background: linear-gradient(135deg, #FF9A3C, #FFB84D) !important; }
+.score-card.bad { background: linear-gradient(135deg, #909399, #B0B3BB) !important; }
 .score-label { font-size: 26rpx; opacity: 0.85; }
-.score-value { font-size: 90rpx; font-weight: 800; display: block; line-height: 1.2; }
-.score-advice { font-size: 24rpx; margin-top: 20rpx; line-height: 2; text-align: left; }
+.score-value { font-size: 100rpx; font-weight: 800; display: block; line-height: 1.2; }
+.score-advice { font-size: 24rpx; margin-top: 24rpx; line-height: 2.2; text-align: left; }
 .score-advice text { display: block; }
