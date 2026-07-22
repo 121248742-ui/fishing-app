@@ -12,10 +12,30 @@
     "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
     "list": [
-      { "pagePath": "pages/index/index", "text": "🐟 钓鱼图鉴" },
-      { "pagePath": "pages/circle/circle", "text": "💬 钓鱼圈" },
-      { "pagePath": "pages/weather/weather", "text": "☀️ 天气" },
-      { "pagePath": "pages/atlas/atlas", "text": "👤 我的" }
+      {
+        "pagePath": "pages/index/index",
+        "text": "钓鱼图鉴",
+        "iconPath": "icons/fish_inactive.png",
+        "selectedIconPath": "icons/fish_active.png"
+      },
+      {
+        "pagePath": "pages/circle/circle",
+        "text": "钓友圈",
+        "iconPath": "icons/circle_inactive.png",
+        "selectedIconPath": "icons/circle_active.png"
+      },
+      {
+        "pagePath": "pages/weather/weather",
+        "text": "天气",
+        "iconPath": "icons/weather_inactive.png",
+        "selectedIconPath": "icons/weather_active.png"
+      },
+      {
+        "pagePath": "pages/atlas/atlas",
+        "text": "我的",
+        "iconPath": "icons/me_inactive.png",
+        "selectedIconPath": "icons/me_active.png"
+      }
     ]
   },
   "window": {
