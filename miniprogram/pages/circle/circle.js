@@ -110,8 +110,9 @@ Page({
     }
 
     CDB.addPost(post,
-      function() { that.closeForm(); that.onShow() },
-      function() {
+      function() { that.closeForm(); that.onShow(); wx.showToast({ title: '发布成功', icon: 'success' }) },
+      function(err) {
+        // Cloud failed, save locally
         var posts = wx.getStorageSync('circle_posts') || []
         post.time = new Date().toISOString()
         posts.push(post)
