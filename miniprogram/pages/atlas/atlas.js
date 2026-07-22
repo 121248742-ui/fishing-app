@@ -94,15 +94,19 @@ Page({
       wx.showShareMenu({ withShareTicket: true, menus: ['shareAppMessage', 'shareTimeline'] })
     }
     if (page === 'likes') {
-      var ap = wx.getStorageSync('circle_posts') || []
-      var likes = ap.reduce(function(s,p){return s+(p.likes||0)},0)
-      var comments = ap.reduce(function(s,p){return s+(p.comments?p.comments.length:0)},0)
-      wx.setStorageSync('notify_seen', {likes:likes, comments:comments})
-      this.setData({newLikes:0, newComments:0})
+      // Don't reset on open - only reset when there's new data to see
     }
     this.setData({subPage: page})
   },
   closeSubPage: function() { this.setData({subPage: ''}) },
+  markNotifRead: function() {
+    var ap = wx.getStorageSync('circle_posts') || []
+    var likes = ap.reduce(function(s,p){return s+(p.likes||0)},0)
+    var comments = ap.reduce(function(s,p){return s+(p.comments?p.comments.length:0)},0)
+    wx.setStorageSync('notify_seen', {likes:likes, comments:comments})
+    this.setData({newLikes:0, newComments:0})
+    wx.showToast({title:'已标记已读',icon:'none'})
+  },
   goDetail: function(e) { wx.navigateTo({url:'/pages/detail/detail?id='+e.currentTarget.dataset.id}) },
 
   // My Post Detail
