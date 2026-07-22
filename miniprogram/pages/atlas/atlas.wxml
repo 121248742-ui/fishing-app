@@ -91,7 +91,7 @@
   <view class="sub-head"><text class="sub-back" bindtap="closeSubPage">←</text><text class="sub-title">获赞与互动</text></view>
   <scroll-view scroll-y class="sub-body">
     <view wx:if="{{totalLikes === 0}}" class="empty-state"><text style="font-size:64rpx;">❤️</text><text style="font-size:28rpx;margin-top:16rpx;">还没有收到赞</text></view>
-    <view class="mp-item" wx:for="{{myPosts}}" wx:key="time" wx:if="{{item.likes > 0}}">
+    <view class="mp-item" wx:for="{{myPosts}}" wx:key="time" wx:if="{{item.likes > 0}}" bindtap="openMyPost" data-idx="{{index}}">
       <image wx:if="{{item.photo}}" src="{{item.photo}}" mode="aspectFill" class="mp-thumb"/>
       <view wx:else class="mp-thumb-empty">🎣</view>
       <view class="mp-info"><text class="mp-name">{{item.fishType || '渔获分享'}}</text><text class="mp-meta">❤️{{item.likes}}个赞 · {{item.timeAgo}}</text></view>
