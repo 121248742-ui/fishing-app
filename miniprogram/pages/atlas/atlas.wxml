@@ -30,20 +30,18 @@
   <view class="logout-row" bindtap="doLogout"><text>退出登录</text></view>
 </view>
 
-<view class="header-banner" wx:else style="background:rgba(0,0,0,0.5);">
-  <image class="login-bg" src="/images/user-bg.jpg" mode="aspectFill"/>
+<view class="header-banner" wx:else style="background:linear-gradient(135deg,#1A7A3D,#1AAD5F);padding:48rpx 32rpx;">
   <view class="login-box">
-    <view class="login-sub">登录后记录你的钓鱼旅程</view>
-    <button class="avatar-pick-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-      <image wx:if="{{tempAvatar}}" src="{{tempAvatar}}" class="pick-avatar-preview" mode="aspectFill"/>
-      <text wx:else class="avatar-placeholder-text">+</text>
+    <button class="avatar-btn-simple" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+      <image wx:if="{{tempAvatar}}" src="{{tempAvatar}}" mode="aspectFill" style="width:140rpx;height:140rpx;border-radius:50%;"/>
+      <text wx:else style="font-size:64rpx;">📷</text>
     </button>
-    <view class="pick-row">
-      <text class="pick-label">点击上方获取微信头像</text>
-      <text class="pick-upload" bindtap="uploadAvatar">从相册上传</text>
+    <view style="display:flex;gap:16rpx;align-items:center;">
+      <text style="font-size:24rpx;opacity:0.85;">点击获取微信头像</text>
+      <text style="font-size:24rpx;opacity:0.8;text-decoration:underline;" bindtap="uploadAvatar">从相册上传</text>
     </view>
-    <input type="nickname" class="nickname-input" placeholder="点击输入微信昵称（必填）" bindinput="onNicknameInput" value="{{tempNickname}}"/>
-    <button class="login-btn" bindtap="doLogin">登录</button>
+    <input type="nickname" placeholder="点击输入微信昵称（必填）" bindinput="onNicknameInput" value="{{tempNickname}}" style="background:rgba(255,255,255,0.25);color:#fff;text-align:center;padding:16rpx 40rpx;border-radius:40rpx;font-size:28rpx;width:400rpx;"/>
+    <button bindtap="doLogin" style="background:#fff;color:#1AAD5F;font-size:30rpx;font-weight:700;padding:18rpx 80rpx;border-radius:44rpx;">登录</button>
   </view>
 </view>
 
