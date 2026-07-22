@@ -152,8 +152,8 @@
 .detail-actions {display:flex;align-items:center;padding:0 8rpx 16rpx;border-bottom:1px solid #F0F2F5}
 .detail-like {font-size:28rpx;color:var(--text-secondary)}
 .act-btn {font-size:24rpx;padding:8rpx 24rpx;border-radius:20rpx;margin-left:12rpx}
-.act-edit {color:#1AAD5F;background:#E8F8EF;margin-left:40rpx}
-.act-del {color:#FA5151;background:#FDE8E8}
+.act-edit {color:#1AAD5F;background:#E8F8EF;margin-left:auto}
+.act-del {color:#FA5151;background:#FDE8E8;margin-right:24rpx}
 
 /* Comments */
 .comment-section {padding:20rpx 0 100rpx}
