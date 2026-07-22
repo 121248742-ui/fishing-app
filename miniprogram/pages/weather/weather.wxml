@@ -6,9 +6,6 @@
       <text wx:else class="spot-cur-name">未选择钓点</text>
       <text class="spot-cur-addr">{{activeSpot.address || '点击下方按钮在地图上选择钓点'}}</text>
     </view>
-    <button class="spot-add-btn" bindtap="addSpot">
-      <text class="spot-add-icon">+</text>
-    </button>
   </view>
 
   <scroll-view scroll-x class="spot-scroll" wx:if="{{spots.length > 0}}">
