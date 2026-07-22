@@ -211,10 +211,15 @@ Page({
     this.setData({ detailPost: dp, commentText: '', replyTo: '' })
 
     if (dp._id && dp._id.indexOf('local_') !== 0) {
-      CDB.addComment(dp._id, comment)
+      CDB.addComment(dp._id, comment, null, function() {
+        // Cloud failed, save locally
+        var posts = wx.getStorageSync('circle_posts') || []
+        var rIdx = posts.length - 1 - that.data.detailIdx
+        if (rIdx >= 0) { posts[rIdx].comments = dp.comments; wx.setStorageSync('circle_posts', posts) }
+      })
     } else {
       var posts = wx.getStorageSync('circle_posts') || []
-      var rIdx = posts.length - 1 - this.data.detailIdx
+      var rIdx = posts.length - 1 - that.data.detailIdx
       if (rIdx >= 0) { posts[rIdx].comments = dp.comments; wx.setStorageSync('circle_posts', posts) }
     }
   },

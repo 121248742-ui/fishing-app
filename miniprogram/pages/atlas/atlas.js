@@ -220,6 +220,10 @@ Page({
     vp.comments = vp.comments || []
     vp.comments.push(Object.assign({}, comment, {timeAgo: '刚刚'}))
     this.setData({viewPost: vp, commentText: '', replyTo: ''})
+    // Also save to cloud
+    if (vp._id && vp._id.indexOf('local_') !== 0) {
+      CDB.addComment(vp._id, comment)
+    }
   },
 
   // Delete
