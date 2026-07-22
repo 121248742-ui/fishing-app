@@ -205,25 +205,30 @@ Page({
   sendMyComment: function() {
     var that = this; var text = this.data.commentText.trim(); if (!text) return
     var userInfo = wx.getStorageSync('userInfo') || {}
-    var posts = wx.getStorageSync('circle_posts') || []
-    var realIdx = posts.length - 1 - this.data.viewPostIdx
-    if (realIdx < 0 || realIdx >= posts.length) return
+    var vp = this.data.viewPost
+    if (!vp) return
     var comment = {
       text: text, userName: userInfo.nickName || '钓鱼人',
       replyTo: this.data.replyTo || '',
       time: new Date().toISOString()
     }
-    posts[realIdx].comments = posts[realIdx].comments || []
-    posts[realIdx].comments.push(comment)
-    wx.setStorageSync('circle_posts', posts)
-    var vp = this.data.viewPost
+    // Update display immediately
     vp.comments = vp.comments || []
     vp.comments.push(Object.assign({}, comment, {timeAgo: '刚刚'}))
     this.setData({viewPost: vp, commentText: '', replyTo: ''})
-    // Also save to cloud
+    // Save to cloud
     if (vp._id && vp._id.indexOf('local_') !== 0) {
       CDB.addComment(vp._id, comment)
     }
+    // Also save to local as backup
+    try {
+      var posts = wx.getStorageSync('circle_posts') || []
+      var realIdx = posts.length - 1 - this.data.viewPostIdx
+      if (realIdx >= 0 && realIdx < posts.length) {
+        posts[realIdx].comments = vp.comments
+        wx.setStorageSync('circle_posts', posts)
+      }
+    } catch(e) {}
   },
 
   // Delete
