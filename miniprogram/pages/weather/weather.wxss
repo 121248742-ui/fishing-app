@@ -32,9 +32,15 @@
 .spot-chip {
   display: inline-flex; flex-direction: column; align-items: flex-start;
   padding: 16rpx 24rpx; margin-right: 14rpx; border-radius: 14rpx;
-  background: #F7F8FA; min-width: 140rpx;
+  background: #F7F8FA; min-width: 140rpx; position: relative;
   transition: all 0.2s;
 }
+.spot-chip-close {
+  position: absolute; top: 2rpx; right: 8rpx;
+  font-size: 32rpx; color: #B0B6C0; line-height: 1; padding: 4rpx 8rpx;
+  z-index: 1;
+}
+.spot-chip.active .spot-chip-close { color: rgba(255,255,255,0.7); }
 .spot-chip.active { background: var(--green-500); }
 .spot-chip-name {
   font-size: 26rpx; font-weight: 600; max-width: 180rpx;

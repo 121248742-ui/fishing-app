@@ -14,8 +14,8 @@
   <scroll-view scroll-x class="spot-scroll" wx:if="{{spots.length > 0}}">
     <view class="spot-chip {{activeSpot && activeSpot.name === item.name ? 'active' : ''}}"
       wx:for="{{spots}}" wx:key="name"
-      bindtap="selectSpot" data-idx="{{index}}"
-      bindlongpress="removeSpot" data-idx="{{index}}">
+      bindtap="selectSpot" data-idx="{{index}}">
+      <text class="spot-chip-close" catchtap="removeSpot" data-idx="{{index}}">×</text>
       <text class="spot-chip-name">{{item.name}}</text>
       <text class="spot-chip-addr" wx:if="{{item.address}}">{{item.address}}</text>
     </view>
