@@ -15,28 +15,28 @@
 .header-banner .login-box,
 .header-banner .progress-section { position: relative; z-index: 2; }
 
-/* Login */
-.login-box { display: flex; flex-direction: column; align-items: center; gap: 20rpx; }
-.login-sub { font-size: 26rpx; opacity: 0.9; }
-.avatar-pick-btn {
-  width: 160rpx; height: 160rpx; border-radius: 50%; padding: 0; margin: 0;
-  background: rgba(255,255,255,0.35); border: 3rpx dashed rgba(255,255,255,0.7);
+/* Login Card - no absolute positioning */
+.login-card {
+  margin: 24rpx 16rpx; padding: 56rpx 32rpx; border-radius: var(--radius);
+  background: linear-gradient(135deg, #1A7A3D, #1AAD5F); color: #fff;
+}
+.login-inner { display: flex; flex-direction: column; align-items: center; gap: 20rpx; }
+.avatar-zone {
+  width: 140rpx; height: 140rpx; border-radius: 50%;
+  background: rgba(255,255,255,0.25); border: 3rpx dashed rgba(255,255,255,0.5);
   display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
-.avatar-pick-btn::after { border: none; }
-.pick-avatar-preview { width: 100%; height: 100%; border-radius: 50%; }
-.avatar-placeholder-text { font-size: 64rpx; color: rgba(255,255,255,0.7); font-weight: 300; }
-.pick-row { display: flex; gap: 20rpx; align-items: center; }
-.pick-label { font-size: 24rpx; opacity: 0.8; }
-.pick-upload { font-size: 24rpx; opacity: 0.9; padding: 10rpx 20rpx; background: rgba(255,255,255,0.2); border-radius: 20rpx; }
-.nickname-input {
-  background: rgba(255,255,255,0.3); color: #fff; text-align: center;
+.avatar-preview { width: 140rpx; height: 140rpx; border-radius: 50%; }
+.avatar-empty { font-size: 56rpx; }
+.avatar-tip { font-size: 24rpx; opacity: 0.85; }
+.name-input {
+  background: rgba(255,255,255,0.25); color: #fff; text-align: center;
   padding: 16rpx 40rpx; border-radius: 40rpx; font-size: 28rpx; width: 400rpx;
 }
-.nickname-input::placeholder { color: rgba(255,255,255,0.6); }
-.login-btn {
-  background: rgba(255,255,255,0.95); color: #07C160; font-size: 30rpx;
-  font-weight: 600; padding: 18rpx 80rpx; border-radius: 44rpx; line-height: 1;
+.name-input::placeholder { color: rgba(255,255,255,0.55); }
+.submit-btn {
+  background: #fff; color: #1AAD5F; font-size: 30rpx; font-weight: 700;
+  padding: 18rpx 80rpx; border-radius: 44rpx; line-height: 1; margin-top: 8rpx;
 }
 
 /* Logged in */
