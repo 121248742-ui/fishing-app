@@ -1,6 +1,6 @@
 .header-banner {
   margin: 24rpx 16rpx; padding: 32rpx; border-radius: var(--radius);
-  background-image: url('/images/user-bg.jpg');
+  background-image: url('../../images/user-bg.jpg');
   background-position: center; background-size: cover; background-repeat: no-repeat;
   color: #fff; position: relative;
 }
@@ -18,9 +18,10 @@
 /* Login */
 .login-box { display: flex; flex-direction: column; align-items: center; gap: 16rpx; }
 .avatar-pick-btn {
-  width: 140rpx; height: 140rpx; border-radius: 50%; padding: 0; margin: 0;
-  background: rgba(255,255,255,0.15); border: 4rpx dashed rgba(255,255,255,0.4);
+  width: 160rpx; height: 160rpx; border-radius: 50%; padding: 0; margin: 0;
+  background: rgba(255,255,255,0.3); border: 4rpx dashed rgba(255,255,255,0.6);
   display: flex; align-items: center; justify-content: center; overflow: hidden;
+  position: relative; z-index: 2;
 }
 .avatar-pick-btn::after { border: none; }
 .pick-avatar-preview { width: 100%; height: 100%; border-radius: 50%; }
