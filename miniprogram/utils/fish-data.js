@@ -1,4 +1,4 @@
-const BASE = 'https://121248742-ui.github.io/fishing-app/images/'
+const BASE = 'cloud://cloudbase-d1gq1v8xl0c056a2a.636c-cloudbase-d1gq1v8xl0c056a2a-1456798557/images/'
 
 const FISH_SPECIES = [
   {     id:1, name:"鲫鱼"

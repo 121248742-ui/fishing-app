@@ -1,5 +1,5 @@
 <view class="hero">
-  <image src="{{fish.image}}" mode="aspectFit" class="hero-img"/>
+  <image lazy-load src="{{fish.image}}" mode="aspectFit" class="hero-img"/>
 </view>
 
 <view class="card" style="text-align:center;">
@@ -39,7 +39,7 @@
 <view class="card">
   <view class="section-title">📸 我的渔获</view>
   <view wx:if="{{unlocked}}">
-    <image wx:if="{{photo}}" src="{{photo}}" mode="aspectFit" class="catch-photo"/>
+    <image lazy-load wx:if="{{photo}}" src="{{photo}}" mode="aspectFit" class="catch-photo"/>
     <view class="catch-info">
       <text wx:if="{{weight}}">🎣 {{weight}}斤 · </text>
       <text>{{date}}</text>
@@ -49,7 +49,7 @@
   </view>
   <view wx:else>
     <view class="photo-upload" bindtap="choosePhoto">
-      <image wx:if="{{photo}}" src="{{photo}}" mode="aspectFill" class="catch-upload-preview"/>
+      <image lazy-load wx:if="{{photo}}" src="{{photo}}" mode="aspectFill" class="catch-upload-preview"/>
       <view wx:else class="photo-placeholder-small">
         <text style="font-size:48rpx;">📷</text>
         <text style="font-size:24rpx;color:#ccc;">上传渔获照片来解锁</text>

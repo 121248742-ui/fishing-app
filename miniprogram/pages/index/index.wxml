@@ -10,7 +10,7 @@
 <view wx:else class="fish-list">
   <view class="fish-item {{item.hot ? 'hot' : ''}}" wx:for="{{list}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
     <view class="fish-img-wrap img-bg-{{item.bgIdx}}">
-      <image src="{{item.image}}" mode="aspectFit" class="fish-img"/>
+      <image lazy-load src="{{item.image}}" mode="aspectFit" class="fish-img"/>
     </view>
     <view class="fish-info">
       <view class="fish-name-row">

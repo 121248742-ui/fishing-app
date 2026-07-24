@@ -1,5 +1,12 @@
 var F = require('../../utils/fish-data')
+var CDB = require('../../utils/cloud-db')
 var ALL_FISH = F.FISH_SPECIES
+
+function syncUserSpots(spots) {
+  var u = wx.getStorageSync('userInfo') || {}
+  var uid = u.code || 'local'
+  if (uid !== 'local') CDB.saveUserSpots(uid, spots)
+}
 
 var WEATHER_CODES = {
   0: { icon: '☀️', desc: '晴' }, 1: { icon: '🌤', desc: '大部晴' },
@@ -26,6 +33,28 @@ Page({
     var fishIdx = wx.getStorageSync('weather_fish_idx') || 0
     var fishList = ALL_FISH.map(function(f) { return f.name })
     this.setData({ spots: spots, activeSpot: activeSpot, fishList: fishList, fishIdx: fishIdx })
+    // Pull user spots from cloud (for cross-device sync)
+    var u = wx.getStorageSync('userInfo') || {}
+    if (u.code) {
+      CDB.getAllUserSpots(function(allUserSpots) {
+        allUserSpots.forEach(function(doc) {
+          if (doc.userId === u.code) {
+            var cloudSpots = doc.spots || []
+            var merged = spots.slice()
+            cloudSpots.forEach(function(cs) {
+              if (!merged.some(function(s) { return s.name === cs.name })) {
+                merged.push(cs)
+              }
+            })
+            if (merged.length > spots.length) {
+              wx.setStorageSync('weather_spots', merged)
+              that.setData({ spots: merged })
+              if (!activeSpot && merged.length) that.setData({ activeSpot: merged[0] })
+            }
+          }
+        })
+      })
+    }
     if (activeSpot) {
       this.fetchWeather(activeSpot)
     } else {
@@ -61,6 +90,7 @@ Page({
         var spots = that.data.spots
         spots.splice(e.currentTarget.dataset.idx, 1)
         wx.setStorageSync('weather_spots', spots)
+        syncUserSpots(spots)
         that.onShow()
       }
     })
@@ -77,6 +107,7 @@ Page({
         spots.push({ name: res.name, address: res.address || '', lat: res.latitude, lon: res.longitude })
         wx.setStorageSync('weather_spots', spots)
         wx.setStorageSync('weather_active_spot', spots.length - 1)
+        syncUserSpots(spots)
         that.onShow()
       }
     })

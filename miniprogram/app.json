@@ -1,8 +1,8 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/circle/circle",
     "pages/weather/weather",
+    "pages/map/map",
     "pages/atlas/atlas",
     "pages/detail/detail"
   ],
@@ -19,16 +19,16 @@
         "selectedIconPath": "icons/fish_active.png"
       },
       {
-        "pagePath": "pages/circle/circle",
-        "text": "钓友圈",
-        "iconPath": "icons/circle_inactive.png",
-        "selectedIconPath": "icons/circle_active.png"
-      },
-      {
         "pagePath": "pages/weather/weather",
         "text": "天气",
         "iconPath": "icons/weather_inactive.png",
         "selectedIconPath": "icons/weather_active.png"
+      },
+      {
+        "pagePath": "pages/map/map",
+        "text": "钓点地图",
+        "iconPath": "icons/map_inactive.png",
+        "selectedIconPath": "icons/map_active.png"
       },
       {
         "pagePath": "pages/atlas/atlas",

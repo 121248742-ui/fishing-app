@@ -5,47 +5,6 @@ try {
 } catch(e) {}
 var _ = db ? db.command : null
 
-// ===== POSTS =====
-function getPosts(success, fail) {
-  if (!db) return fail && fail()
-  db.collection('posts').orderBy('createTime', 'desc').limit(100).get({
-    success: function(r) { success(r.data) },
-    fail: fail
-  })
-}
-
-function addPost(data, success, fail) {
-  if (!db) return fail && fail()
-  data.createTime = new Date()
-  data.comments = []
-  data.likes = 0
-  data.likedBy = []
-  db.collection('posts').add({ data: data, success: success, fail: fail })
-}
-
-function updatePost(id, data, success, fail) {
-  if (!db) return fail && fail()
-  db.collection('posts').doc(id).update({ data: data, success: success, fail: fail })
-}
-
-function removePost(id, success, fail) {
-  if (!db) return fail && fail()
-  db.collection('posts').doc(id).remove({ success: success, fail: fail })
-}
-
-// ===== COMMENTS (stored on post) =====
-function addComment(postId, comment, success, fail) {
-  if (!db) return fail && fail()
-  db.collection('posts').doc(postId).get({
-    success: function(r) {
-      var comments = r.data.comments || []
-      comments.push({ text: comment.text, userName: comment.userName, replyTo: comment.replyTo || '', createTime: new Date() })
-      db.collection('posts').doc(postId).update({ data: { comments: comments }, success: success, fail: fail })
-    },
-    fail: fail
-  })
-}
-
 // ===== ATLAS =====
 function saveAtlas(userId, data, success, fail) {
   if (!db) return fail && fail()
@@ -67,4 +26,43 @@ function getAtlas(userId, success, fail) {
   })
 }
 
-module.exports = { getPosts, addPost, updatePost, removePost, addComment, saveAtlas, getAtlas }
+// ===== FISHING SPOTS =====
+function getSpots(success, fail) {
+  if (!db) return fail && fail()
+  db.collection('fishing_spots').orderBy('createTime', 'desc').limit(200).get({
+    success: function(r) { success(r.data) },
+    fail: fail
+  })
+}
+
+function addSpot(data, success, fail) {
+  if (!db) return fail && fail()
+  data.createTime = db.serverDate()
+  db.collection('fishing_spots').add({ data: data, success: success, fail: fail })
+}
+
+// ===== USER SPOTS (personal weather spots, visible to all) =====
+function getAllUserSpots(success, fail) {
+  if (!db) return fail && fail()
+  db.collection('user_spots').limit(500).get({
+    success: function(r) { success(r.data) },
+    fail: fail
+  })
+}
+
+function saveUserSpots(userId, spots, success, fail) {
+  if (!db) return fail && fail()
+  db.collection('user_spots').where({ userId: userId }).get({
+    success: function(r) {
+      if (r.data.length) {
+        db.collection('user_spots').doc(r.data[0]._id).update({ data: { spots: spots } })
+      } else {
+        db.collection('user_spots').add({ data: { userId: userId, spots: spots, createTime: new Date() } })
+      }
+      if (success) success()
+    },
+    fail: fail
+  })
+}
+
+module.exports = { saveAtlas, getAtlas, getSpots, addSpot, getAllUserSpots, saveUserSpots }

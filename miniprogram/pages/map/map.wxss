@@ -1,0 +1,18 @@
+.full-map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+
+.map-controls { position: fixed; top: 120rpx; right: 24rpx; display: flex; flex-direction: column; gap: 16rpx; z-index: 100; align-items: flex-end; }
+.ctrl-btn { width: 72rpx; height: 72rpx; background: #fff; border-radius: 50%; box-shadow: 0 4px 16px rgba(0,0,0,0.12); display: flex; align-items: center; justify-content: center; font-size: 32rpx; }
+.ctrl-btn:active { background: #f0f0f0; }
+.ctrl-count { background: rgba(0,0,0,0.6); color: #fff; font-size: 22rpx; padding: 8rpx 20rpx; border-radius: 24rpx; }
+
+/* Bottom Sheet */
+.bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 28rpx 28rpx 0 0; z-index: 200; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); padding-bottom: calc(24rpx + env(safe-area-inset-bottom)); }
+.sheet-handle { width: 60rpx; height: 6rpx; background: #D1D5DB; border-radius: 3rpx; margin: 16rpx auto 8rpx; }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; padding: 12rpx 28rpx 16rpx; }
+.sheet-title { font-size: 32rpx; font-weight: 700; }
+.sheet-close { font-size: 36rpx; color: #999; padding: 8rpx; }
+.sheet-body { padding: 0 28rpx 24rpx; }
+.sheet-addr { font-size: 26rpx; color: var(--text-secondary); display: block; margin-bottom: 12rpx; }
+.sheet-desc { font-size: 28rpx; color: var(--text); line-height: 1.6; display: block; margin-bottom: 12rpx; }
+.sheet-user { font-size: 24rpx; color: #999; display: block; margin-bottom: 20rpx; }
+.sheet-nav-btn { background: linear-gradient(135deg,#1AAD5F,#2BD472); color: #fff; width: 100%; border-radius: 12rpx; font-size: 30rpx; font-weight: 600; }

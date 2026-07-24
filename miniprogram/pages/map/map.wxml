@@ -1,0 +1,35 @@
+<map
+  id="fishingMap"
+  class="full-map"
+  latitude="{{latitude}}"
+  longitude="{{longitude}}"
+  scale="{{scale}}"
+  markers="{{markers}}"
+  bindmarkertap="onMarkerTap"
+  bindregionchange="onRegionChange"
+  show-location="{{true}}"
+  show-compass="{{true}}"
+  enable-zoom="{{true}}"
+  enable-scroll="{{true}}"
+/>
+
+<!-- Controls -->
+<view class="map-controls">
+  <view class="ctrl-btn" bindtap="locateMe">📍</view>
+  <view class="ctrl-count">视野内 {{markers.length}}/{{allSpots.length}} 个钓点</view>
+</view>
+
+<!-- Spot Detail Sheet -->
+<view wx:if="{{showPanel && selectedSpot}}" class="bottom-sheet">
+  <view class="sheet-handle"></view>
+  <view class="sheet-head">
+    <text class="sheet-title">📍 {{selectedSpot.name}}</text>
+    <text class="sheet-close" bindtap="closePanel">✕</text>
+  </view>
+  <view class="sheet-body">
+    <text wx:if="{{selectedSpot.address}}" class="sheet-addr">🗺️ {{selectedSpot.address}}</text>
+    <text wx:if="{{selectedSpot.desc}}" class="sheet-desc">{{selectedSpot.desc}}</text>
+    <text class="sheet-user">👤 {{selectedSpot.userName || '匿名钓友'}} · {{selectedSpot.type === 'personal' ? '个人钓点' : '共享钓点'}}</text>
+    <button class="sheet-nav-btn" bindtap="goSpot">🧭 导航到此钓点</button>
+  </view>
+</view>
